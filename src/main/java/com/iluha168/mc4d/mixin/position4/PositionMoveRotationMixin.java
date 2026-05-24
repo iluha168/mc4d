@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.position4;
 
-import com.iluha168.mc4d.MC4D;
+import com.iluha168.mc4d.world.entity.Relative4;
 import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.sugar.Local;
 import io.netty.buffer.ByteBuf;
@@ -36,7 +36,7 @@ public class PositionMoveRotationMixin {
 		@Local(argsOnly = true, name = "change") PositionMoveRotation change,
 		@Local(argsOnly = true, name = "relatives") Set<Relative> relatives
 	) {
-		double offsetW = relatives.contains(MC4D.RelativeW) ? ((Vec4) source.position()).w : 0.0;
+		double offsetW = relatives.contains(Relative4.W) ? ((Vec4) source.position()).w : 0.0;
 		return new Vec4(x, y, z, offsetW + ((Vec4) change.position()).w);
 	}
 }

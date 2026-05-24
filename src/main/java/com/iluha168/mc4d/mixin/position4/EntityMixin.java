@@ -9,6 +9,7 @@ import net.minecraft.core.SectionPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
+import net.minecraft.util.Util;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.PositionMoveRotation;
 import net.minecraft.world.level.ChunkPos;
@@ -102,7 +103,7 @@ public abstract class EntityMixin implements Entity4 {
 	 */
 	@Overwrite
 	public final void setPosRaw(double x, double y, double z) {
-		throw new IllegalArgumentException("Not patched 3D space: use Entity4.setPosRaw instead.");
+		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use Entity4.setPosRaw instead."));
 	}
 
 	@Override
@@ -149,7 +150,7 @@ public abstract class EntityMixin implements Entity4 {
 	 */
 	@Overwrite
 	public void setPos(double x, double y, double z) {
-		throw new IllegalArgumentException("Not patched 3D space: use setPos(Vec3).");
+		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use setPos(Vec3)."));
 	}
 
 	@Redirect(method = "setPos(Lnet/minecraft/world/phys/Vec3;)V", at = @At(
@@ -167,7 +168,7 @@ public abstract class EntityMixin implements Entity4 {
 	 */
 	@Overwrite
 	public void snapTo(double x, double y, double z, float yRot, float xRot) {
-		throw new IllegalArgumentException("Not patched 3D space: use snapTo(Vec3, yRot, xRot).");
+		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use snapTo(Vec3, yRot, xRot)."));
 	}
 
 	@Redirect(method = "snapTo(Lnet/minecraft/world/phys/Vec3;FF)V", at = @At(
@@ -189,7 +190,7 @@ public abstract class EntityMixin implements Entity4 {
 	 */
 	@Overwrite
 	public void snapTo(double x, double y, double z) {
-		throw new IllegalArgumentException("Not patched 3D space: use snapTo(Vec3).");
+		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use snapTo(Vec3)."));
 	}
 
 	@Redirect(method = "snapTo(Lnet/minecraft/world/phys/Vec3;)V", at = @At(
@@ -206,7 +207,7 @@ public abstract class EntityMixin implements Entity4 {
 	 */
 	@Overwrite
 	public void absSnapTo(double x, double y, double z) {
-		throw new IllegalArgumentException("Not patched 3D space: use Entity4.absSnapTo instead.");
+		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use Entity4.absSnapTo instead."));
 	}
 
 	@Override
@@ -226,7 +227,7 @@ public abstract class EntityMixin implements Entity4 {
 	 */
 	@Overwrite
 	public void absSnapTo(double x, double y, double z, float yRot, float xRot) {
-		throw new IllegalArgumentException("Not patched 3D space: use Entity4.absSnapTo instead.");
+		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use Entity4.absSnapTo instead."));
 	}
 
 	@Override

@@ -7,7 +7,9 @@ The goal of this mod is to make that dimension act identical to the existing 3.
 > Create a new world after installing the mod.
 
 ## Features
-- All entities have 4D positions. The 4th axis is labeled "W".
+- The 4th axis, labeled "W".
+- 2 new `Direction`s: "Ana" for positive W and "kata" for negative W.
+- All entities have 4D positions.
 
 ## Mod compatibility
 If a mod uses vanilla dimension abstractions like `Vec3`, `AABB`, etc., and does not operate on each individual dimension, it should work fine.

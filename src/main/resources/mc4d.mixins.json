@@ -3,6 +3,11 @@
   "package": "com.iluha168.mc4d.mixin",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
+    "position4.AABBMixin",
+    "position4.DirectionMixin",
+    "position4.DirectionMixin$AxisMixin",
+    "position4.DirectionMixin$AxisMixin$XYZAxisMixin",
+    "position4.DirectionMixin$PlaneMixin",
     "position4.EntityMixin",
     "position4.PlayerListMixin",
     "position4.PositionMixin",
@@ -10,9 +15,13 @@
     "position4.RelativeMixin",
     "position4.ServerboundMovePlayerPacketMixin",
     "position4.ServerboundMovePlayerPacketMixin$PosMixin",
-    "position4.ServerGamePacketListenerImplMixin"
+    "position4.ServerboundMovePlayerPacketMixin$PosRotMixin",
+    "position4.ServerGamePacketListenerImplMixin",
+    "position4.Vec3iMixin"
   ],
   "client": [
+    "position4.ClientPacketListenerMixin",
+    "position4.DebugEntryPositionMixin",
     "position4.LocalPlayerMixin"
   ],
   "server": [],

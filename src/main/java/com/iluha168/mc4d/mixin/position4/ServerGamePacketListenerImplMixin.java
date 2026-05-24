@@ -12,6 +12,7 @@ import com.llamalad7.mixinextras.sugar.ref.LocalDoubleRef;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.util.Util;
 import net.minecraft.world.entity.PositionMoveRotation;
 import net.minecraft.world.entity.Relative;
 import net.minecraft.world.phys.Vec3;
@@ -52,7 +53,7 @@ public abstract class ServerGamePacketListenerImplMixin implements ServerGamePac
 	 */
 	@Overwrite
 	public void teleport(double x, double y, double z, float yRot, float xRot) {
-		throw new IllegalArgumentException("Not patched 3D space: use ServerGamePacketListenerImpl4.teleport.");
+		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use ServerGamePacketListenerImpl4.teleport."));
 	}
 
 	@Override
