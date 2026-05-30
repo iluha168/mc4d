@@ -7,7 +7,7 @@ The goal of this mod is to make that dimension act identical to the existing 3.
 > Create a new world after installing the mod.
 
 ## Features
-- The 4th axis, labeled "W".
+- The 4th axis, labeled "W". It is the 3rd **horizontal** axis.
 - 2 new `Direction`s: "Ana" for positive W and "kata" for negative W.
 - All entities have 4D positions.
 

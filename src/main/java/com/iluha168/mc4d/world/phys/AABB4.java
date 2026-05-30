@@ -16,6 +16,11 @@ import org.jspecify.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Adds 4th dimension to 3D AABBs.
+ * Any operation on AABB4 returns an AABB4: AABB + AABB4 = AABB; AABB4 + AABB = AABB4.
+ * Callers should be oblivious that they work with 4D boxes.
+ */
 public class AABB4 extends AABB implements IAABB4 {
 	public static final double EPSILON = 1.0E-7;
 	public static final AABB4 INFINITE = new AABB4(
@@ -288,7 +293,11 @@ public class AABB4 extends AABB implements IAABB4 {
 	}
 
 	public boolean intersects(AABB aabb) {
-		return this.intersects(aabb.minX, aabb.minY, aabb.minZ, aabb.maxX, aabb.maxY, aabb.maxZ);
+		IAABB4 aabb4 = (IAABB4) aabb;
+		return this.intersects(
+			aabb.minX, aabb.minY, aabb.minZ, aabb4.minW(),
+			aabb.maxX, aabb.maxY, aabb.maxZ, aabb4.maxW()
+		);
 	}
 
 	@Override

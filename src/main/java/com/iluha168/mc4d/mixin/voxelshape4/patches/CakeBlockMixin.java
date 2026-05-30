@@ -1,0 +1,25 @@
+package com.iluha168.mc4d.mixin.voxelshape4.patches;
+
+import com.iluha168.mc4d.world.level.block.Block4;
+import net.minecraft.world.level.block.CakeBlock;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
+
+@Mixin(CakeBlock.class)
+public class CakeBlockMixin {
+	@Redirect(method = "lambda$static$0", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/level/block/Block;box(DDDDDD)Lnet/minecraft/world/phys/shapes/VoxelShape;"
+	))
+	private static VoxelShape northWestLeg(
+		double minX, double minY, double minZ,
+		double maxX, double maxY, double maxZ
+	) {
+		return Block4.box(
+			minX, minY, minZ, minZ,
+			maxX, maxY, maxZ, maxZ
+		);
+	}
+}

@@ -2,6 +2,10 @@ package com.iluha168.mc4d.core;
 
 import net.minecraft.core.Direction;
 
+/**
+ * <b>All {@link Direction}</b> instances implement {@link Direction4}.
+ * Use {@link Direction4#as} for type-casting.
+ */
 public interface Direction4 {
 	Direction KATA = Direction.valueOf("KATA");
 	Direction ANA = Direction.valueOf("ANA");
@@ -12,6 +16,10 @@ public interface Direction4 {
 		return (Direction4) (Object) direction;
 	}
 
+	/**
+	 * <b>All {@link Direction.Axis}</b> instances implement {@link Direction4.Axis}.
+	 * Use {@link Direction4.Axis#as} for type-casting.
+	 */
 	interface Axis {
 		Direction.Axis W = Direction.Axis.valueOf("W");
 

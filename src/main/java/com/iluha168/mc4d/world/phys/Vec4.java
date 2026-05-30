@@ -19,6 +19,11 @@ import org.jspecify.annotations.NonNull;
 import java.util.EnumSet;
 import java.util.List;
 
+/**
+ * Adds 4th dimension to 3D vectors.
+ * Any operation on Vec4 returns a Vec4: Vec3 + Vec4 = Vec3; Vec4 + Vec3 = Vec4.
+ * Callers should be oblivious that they work with 4D vectors.
+ */
 public class Vec4 extends Vec3 implements Position4 {
 	public static final Codec<Vec4> CODEC = Codec.DOUBLE
 		.listOf()

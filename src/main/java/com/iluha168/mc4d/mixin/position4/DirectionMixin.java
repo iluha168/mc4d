@@ -11,29 +11,66 @@ import net.minecraft.util.Util;
 import org.apache.commons.lang3.ArrayUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 @SuppressWarnings("AddedEnumConstantsNamePattern")
 @Mixin(Direction.class)
 public enum DirectionMixin implements Direction4 {
-	KATA(6, 7, -1, "kata", Direction.AxisDirection.NEGATIVE, Direction4.Axis.W, new Vec4i(0, 0, 0, -1)),
-	ANA (7, 6, -1, "ana" , Direction.AxisDirection.POSITIVE, Direction4.Axis.W, new Vec4i(0, 0, 0, 1));
+	KATA(6, 7, 4, "kata", Direction.AxisDirection.NEGATIVE, Direction4.Axis.W, new Vec4i(0, 0, 0, -1)),
+	ANA (7, 6, 5, "ana" , Direction.AxisDirection.POSITIVE, Direction4.Axis.W, new Vec4i(0, 0, 0, 1));
 
 	@Shadow
-	DirectionMixin(int data3d, int oppositeIndex, int data2d, String name, Direction.AxisDirection axisDirection, Direction.Axis axis, Vec3i normal) {}
+	DirectionMixin(
+		int data3d,
+		int oppositeIndex,
+		/* TODO Represents rotation around the Y axis. Makes no sense in 4D */ int data2d,
+		String name,
+		Direction.AxisDirection axisDirection,
+		Direction.Axis axis,
+		Vec3i normal
+	) {}
 
 	@Shadow
 	@Final
 	private Vec3i normal;
 
+	// TODO orderedByNearest
+	// TODO makeDirectionArray
+	// TODO rotate
+	// TODO getYRot
+	// TODO getRotation
+	// TODO getFacingAxis
+	// TODO getClockWise
+	// TODO getCounterClockWise
+
+	@WrapMethod(method = "getClockWise()Lnet/minecraft/core/Direction;")
+	Direction getClockWiseYW(Operation<Direction> original) {
+		Direction This = (Direction) (Object) this;
+		return This == Direction4.KATA || This == Direction4.ANA ? This : original.call();
+	}
+
+	// TODO getClockWiseX
+	// TODO getCounterClockWiseX
+	// TODO getClockWiseZ
+	// TODO getCounterClockWiseZ
+
+	@WrapMethod(method = "getCounterClockWise()Lnet/minecraft/core/Direction;")
+	Direction getCounterClockWiseYW(Operation<Direction> original) {
+		Direction This = (Direction) (Object) this;
+		return This == Direction4.KATA || This == Direction4.ANA ? This : original.call();
+	}
+
 	@Override
 	public int getStepW() {
 		return ((Position4i) this.normal).getZ();
 	}
+
+	// TODO step
 
 	@WrapMethod(method = "fromAxisAndDirection")
 	private static Direction fromAxisAndDirection4(Direction.Axis axis, Direction.AxisDirection direction, Operation<Direction> original) {
@@ -42,7 +79,15 @@ public enum DirectionMixin implements Direction4 {
 			: original.call(axis, direction);
 	}
 
-	// TODO mixin static and non-static methods
+	// TODO getApproximateNearest
+	// TODO getApproximateNearest
+	// TODO getApproximateNearest
+	// TODO getNearest
+	// TODO getNearest
+	// TODO axisStepOrder
+	// TODO getUnitVec3
+	// TODO getUnitVec3f
+	// TODO isFacingAngle
 
 	@Mixin(Direction.Axis.class)
 	enum AxisMixin implements Direction4.Axis {
@@ -71,7 +116,76 @@ public enum DirectionMixin implements Direction4 {
 			public boolean choose(boolean x, boolean y, boolean z) {
 				throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: choose"));
 			}
+
+			@Override
+			public int choose(int x, int y, int z, int w) {
+				return w;
+			}
+
+			@Override
+			public double choose(double x, double y, double z, double w) {
+				return w;
+			}
+
+			@Override
+			public boolean choose(boolean x, boolean y, boolean z, boolean w) {
+				return w;
+			}
 		};
+
+		@Mixin(targets = "net/minecraft/core/Direction$Axis$1")
+		static class XAxisMixin implements Direction4.Axis {
+			@Override
+			public int choose(int x, int y, int z, int w) {
+				return x;
+			}
+
+			@Override
+			public double choose(double x, double y, double z, double w) {
+				return x;
+			}
+
+			@Override
+			public boolean choose(boolean x, boolean y, boolean z, boolean w) {
+				return x;
+			}
+		}
+
+		@Mixin(targets = "net/minecraft/core/Direction$Axis$2")
+		static class YAxisMixin implements Direction4.Axis {
+			@Override
+			public int choose(int x, int y, int z, int w) {
+				return y;
+			}
+
+			@Override
+			public double choose(double x, double y, double z, double w) {
+				return y;
+			}
+
+			@Override
+			public boolean choose(boolean x, boolean y, boolean z, boolean w) {
+				return y;
+			}
+		}
+
+		@Mixin(targets = "net/minecraft/core/Direction$Axis$3")
+		static class ZAxisMixin implements Direction4.Axis {
+			@Override
+			public int choose(int x, int y, int z, int w) {
+				return z;
+			}
+
+			@Override
+			public double choose(double x, double y, double z, double w) {
+				return z;
+			}
+
+			@Override
+			public boolean choose(boolean x, boolean y, boolean z, boolean w) {
+				return z;
+			}
+		}
 
 		@Mixin(targets = {
 			"net/minecraft/core/Direction$Axis$1",
@@ -83,8 +197,8 @@ public enum DirectionMixin implements Direction4 {
 			 * @author iluha168
 			 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
 			 */
-			@Overwrite
-			public int choose(int x, int y, int z) {
+			@Inject(method = "choose(III)I", at = @At("HEAD"))
+			void choose(int x, int y, int z, CallbackInfoReturnable<Integer> cir) {
 				throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use Direction4.axis.choose instead."));
 			}
 
@@ -92,8 +206,8 @@ public enum DirectionMixin implements Direction4 {
 			 * @author iluha168
 			 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
 			 */
-			@Overwrite
-			public boolean choose(boolean x, boolean y, boolean z) {
+			@Inject(method = "choose(ZZZ)Z", at = @At("HEAD"))
+			void choose(boolean x, boolean y, boolean z, CallbackInfoReturnable<Boolean> cir) {
 				throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use Direction4.Axis.choose instead."));
 			}
 
@@ -101,8 +215,8 @@ public enum DirectionMixin implements Direction4 {
 			 * @author iluha168
 			 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
 			 */
-			@Overwrite
-			public double choose(double x, double y, double z) {
+			@Inject(method = "choose(DDD)D", at = @At("HEAD"))
+			void choose(double x, double y, double z, CallbackInfoReturnable<Double> cir) {
 				throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use Direction4.Axis.choose instead."));
 			}
 		}
@@ -126,34 +240,13 @@ public enum DirectionMixin implements Direction4 {
 		AxisMixin(String name) {}
 
 		@Override
-		public int choose(int x, int y, int z, int w) {
-			if ((Object) this == Direction4.Axis.W) return w;
-			return switch ((Direction.Axis) (Object) this) {
-				case X -> x;
-				case Y -> y;
-				case Z -> z;
-			};
-		}
+		public abstract int choose(int x, int y, int z, int w);
 
 		@Override
-		public boolean choose(boolean x, boolean y, boolean z, boolean w) {
-			if ((Object) this == Direction4.Axis.W) return w;
-			return switch ((Direction.Axis) (Object) this) {
-				case X -> x;
-				case Y -> y;
-				case Z -> z;
-			};
-		}
+		public abstract boolean choose(boolean x, boolean y, boolean z, boolean w);
 
 		@Override
-		public double choose(double x, double y, double z, double w) {
-			if ((Object) this == Direction4.Axis.W) return w;
-			return switch ((Direction.Axis) (Object) this) {
-				case X -> x;
-				case Y -> y;
-				case Z -> z;
-			};
-		}
+		public abstract double choose(double x, double y, double z, double w);
 
 		@WrapMethod(method = "isHorizontal")
 		boolean isHorizontal(Operation<Boolean> original) {
