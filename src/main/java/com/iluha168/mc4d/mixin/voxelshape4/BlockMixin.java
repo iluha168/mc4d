@@ -1,10 +1,12 @@
 package com.iluha168.mc4d.mixin.voxelshape4;
 
 import com.iluha168.mc4d.world.level.block.Block4;
+import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -56,6 +58,14 @@ public class BlockMixin {
 			minX, minY, minZ, 8 - halfW,
 			maxX, maxY, maxZ, 8 + halfW
 		);
+	}
+
+	@Redirect(method = "updateEntityMovementAfterFallOn", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/phys/Vec3;multiply(DDD)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 updateEntityMovementAfterFallOn(Vec3 movement, double xScale, double yScale, double zScale) {
+		return ((Vec4) movement).multiply(xScale, yScale, zScale, zScale);
 	}
 
 	// TODO everything else

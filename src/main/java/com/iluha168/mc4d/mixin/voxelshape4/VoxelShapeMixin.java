@@ -4,12 +4,15 @@ import com.iluha168.mc4d.core.Direction4;
 import com.iluha168.mc4d.core.Position4;
 import com.iluha168.mc4d.core.Position4i;
 import com.iluha168.mc4d.world.phys.AABB4;
+import com.iluha168.mc4d.world.phys.Vec4;
 import com.iluha168.mc4d.world.phys.shapes.ArrayVoxelShape4;
 import com.iluha168.mc4d.world.phys.shapes.DiscreteVoxelShape4;
 import com.iluha168.mc4d.world.phys.shapes.Shapes4;
 import com.iluha168.mc4d.world.phys.shapes.VoxelShape4;
 import com.llamalad7.mixinextras.sugar.Local;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
+import net.minecraft.core.AxisCycle;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.util.Util;
@@ -46,6 +49,12 @@ class VoxelShapeMixin implements VoxelShape4 {
 
 	@Shadow
 	public abstract boolean isEmpty();
+
+	@Shadow
+	protected abstract int findIndex(Direction.Axis axis, double coord);
+
+	@Shadow
+	protected abstract double get(Direction.Axis axis, int i);
 
 	@Redirect(method = "bounds", at = @At(value = "NEW", target = "(DDDDDD)Lnet/minecraft/world/phys/AABB;"))
 	AABB bounds(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
@@ -118,7 +127,30 @@ class VoxelShapeMixin implements VoxelShape4 {
 		);
 	}
 
-	// TODO forAllEdges
+	/**
+	 * @author iluha168
+	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
+	 */
+	@Overwrite
+	public void forAllEdges(Shapes.DoubleLineConsumer consumer) {
+		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use VoxelShape4#forAllEdges instead."));
+	}
+	@Override
+	public void forAllEdges(Shapes4.DoubleLineConsumer consumer) {
+		((DiscreteVoxelShape4) this.shape).forAllEdges(
+			(xi1, yi1, zi1, wi1, xi2, yi2, zi2, wi2) -> consumer.consume(
+				this.get(Direction.Axis.X, xi1),
+				this.get(Direction.Axis.Y, yi1),
+				this.get(Direction.Axis.Z, zi1),
+				this.get(Direction4.Axis.W, wi1),
+				this.get(Direction.Axis.X, xi2),
+				this.get(Direction.Axis.Y, yi2),
+				this.get(Direction.Axis.Z, zi2),
+				this.get(Direction4.Axis.W, wi2)
+			),
+			true
+		);
+	}
 
 	/**
 	 * @author iluha168
@@ -162,7 +194,23 @@ class VoxelShapeMixin implements VoxelShape4 {
 
 	// TODO min
 	// TODO max
-	// TODO clip
+
+	@Redirect(method = "clip", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/phys/shapes/DiscreteVoxelShape;isFullWide(III)Z"
+	))
+	boolean clip(
+		DiscreteVoxelShape shape, int x, int y, int z,
+		@Local(name = "testPoint") Vec3 testPoint,
+		@Local(argsOnly = true, name = "pos") BlockPos pos
+	) {
+		if (!(testPoint instanceof Vec4 testPoint4)) {
+			throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: supply a Vec4."));
+		}
+		int w = this.findIndex(Direction4.Axis.W, testPoint4.w - ((Position4i) pos).getW());
+		return ((DiscreteVoxelShape4) shape).isFullWide(x, y, z, w);
+	}
+
 	// TODO closestPointTo
 
 	@ModifyConstant(method = "getFaceShape", constant = @Constant(intValue = 6))
@@ -170,6 +218,65 @@ class VoxelShapeMixin implements VoxelShape4 {
 		return 8; // Direction.values().length
 	}
 
-	// TODO collideX
-	// TODO toString
+	/**
+	 * @author iluha168
+	 * @reason Way too tightly coupled with 3D, cant mixin a loop?
+	 */
+	@Overwrite
+	protected double collideX(AxisCycle transform, AABB moving, double distance) {
+		if (this.isEmpty()) {
+			return distance;
+		}
+		if (Math.abs(distance) < Shapes.EPSILON) {
+			return 0.0;
+		}
+		
+		AxisCycle inverse = transform.inverse();
+		Direction.Axis aAxis = inverse.cycle(Direction.Axis.X); // aAxis must always be the axis we are trying to move on!
+		Direction.Axis bAxis = inverse.cycle(Direction.Axis.Y);
+		Direction.Axis cAxis = inverse.cycle(Direction.Axis.Z);
+		Direction.Axis dAxis = inverse.cycle(Direction4.Axis.W);
+
+		double maxA = moving.max(aAxis);
+		double minA = moving.min(aAxis);
+
+		int aMin = this.findIndex(aAxis, minA + Shapes.EPSILON);
+		int aMax = this.findIndex(aAxis, maxA - Shapes.EPSILON);
+		int bMin = Math.max(0, this.findIndex(bAxis, moving.min(bAxis) + Shapes.EPSILON));
+		int bMax = Math.min(this.shape.getSize(bAxis), this.findIndex(bAxis, moving.max(bAxis) - Shapes.EPSILON) + 1);
+		int cMin = Math.max(0, this.findIndex(cAxis, moving.min(cAxis) + Shapes.EPSILON));
+		int cMax = Math.min(this.shape.getSize(cAxis), this.findIndex(cAxis, moving.max(cAxis) - Shapes.EPSILON) + 1);
+		int dMin = Math.max(0, this.findIndex(dAxis, moving.min(dAxis) + Shapes.EPSILON));
+		int dMax = Math.min(this.shape.getSize(dAxis), this.findIndex(dAxis, moving.max(dAxis) - Shapes.EPSILON) + 1);
+
+		int aSize = this.shape.getSize(aAxis);
+		DiscreteVoxelShape4 shape4 = (DiscreteVoxelShape4) this.shape;
+		if (distance > 0.0) {
+			for (int a = aMax + 1; a < aSize; a++)
+				for (int b = bMin; b < bMax; b++)
+					for (int c = cMin; c < cMax; c++)
+						for (int d = dMin; d < dMax; d++)
+							if (shape4.isFullWide(inverse, a, b, c, d)) {
+								double newDistance = this.get(aAxis, a) - maxA;
+								if (newDistance >= -Shapes.EPSILON) {
+									distance = Math.min(distance, newDistance);
+								}
+								return distance;
+							}
+		} else if (distance < 0.0) {
+			for (int a = aMin - 1; a >= 0; a--)
+				for (int b = bMin; b < bMax; b++)
+					for (int c = cMin; c < cMax; c++)
+						for (int d = dMin; d < dMax; d++)
+							if (shape4.isFullWide(inverse, a, b, c, d)) {
+								double newDistance = this.get(aAxis, a + 1) - minA;
+								if (newDistance <= Shapes.EPSILON) {
+									distance = Math.max(distance, newDistance);
+								}
+								return distance;
+							}
+		}
+
+		return distance;
+	}
 }

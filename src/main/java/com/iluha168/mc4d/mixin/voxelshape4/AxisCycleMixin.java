@@ -2,17 +2,12 @@ package com.iluha168.mc4d.mixin.voxelshape4;
 
 import com.iluha168.mc4d.core.AxisCycle4;
 import com.iluha168.mc4d.core.Direction4;
-import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.core.AxisCycle;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Util;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Constant;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @SuppressWarnings("AddedEnumConstantsNamePattern")
@@ -141,21 +136,16 @@ enum AxisCycleMixin implements AxisCycle4 {
 	@Shadow
 	public abstract AxisCycle inverse();
 
-	@WrapMethod(method = "between")
-	private static AxisCycle between(Direction.Axis from, Direction.Axis _to, Operation<AxisCycle> original) {
-		if (from == Direction4.Axis.W && _to == Direction4.Axis.W) {
-			return AxisCycle.NONE;
-		}
-		if (from == Direction4.Axis.W) return switch (_to) {
-			case X -> AxisCycle.BACKWARD;
-			case Y -> AxisCycle4.TRANSPOSE;
-			case Z -> AxisCycle.FORWARD;
-		};
-		if (_to == Direction4.Axis.W) return switch (_to) {
-			case X -> AxisCycle.FORWARD;
-			case Y -> AxisCycle4.TRANSPOSE;
-			case Z -> AxisCycle.BACKWARD;
-		};
-		return original.call(from, _to);
+	@Redirect(method = "<clinit>", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/core/AxisCycle;values()[Lnet/minecraft/core/AxisCycle;"
+	))
+	private static AxisCycle[] VALUES() {
+		return new AxisCycle[] { AxisCycle.NONE, AxisCycle.FORWARD, AxisCycle4.TRANSPOSE, AxisCycle.BACKWARD };
+	}
+
+	@ModifyConstant(method = "between", constant = @Constant(intValue = 3))
+	private static int between(int constant) {
+		return 4;
 	}
 }

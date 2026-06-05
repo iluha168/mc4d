@@ -11,5 +11,11 @@ public interface Entity4 {
 	void absSnapTo(Vec4 newPos);
 	void absSnapTo(Vec4 newPos, float yRot, float xRot);
 
+	void doCheckFallDamage(Vec4 movement, boolean onGround);
+
 	double getW();
+
+	void setWO(double wo);
+	double getWO();
+	void setWOld(double wOld);
 }

@@ -89,6 +89,7 @@ public class Vec4 extends Vec3 implements Position4 {
 	}
 
 	@Override
+	@Deprecated
 	public @NonNull Vec4 cross(@NonNull Vec3 vec) {
 		throw Util.pauseInIde(new ArithmeticException("No cross product defined for 4D space"));
 	}
@@ -104,7 +105,12 @@ public class Vec4 extends Vec3 implements Position4 {
 	}
 
 	@Override
+	@Deprecated
 	public @NonNull Vec4 subtract(double x, double y, double z) {
+		if (x == 0 && z == 0) {
+			// Call site intends to modify only the Y axis
+			return this.subtract(x, y, z, z);
+		}
 		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: subtraction"));
 	}
 
@@ -123,7 +129,12 @@ public class Vec4 extends Vec3 implements Position4 {
 	}
 
 	@Override
+	@Deprecated
 	public @NonNull Vec4 add(double x, double y, double z) {
+		if (x == 0 && z == 0) {
+			// Call site intends to modify only the Y axis
+			return this.add(x, y, z, z);
+		}
 		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: addition"));
 	}
 
@@ -151,6 +162,7 @@ public class Vec4 extends Vec3 implements Position4 {
 	}
 
 	@Override
+	@Deprecated
 	public double distanceToSqr(double x, double y, double z) {
 		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: distance to sqr"));
 	}
@@ -188,6 +200,7 @@ public class Vec4 extends Vec3 implements Position4 {
 	}
 
 	@Override
+	@Deprecated
 	public @NonNull Vec4 multiply(double xScale, double yScale, double zScale) {
 		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: multiplication"));
 	}
@@ -212,6 +225,7 @@ public class Vec4 extends Vec3 implements Position4 {
 	}
 
 	@Override
+	@Deprecated
 	public @NonNull Vec4 offsetRandomXZ(@NonNull RandomSource random, float offset) {
 		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: offsetRandomXZ"));
 	}
@@ -283,21 +297,25 @@ public class Vec4 extends Vec3 implements Position4 {
 	}
 
 	@Override
+	@Deprecated
 	public @NonNull Vec4 xRot(float radians) {
 		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: rotation around X axis is ambiguous"));
 	}
 
 	@Override
+	@Deprecated
 	public @NonNull Vec4 yRot(float radians) {
 		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: rotation around Y axis is ambiguous"));
 	}
 
 	@Override
+	@Deprecated
 	public @NonNull Vec4 zRot(float radians) {
 		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: rotation around Z axis is ambiguous"));
 	}
 
 	@Override
+	@Deprecated
 	public @NonNull Vec4 rotateClockwise90() {
 		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: rotation around Y axis is ambiguous"));
 	}
@@ -344,6 +362,7 @@ public class Vec4 extends Vec3 implements Position4 {
 	}
 
 	@Override
+	@Deprecated
 	public @NonNull Vector3f toVector3f() {
 		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: toVector3f"));
 	}
@@ -351,6 +370,7 @@ public class Vec4 extends Vec3 implements Position4 {
 	// `projectedOn`, surprisingly, does not need an override
 
 	@Override
+	@Deprecated
 	public @NonNull Vec4 addLocalCoordinates(@NonNull Vec3 direction) {
 		throw Util.pauseInIde(new NotImplementedException()); // TODO
 	}

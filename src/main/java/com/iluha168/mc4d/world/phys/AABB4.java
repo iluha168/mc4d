@@ -132,6 +132,7 @@ public class AABB4 extends AABB implements IAABB4 {
 	}
 
 	@Override
+	@Deprecated
 	public @NonNull AABB4 contract(double xa, double ya, double za) {
 		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: contract"));
 	}
@@ -176,7 +177,12 @@ public class AABB4 extends AABB implements IAABB4 {
 	}
 
 	@Override
+	@Deprecated
 	public @NonNull AABB4 expandTowards(double xa, double ya, double za) {
+		if (xa == 0 && za == 0) {
+			// Call site intends to modify only the Y axis
+			return this.expandTowards(xa, ya, za, za);
+		}
 		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use expandTowards(Vec3) instead."));
 	}
 
@@ -215,7 +221,12 @@ public class AABB4 extends AABB implements IAABB4 {
 	}
 
 	@Override
+	@Deprecated
 	public @NonNull AABB4 inflate(double xAdd, double yAdd, double zAdd) {
+		if (xAdd == 0 && zAdd == 0) {
+			// Y-only
+			return this.inflate(xAdd, yAdd, zAdd, zAdd);
+		}
 		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use AABB4.inflate instead."));
 	}
 
@@ -263,7 +274,12 @@ public class AABB4 extends AABB implements IAABB4 {
 	}
 
 	@Override
+	@Deprecated
 	public @NonNull AABB4 move(double xa, double ya, double za) {
+		if (xa == 0 && za == 0) {
+			// Call site intends to modify only the Y axis
+			return this.move(xa, ya, za, za);
+		}
 		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use AABB4.move instead."));
 	}
 
@@ -288,6 +304,7 @@ public class AABB4 extends AABB implements IAABB4 {
 	}
 
 	@Override
+	@Deprecated
 	public @NonNull AABB4 move(@NonNull Vector3f pos) {
 		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use AABB4.move instead."));
 	}
@@ -301,6 +318,7 @@ public class AABB4 extends AABB implements IAABB4 {
 	}
 
 	@Override
+	@Deprecated
 	public boolean intersects(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
 		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use AABB4.intersects instead."));
 	}
@@ -337,6 +355,7 @@ public class AABB4 extends AABB implements IAABB4 {
 	}
 
 	@Override
+	@Deprecated
 	public boolean contains(double x, double y, double z) {
 		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use AABB4.contains instead."));
 	}
@@ -360,6 +379,7 @@ public class AABB4 extends AABB implements IAABB4 {
 	}
 
 	@Override
+	@Deprecated
 	public @NonNull AABB4 deflate(double xSubtract, double ySubtract, double zSubtract) {
 		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use AABB4.deflate instead."));
 	}
@@ -397,7 +417,7 @@ public class AABB4 extends AABB implements IAABB4 {
 		}
 	}
 
-	private static @Nullable Direction getDirection(
+	public static @Nullable Direction getDirection(
 		double minX,
 		double minY,
 		double minZ,
@@ -569,6 +589,17 @@ public class AABB4 extends AABB implements IAABB4 {
 	@Override
 	public @NonNull Vec4 getMaxPosition() {
 		return new Vec4(this.maxX, this.maxY, this.maxZ, this.maxW);
+	}
+
+	public static AABB4 ofSize(Vec4 center, double sizeX, double sizeY, double sizeZ, double sizeW) {
+		double halfX = sizeX / 2.0;
+		double halfY = sizeY / 2.0;
+		double halfZ = sizeZ / 2.0;
+		double halfW = sizeW / 2.0;
+		return new AABB4(
+			center.x - halfX, center.y - halfY, center.z - halfZ, center.w - halfW,
+			center.x + halfX, center.y + halfY, center.z + halfZ, center.w + halfW
+		);
 	}
 
 	/**

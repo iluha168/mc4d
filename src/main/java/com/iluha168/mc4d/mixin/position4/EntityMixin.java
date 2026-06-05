@@ -1,8 +1,15 @@
 package com.iluha168.mc4d.mixin.position4;
 
+import com.iluha168.mc4d.core.Position4;
 import com.iluha168.mc4d.world.entity.Entity4;
+import com.iluha168.mc4d.world.phys.AABB4;
 import com.iluha168.mc4d.world.phys.Vec4;
+import com.llamalad7.mixinextras.expression.Definition;
+import com.llamalad7.mixinextras.expression.Expression;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.Share;
+import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
@@ -11,24 +18,27 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.PositionMoveRotation;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.entity.EntityInLevelCallback;
 import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.waypoints.WaypointTransmitter;
 import org.jspecify.annotations.Nullable;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
-
-import java.util.Optional;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin implements Entity4 {
@@ -80,11 +90,35 @@ public abstract class EntityMixin implements Entity4 {
 	@Shadow
 	public double zo;
 
+	@Unique
+	public double wo;
+
+	@Unique
+	public double wOld;
+
 	@Shadow
 	public abstract void setPos(Vec3 pos);
 
 	@Shadow
 	public abstract void absSnapRotationTo(float yRot, float xRot);
+
+	@Shadow
+	public abstract void setDeltaMovement(Vec3 deltaMovement);
+
+	@Shadow
+	public abstract boolean touchingUnloadedChunk();
+
+	@Shadow
+	protected abstract void checkSupportingBlock(boolean onGround, @Nullable Vec3 movement);
+
+	@Shadow
+	public abstract BlockPos getOnPosLegacy();
+
+	@Shadow
+	protected abstract void checkFallDamage(double ya, boolean onGround, BlockState onState, BlockPos pos);
+
+	@Shadow
+	public boolean horizontalCollision;
 
 	@Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;setPos(DDD)V"))
 	void setInitialPosWithVector(Entity instance, double x, double y, double z){
@@ -218,6 +252,7 @@ public abstract class EntityMixin implements Entity4 {
 		this.xo = cx;
 		this.yo = newPos.y;
 		this.zo = cz;
+		this.wo = cw;
 		this.setPos(new Vec4(cx, newPos.y, cz, cw));
 	}
 
@@ -237,16 +272,21 @@ public abstract class EntityMixin implements Entity4 {
 	}
 
 	// NBT
-	@Redirect(method = "load", at = @At(
-		value = "INVOKE",
-		target = "Lnet/minecraft/world/level/storage/ValueInput;read(Ljava/lang/String;Lcom/mojang/serialization/Codec;)Ljava/util/Optional;",
-		ordinal = 0
-	))
-	Optional<Vec4> loadPos(ValueInput input, String Pos, Codec<Vec3> tCodec){
-		assert Pos.equals("Pos");
-		final Optional<Vec4> pos = input.read(Pos, Vec4.CODEC);
-		if (pos.isPresent()) return pos;
-		return Optional.of(Vec4.ZERO);
+	@Definition(id = "input", local = @Local(type = ValueInput.class, name = "input", argsOnly = true))
+	@Definition(id = "read", method = "Lnet/minecraft/world/level/storage/ValueInput;read(Ljava/lang/String;Lcom/mojang/serialization/Codec;)Ljava/util/Optional;")
+	@Definition(id = "CODEC", field = "Lnet/minecraft/world/phys/Vec3;CODEC:Lcom/mojang/serialization/Codec;")
+	@Expression("input.read(?, CODEC)")
+	@ModifyArg(method = "load", at = @At("MIXINEXTRAS:EXPRESSION"), index = 1)
+	Codec<Vec4> loadPosAndMotionCodec(Codec<Vec3> codec){
+		return Vec4.CODEC;
+	}
+
+	@Definition(id = "orElse", method = "Ljava/util/Optional;orElse(Ljava/lang/Object;)Ljava/lang/Object;")
+	@Definition(id = "ZERO", field = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;")
+	@Expression("?.orElse(ZERO)")
+	@ModifyArg(method = "load", at = @At("MIXINEXTRAS:EXPRESSION"), index = 0)
+	Object loadPosAndMotionDefault(Object o){
+		return Vec4.ZERO;
 	}
 
 	@Redirect(method = "load", at = @At(
@@ -264,28 +304,36 @@ public abstract class EntityMixin implements Entity4 {
 		));
 	}
 
-	@Redirect(method = "saveWithoutId", at = @At(
+	@Redirect(method = "load", at = @At(
 		value = "INVOKE",
-		target = "Lnet/minecraft/world/level/storage/ValueOutput;store(Ljava/lang/String;Lcom/mojang/serialization/Codec;Ljava/lang/Object;)V",
-		ordinal = 0
+		target = "Lnet/minecraft/world/entity/Entity;setDeltaMovement(DDD)V"
 	))
-	<T> void storePosInVehicle(ValueOutput output, String Pos, Codec<T> tCodec, T posInVehicle) {
-		assert Pos.equals("Pos");
-		assert this.vehicle != null;
-		output.store(Pos, Vec4.CODEC, Vec4.of(
-			(Vec3) posInVehicle,
-			((Entity4) this.vehicle).getW()
+	void loadDeltaMovementRaw(
+		Entity instance, double xd, double yd, double zd,
+		@Local(name = "motion") Vec3 motion
+	) {
+		double wd = ((Vec4) motion).w;
+		this.setDeltaMovement(new Vec4(
+			xd, yd, zd, Math.abs(wd) > 10.0 ? 0.0 : wd
 		));
 	}
 
+	@Definition(id = "store", method = "Lnet/minecraft/world/level/storage/ValueOutput;store(Ljava/lang/String;Lcom/mojang/serialization/Codec;Ljava/lang/Object;)V")
+	@Definition(id = "CODEC", field = "Lnet/minecraft/world/phys/Vec3;CODEC:Lcom/mojang/serialization/Codec;")
+	@Expression("?.store(?, CODEC, ?)")
+	@ModifyArg(method = "saveWithoutId", at = @At("MIXINEXTRAS:EXPRESSION"), index = 1)
+	Codec<Vec4> storePosAndMotionCodec(Codec<Vec3> codec) {
+		return Vec4.CODEC;
+	}
+
 	@Redirect(method = "saveWithoutId", at = @At(
-		value = "INVOKE",
-		target = "Lnet/minecraft/world/level/storage/ValueOutput;store(Ljava/lang/String;Lcom/mojang/serialization/Codec;Ljava/lang/Object;)V",
-		ordinal = 1
+		value = "NEW",
+		target = "(DDD)Lnet/minecraft/world/phys/Vec3;",
+		ordinal = 0
 	))
-	<T> void storePos(ValueOutput output, String Pos, Codec<T> tCodec, T entityPos) {
-		assert Pos.equals("Pos");
-		output.store(Pos, Vec4.CODEC, (Vec4) entityPos);
+	Vec3 storePosInVehicle(double x, double y, double z) {
+		assert this.vehicle != null;
+		return new Vec4(x, y, z, ((Entity4) this.vehicle).getW());
 	}
 
 	// Random fixes
@@ -306,5 +354,301 @@ public abstract class EntityMixin implements Entity4 {
 			x, y, z,
 			((Vec4) absoluteDestination.position()).w
 		));
+	}
+
+	@Redirect(method = "isInWall", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/phys/AABB;ofSize(Lnet/minecraft/world/phys/Vec3;DDD)Lnet/minecraft/world/phys/AABB;"
+	))
+	AABB isInWall(Vec3 center, double sizeX, double sizeY, double sizeZ) {
+		return AABB4.ofSize((Vec4) center, sizeX, sizeY, sizeZ, sizeX);
+	}
+
+	@Redirect(method = "getEyePosition()Lnet/minecraft/world/phys/Vec3;", at = @At(
+		value = "NEW",
+		target = "(DDD)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 getEyePosition(double x, double y, double z) {
+		return new Vec4(x, y, z, this.getW());
+	}
+
+	@Redirect(method = "getEyePosition(F)Lnet/minecraft/world/phys/Vec3;", at = @At(
+		value = "NEW",
+		target = "(DDD)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 getEyePositionPartial(double x, double y, double z, @Local(argsOnly = true, name = "partialTickTime") float partialTickTime) {
+		double w = Mth.lerp(partialTickTime, this.wo, this.getW());
+		return new Vec4(x, y, z, w);
+	}
+
+	@Override
+	public void setWO(double wo) {
+		this.wo = wo;
+	}
+	@Override
+	public double getWO() {
+		return this.wo;
+	}
+	@Override
+	public void setWOld(double wOld) {
+		this.wOld = wOld;
+	}
+
+	@Inject(method = "setOldPos(Lnet/minecraft/world/phys/Vec3;)V", at = @At("TAIL"))
+	void setOldPos(Vec3 position, CallbackInfo ci) {
+		this.wo = this.wOld = ((Vec4) position).w;
+	}
+
+	@Redirect(method = "pick", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/phys/Vec3;add(DDD)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 pickAddViewVector(
+		Vec3 from, double x, double y, double z,
+		@Local(name = "viewVector") Vec3 viewVector,
+		@Local(argsOnly = true, name = "range") double range
+	) {
+		double w = ((Position4) viewVector).w() * range;
+		return ((Vec4) from).add(x, y, z, w);
+	}
+
+	// if (this.noPhysics) {
+	//     this.setPos(this.getX() + delta.x, this.getY() + delta.y, this.getZ() + delta.z);
+	@Redirect(method = "move", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;setPos(DDD)V"
+	))
+	void moveNoPhysics(Entity This, double x, double y, double z, @Local(argsOnly = true, name = "delta") Vec3 delta) {
+		double w = this.getW() + ((Position4) delta).w();
+		This.setPos(new Vec4(x, y, z, w));
+	}
+	//     this.horizontalCollision = false;
+	//     this.verticalCollision = false;
+	//     this.verticalCollisionBelow = false;
+	//     this.minorHorizontalCollision = false;
+	// } else {
+	//     if (moverType == MoverType.PISTON) {
+	//         delta = this.limitPistonMovement(delta);
+	//         if (delta.equals(Vec3.ZERO)) {
+	//             return;
+	//         }
+	//     }
+	//     ProfilerFiller profiler = Profiler.get();
+	//     profiler.push("move");
+	//     if (this.stuckSpeedMultiplier.lengthSqr() > 1.0E-7) {
+	//         if (moverType != MoverType.PISTON) {
+	//             delta = delta.multiply(this.stuckSpeedMultiplier);
+	//         }
+	//         this.stuckSpeedMultiplier = Vec3.ZERO;
+	//         this.setDeltaMovement(Vec3.ZERO);
+	//     }
+	//     delta = this.maybeBackOffFromEdge(delta, moverType);
+	//     Vec3 movement = this.collide(delta);
+	//     double movementLength = movement.lengthSqr();
+	//     if (movementLength > 1.0E-7 || delta.lengthSqr() - movementLength < 1.0E-7) {
+	//         if (this.fallDistance != 0.0 && movementLength >= 1.0) {
+	//             double checkDistance = Math.min(movement.length(), 8.0);
+	//             Vec3 checkTo = this.position().add(movement.normalize().scale(checkDistance));
+	//             BlockHitResult hitResult = this.level()
+	//                 .clip(new ClipContext(this.position(), checkTo, ClipContext.Block.FALLDAMAGE_RESETTING, ClipContext.Fluid.WATER, this));
+	//             if (hitResult.getType() != HitResult.Type.MISS) {
+	//                 this.resetFallDistance();
+	//             }
+	//         }
+	//         Vec3 pos = this.position();
+	//         Vec3 newPosition = pos.add(movement);
+	//         this.addMovementThisTick(new Entity.Movement(pos, newPosition, delta));
+	//         this.setPos(newPosition);
+	//     }
+	//     profiler.pop();
+	//     profiler.push("rest");
+	//     boolean xCollision = !Mth.equal(delta.x, movement.x);
+	//     boolean zCollision = !Mth.equal(delta.z, movement.z);
+	@Definition(id = "zCollision", local = @Local(type = boolean.class, name = "zCollision"))
+	@Expression("zCollision = ?")
+	@Inject(method = "move", at = @At("MIXINEXTRAS:EXPRESSION"))
+	void move_wCollision(
+		MoverType moverType, Vec3 delta, CallbackInfo ci,
+		@Share("wCollision") LocalBooleanRef wCollision,
+		@Local(name = "movement") Vec3 movement
+	) {
+		wCollision.set(!Mth.equal(((Vec4) delta).w, ((Vec4) movement).w));
+	}
+	//     this.horizontalCollision = xCollision || zCollision;
+	@Definition(id = "abs", method = "Ljava/lang/Math;abs(D)D")
+	@Definition(id = "delta", local = @Local(type = Vec3.class, name = "delta", argsOnly = true))
+	@Definition(id = "y", field = "Lnet/minecraft/world/phys/Vec3;y:D")
+	@Expression("abs(delta.y)")
+	@Inject(method = "move", at = @At("MIXINEXTRAS:EXPRESSION"))
+	void move_horizontalCollision(MoverType moverType, Vec3 delta, CallbackInfo ci, @Share("wCollision") LocalBooleanRef wCollision) {
+		this.horizontalCollision = this.horizontalCollision || wCollision.get();
+	}
+	//     if (Math.abs(delta.y) > 0.0 || this.isLocalInstanceAuthoritative()) {
+	//         this.verticalCollision = delta.y != movement.y;
+	//         this.verticalCollisionBelow = this.verticalCollision && delta.y < 0.0;
+	//         this.setOnGroundWithMovement(this.verticalCollisionBelow, this.horizontalCollision, movement);
+	//     }
+	//     if (this.horizontalCollision) {
+	//         this.minorHorizontalCollision = this.isHorizontalCollisionMinor(movement);
+	//     } else {
+	//         this.minorHorizontalCollision = false;
+	//     }
+	//     BlockPos effectPos = this.getOnPosLegacy();
+	//     BlockState effectState = this.level().getBlockState(effectPos);
+	//     if (this.isLocalInstanceAuthoritative()) {
+	//         this.checkFallDamage(movement.y, this.onGround(), effectState, effectPos);
+	//     }
+	//     if (this.isRemoved()) {
+	//         profiler.pop();
+	//     } else {
+	//         if (this.horizontalCollision) {
+	//             Vec3 vec3 = this.getDeltaMovement();
+	//             this.setDeltaMovement(xCollision ? 0.0 : vec3.x, vec3.y, zCollision ? 0.0 : vec3.z);
+	@Redirect(method = "move", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;setDeltaMovement(DDD)V"
+	))
+	void move_setDeltaMovement(
+		Entity instance, double xd, double yd, double zd,
+		@Share("wCollision") LocalBooleanRef wCollision,
+		@Local(name = "vec3") Vec3 vec3
+	) {
+		double wd = wCollision.get() ? 0 : ((Vec4) vec3).w;
+		instance.setDeltaMovement(new Vec4(xd, yd, zd, wd));
+	}
+	//         }
+	//         if (this.canSimulateMovement()) {
+	//             Block onBlock = effectState.getBlock();
+	//             if (delta.y != movement.y) {
+	//                 onBlock.updateEntityMovementAfterFallOn(this.level(), this);
+	//             }
+	//         }
+	//         if (!this.level().isClientSide() || this.isLocalInstanceAuthoritative()) {
+	//             Entity.MovementEmission emission = this.getMovementEmission();
+	//             if (emission.emitsAnything() && !this.isPassenger()) {
+	//                 this.applyMovementEmissionAndPlaySound(emission, movement, effectPos, effectState);
+	//             }
+	//         }
+	//         float blockSpeedFactor = this.getBlockSpeedFactor();
+	//         this.setDeltaMovement(this.getDeltaMovement().multiply(blockSpeedFactor, 1.0, blockSpeedFactor));
+	@Redirect(method = "move", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/phys/Vec3;multiply(DDD)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 moveBlockSpeedFactor(Vec3 instance, double xScale, double yScale, double zScale) {
+		return ((Vec4) instance).multiply(xScale, yScale, zScale, zScale);
+	}
+	//         profiler.pop();
+	//     }
+	// }
+
+	/**
+	 * @author iluha168
+	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
+	 */
+	@Overwrite
+	public void setDeltaMovement(double xd, double yd, double zd) {
+		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use Entity.setDeltaMovement(Vec4) instead."));
+	}
+	@Inject(method = "setDeltaMovement(Lnet/minecraft/world/phys/Vec3;)V", at = @At("HEAD"))
+	void setDeltaMovement(Vec3 deltaMovement, CallbackInfo ci) {
+		if (!(deltaMovement instanceof Vec4)) {
+			throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: supply Vec4."));
+		}
+	}
+
+	@Definition(id = "deltaMovement", field = "Lnet/minecraft/world/entity/Entity;deltaMovement:Lnet/minecraft/world/phys/Vec3;")
+	@Definition(id = "ZERO", field = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;")
+	@Expression("this.deltaMovement = @(ZERO)")
+	@ModifyExpressionValue(method = "<init>", at = @At("MIXINEXTRAS:EXPRESSION"))
+	private static Vec3 deltaMovement(Vec3 original) {
+		return Vec4.ZERO;
+	}
+
+	@Redirect(method = "checkSupportingBlock", at = @At(
+		value = "NEW",
+		target = "(DDDDDD)Lnet/minecraft/world/phys/AABB;"
+	))
+	AABB checkSupportingBlock(
+		double minX, double minY, double minZ,
+		double maxX, double maxY, double maxZ,
+		@Local(name = "boundingBox") AABB boundingBox
+	) {
+		AABB4 bb = (AABB4) boundingBox;
+		return new AABB4(minX, minY, minZ, bb.minW, maxX, maxY, maxZ, bb.maxW);
+	}
+
+	@Redirect(method = "checkSupportingBlock", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/phys/AABB;move(DDD)Lnet/minecraft/world/phys/AABB;"
+	))
+	AABB checkSupportingBlock(
+		AABB testArea, double xa, double ya, double za,
+		@Local(name = "movement", argsOnly = true) Vec3 movement
+	) {
+		return ((AABB4) testArea).move(xa, ya, za, -((Vec4) movement).w);
+	}
+
+	@ModifyExpressionValue(method = "collideWithShapes", at = @At(
+		value = "FIELD",
+		target = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;",
+		opcode = Opcodes.GETSTATIC
+	))
+	private static Vec3 collideWithShapes_resolvedMovement(Vec3 original) {
+		return Vec4.ZERO;
+	}
+
+	@Definition(id = "movement", local = @Local(type = Vec3.class, name = "movement", argsOnly = true))
+	@Definition(id = "z", field = "Lnet/minecraft/world/phys/Vec3;z:D")
+	@Definition(id = "movementStep", local = @Local(type = Vec3.class, name = "movementStep"))
+	@Expression("movement.z != movementStep.z")
+	@ModifyExpressionValue(method = "collide", at = @At("MIXINEXTRAS:EXPRESSION"))
+	boolean collide_hasHorizontalCollision(
+		boolean original,
+		@Local(argsOnly = true, name = "movement") Vec3 movement,
+		@Local(name = "movementStep") Vec3 movementStep
+	) {
+		return original || ((Vec4) movement).w != ((Vec4) movementStep).w;
+	}
+
+	@Definition(id = "expandTowards", method = "Lnet/minecraft/world/phys/AABB;expandTowards(DDD)Lnet/minecraft/world/phys/AABB;")
+	@Definition(id = "movement", local = @Local(type = Vec3.class, name = "movement", argsOnly = true))
+	@Definition(id = "z", field = "Lnet/minecraft/world/phys/Vec3;z:D")
+	@Expression("?.expandTowards(?, ?, movement.z)")
+	@Redirect(method = "collide", at = @At("MIXINEXTRAS:EXPRESSION"))
+	AABB collide(
+		AABB instance, double xa, double ya, double za,
+		@Local(argsOnly = true, name = "movement") Vec3 movement
+	) {
+		return ((AABB4) instance).expandTowards(xa, ya, za, ((Vec4) movement).w);
+	}
+
+	@Redirect(method = "collide", at = @At(
+		value = "NEW",
+		target = "(DDD)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 collide(
+		double x, double y, double z,
+		@Local(argsOnly = true, name = "movement") Vec3 movement
+	) {
+		return new Vec4(x, y, z, ((Vec4) movement).w);
+	}
+
+	/**
+	 * @author iluha168
+	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
+	 */
+	@Overwrite
+	public final void doCheckFallDamage(double xa, double ya, double za, boolean onGround) {
+		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use Entity4#doCheckFallDamage instead."));
+	}
+	@Override
+	public void doCheckFallDamage(Vec4 movement, boolean onGround) {
+		if (!this.touchingUnloadedChunk()) {
+			this.checkSupportingBlock(onGround, movement);
+			BlockPos pos = this.getOnPosLegacy();
+			BlockState state = this.level.getBlockState(pos);
+			this.checkFallDamage(movement.y, onGround, state, pos);
+		}
 	}
 }

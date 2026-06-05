@@ -1,13 +1,16 @@
 package com.iluha168.mc4d.mixin.position4;
 
+import com.google.common.collect.ImmutableList;
 import com.iluha168.mc4d.core.Direction4;
 import com.iluha168.mc4d.core.Position4i;
 import com.iluha168.mc4d.core.Vec4i;
+import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.util.Util;
+import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.ArrayUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -84,7 +87,22 @@ public enum DirectionMixin implements Direction4 {
 	// TODO getApproximateNearest
 	// TODO getNearest
 	// TODO getNearest
-	// TODO axisStepOrder
+
+	@WrapMethod(method = "axisStepOrder")
+	private static ImmutableList<Direction.Axis> axisStepOrder(Vec3 movement, Operation<ImmutableList<Direction.Axis>> original) {
+		if (!(movement instanceof Vec4 vec4)) return original.call(movement);
+		double dx = Math.abs(vec4.x);
+		double dz = Math.abs(vec4.z);
+		double dw = Math.abs(vec4.w);
+		if (dx > dz && dx > dw) {
+			return dz > dw ? Direction4.YXZW_AXIS_ORDER : Direction4.YXWZ_AXIS_ORDER;
+		}
+		if (dz > dw) {
+			return dx > dw ? Direction4.YZXW_AXIS_ORDER : Direction4.YZWX_AXIS_ORDER;
+		}
+		return dx > dz ? Direction4.YWXZ_AXIS_ORDER : Direction4.YWZX_AXIS_ORDER;
+	}
+
 	// TODO getUnitVec3
 	// TODO getUnitVec3f
 	// TODO isFacingAngle

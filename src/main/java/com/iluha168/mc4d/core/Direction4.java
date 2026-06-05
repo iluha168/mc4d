@@ -1,5 +1,6 @@
 package com.iluha168.mc4d.core;
 
+import com.google.common.collect.ImmutableList;
 import net.minecraft.core.Direction;
 
 /**
@@ -9,6 +10,13 @@ import net.minecraft.core.Direction;
 public interface Direction4 {
 	Direction KATA = Direction.valueOf("KATA");
 	Direction ANA = Direction.valueOf("ANA");
+
+	ImmutableList<Direction.Axis> YXZW_AXIS_ORDER = ImmutableList.of(Direction.Axis.Y, Direction.Axis.X, Direction.Axis.Z, Axis.W);
+	ImmutableList<Direction.Axis> YZXW_AXIS_ORDER = ImmutableList.of(Direction.Axis.Y, Direction.Axis.Z, Direction.Axis.X, Axis.W);
+	ImmutableList<Direction.Axis> YXWZ_AXIS_ORDER = ImmutableList.of(Direction.Axis.Y, Direction.Axis.X, Axis.W, Direction.Axis.Z);
+	ImmutableList<Direction.Axis> YZWX_AXIS_ORDER = ImmutableList.of(Direction.Axis.Y, Direction.Axis.Z, Axis.W, Direction.Axis.X);
+	ImmutableList<Direction.Axis> YWXZ_AXIS_ORDER = ImmutableList.of(Direction.Axis.Y, Axis.W, Direction.Axis.X, Direction.Axis.Z);
+	ImmutableList<Direction.Axis> YWZX_AXIS_ORDER = ImmutableList.of(Direction.Axis.Y, Axis.W, Direction.Axis.Z, Direction.Axis.X);
 
 	int getStepW();
 
