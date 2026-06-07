@@ -6,7 +6,6 @@ import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.util.Util;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
@@ -14,8 +13,6 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-
-import java.io.IOException;
 
 @Mixin(Player.class)
 abstract class PlayerMixin {
@@ -32,7 +29,7 @@ abstract class PlayerMixin {
 		value = "INVOKE",
 		target = "Lnet/minecraft/world/entity/player/Player;canFallAtLeast(DDD)Z"
 	))
-	boolean maybeBackOffFromEdge_canFallAtLeast4(Player instance, double deltaX, double deltaZ, double minHeight) throws IOException {
+	boolean maybeBackOffFromEdge_canFallAtLeast4(Player instance, double deltaX, double deltaZ, double minHeight) {
 		assert (Object) this == instance;
 		return this.canFallAtLeast(deltaX, deltaZ, 0, minHeight);
 	}
@@ -48,7 +45,7 @@ abstract class PlayerMixin {
 		@Local(name = "maxDownStep") float maxDownStep,
 		@Local(name = "stepX") double stepX,
 		@Local(name = "stepZ") double stepZ
-	) throws IOException {
+	) {
 		double deltaW = ((Vec4) delta).w;
 		double stepW = Math.signum(deltaW) * step;
 
@@ -87,7 +84,7 @@ abstract class PlayerMixin {
 		value = "INVOKE",
 		target = "Lnet/minecraft/world/entity/player/Player;canFallAtLeast(DDD)Z"
 	))
-	boolean isAboveGround(Player instance, double deltaX, double deltaZ, double minHeight) throws IOException {
+	boolean isAboveGround(Player instance, double deltaX, double deltaZ, double minHeight) {
 		assert (Object) this == instance;
 		return this.canFallAtLeast(deltaX, deltaZ, 0, minHeight);
 	}
@@ -102,23 +99,21 @@ abstract class PlayerMixin {
 		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space. Do not use a private method instead."));
 	}
 	@Unique
-	private boolean canFallAtLeast(double deltaX, double deltaZ, double deltaW, double minHeight) throws IOException {
+	private boolean canFallAtLeast(double deltaX, double deltaZ, double deltaW, double minHeight) {
 		Entity player = (Entity) (Object) this;
 		AABB4 boundingBox = (AABB4) player.getBoundingBox();
-		try (Level level = player.level()) {
-			return level.noCollision(
-				player,
-				new AABB4(
-					boundingBox.minX + AABB4.EPSILON + deltaX,
-					boundingBox.minY - minHeight - AABB4.EPSILON,
-					boundingBox.minZ + AABB4.EPSILON + deltaZ,
-					boundingBox.minW + AABB4.EPSILON + deltaW,
-					boundingBox.maxX - AABB4.EPSILON + deltaX,
-					boundingBox.minY,
-					boundingBox.maxZ - AABB4.EPSILON + deltaZ,
-					boundingBox.maxW - AABB4.EPSILON + deltaW
-				)
-			);
-		}
+		return player.level().noCollision(
+			player,
+			new AABB4(
+				boundingBox.minX + AABB4.EPSILON + deltaX,
+				boundingBox.minY - minHeight - AABB4.EPSILON,
+				boundingBox.minZ + AABB4.EPSILON + deltaZ,
+				boundingBox.minW + AABB4.EPSILON + deltaW,
+				boundingBox.maxX - AABB4.EPSILON + deltaX,
+				boundingBox.minY,
+				boundingBox.maxZ - AABB4.EPSILON + deltaZ,
+				boundingBox.maxW - AABB4.EPSILON + deltaW
+			)
+		);
 	}
 }

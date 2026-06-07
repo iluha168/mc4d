@@ -20,10 +20,12 @@ import net.minecraft.util.Util;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.PositionMoveRotation;
+import net.minecraft.world.entity.Relative;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.entity.EntityInLevelCallback;
+import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -39,6 +41,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.Set;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin implements Entity4 {
@@ -63,6 +67,7 @@ public abstract class EntityMixin implements Entity4 {
 	@Shadow
 	private Level level;
 
+	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 	@Shadow
 	public abstract boolean isRemoved();
 
@@ -119,6 +124,9 @@ public abstract class EntityMixin implements Entity4 {
 
 	@Shadow
 	public boolean horizontalCollision;
+
+	@Shadow
+	public abstract @Nullable Entity teleport(TeleportTransition transition);
 
 	@Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;setPos(DDD)V"))
 	void setInitialPosWithVector(Entity instance, double x, double y, double z){
@@ -650,5 +658,26 @@ public abstract class EntityMixin implements Entity4 {
 			BlockState state = this.level.getBlockState(pos);
 			this.checkFallDamage(movement.y, onGround, state, pos);
 		}
+	}
+
+	/**
+	 * @author iluha168
+	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
+	 */
+	@Overwrite
+	public boolean teleportTo(ServerLevel level, double x, double y, double z, Set<Relative> relatives, float newYRot, float newXRot, boolean resetCamera) {
+		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use Entity4#teleportTo instead."));
+	}
+	@Override
+	public boolean teleportTo(ServerLevel level, Vec4 newPos, Set<Relative> relatives, float newYRot, float newXRot, boolean resetCamera) {
+		return this.teleport(new TeleportTransition(level, newPos, Vec4.ZERO, newYRot, newXRot, relatives, TeleportTransition.DO_NOTHING)) != null;
+	}
+
+	@Redirect(method = "oldPosition", at = @At(
+		value = "NEW",
+		target = "(DDD)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 oldPosition(double x, double y, double z) {
+		return new Vec4(x, y, z, this.wOld);
 	}
 }

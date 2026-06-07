@@ -73,7 +73,7 @@ public abstract class ServerGamePacketListenerImplMixin implements ServerGamePac
 
 	@Override
 	public void teleport(Vec4 pos, float yRot, float xRot) {
-		this.teleport(new PositionMoveRotation(pos, Vec3.ZERO, yRot, xRot), Collections.emptySet());
+		this.teleport(new PositionMoveRotation(pos, Vec4.ZERO, yRot, xRot), Collections.emptySet());
 	}
 
 	@Inject(method = "resetPosition", at = @At("TAIL"))
@@ -457,5 +457,13 @@ public abstract class ServerGamePacketListenerImplMixin implements ServerGamePac
 	void resyncPlayerWithVehicle(Entity vehicle, CallbackInfo ci, @Local(name = "oldPos") Vec3 oldPos) {
 		Entity4 player4 = (Entity4) this.player;
 		player4.setWO(((Vec4) oldPos).w);
+	}
+
+	@ModifyArg(method = "handleClientTickEnd", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/server/level/ServerPlayer;setKnownMovement(Lnet/minecraft/world/phys/Vec3;)V"
+	))
+	Vec3 handleClientTickEnd(Vec3 lastKnownClientMovement) {
+		return Vec4.ZERO;
 	}
 }

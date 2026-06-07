@@ -11,8 +11,8 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.Util;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import org.apache.commons.lang3.NotImplementedException;
 import org.joml.Vector3f;
 import org.jspecify.annotations.NonNull;
 
@@ -298,20 +298,20 @@ public class Vec4 extends Vec3 implements Position4 {
 
 	@Override
 	@Deprecated
-	public @NonNull Vec4 xRot(float radians) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: rotation around X axis is ambiguous"));
+	public @NonNull Vec4 xRot(float radians) { // We are assuming rotation around XW.
+		return Vec4.of(super.xRot(radians), this.w);
 	}
 
 	@Override
 	@Deprecated
-	public @NonNull Vec4 yRot(float radians) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: rotation around Y axis is ambiguous"));
+	public @NonNull Vec4 yRot(float radians) { // We are assuming rotation around YW.
+		return Vec4.of(super.yRot(radians), this.w);
 	}
 
 	@Override
 	@Deprecated
-	public @NonNull Vec4 zRot(float radians) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: rotation around Z axis is ambiguous"));
+	public @NonNull Vec4 zRot(float radians) { // We are assuming rotation around ZW.
+		return Vec4.of(super.zRot(radians), this.w);
 	}
 
 	@Override
@@ -369,10 +369,29 @@ public class Vec4 extends Vec3 implements Position4 {
 
 	// `projectedOn`, surprisingly, does not need an override
 
+	@SuppressWarnings("SuspiciousNameCombination")
+	public static @NonNull Vec4 applyLocalCoordinatesToRotation(Vec2 rotation, Vec4 direction) {
+		float yCos = Mth.cos((rotation.y + 90.0F) * (float) (Math.PI / 180.0));
+		float ySin = Mth.sin((rotation.y + 90.0F) * (float) (Math.PI / 180.0));
+		float xCos = Mth.cos(-rotation.x * (float) (Math.PI / 180.0));
+		float xSin = Mth.sin(-rotation.x * (float) (Math.PI / 180.0));
+		float xCosUp = Mth.cos((-rotation.x + 90.0F) * (float) (Math.PI / 180.0));
+		float xSinUp = Mth.sin((-rotation.x + 90.0F) * (float) (Math.PI / 180.0));
+		Vec3 forwards = new Vec3(yCos * xCos, xSin, ySin * xCos);
+		Vec3 up = new Vec3(yCos * xCosUp, xSinUp, ySin * xCosUp);
+		Vec3 left = forwards.cross(up).scale(-1.0);
+		double xa = forwards.x * direction.z + up.x * direction.y + left.x * direction.x;
+		double ya = forwards.y * direction.z + up.y * direction.y + left.y * direction.x;
+		double za = forwards.z * direction.z + up.z * direction.y + left.z * direction.x;
+		return new Vec4(xa, ya, za, direction.w); // Literally what am I supposed to do? The rotation happens in 3D.
+	}
+
 	@Override
 	@Deprecated
-	public @NonNull Vec4 addLocalCoordinates(@NonNull Vec3 direction) {
-		throw Util.pauseInIde(new NotImplementedException()); // TODO
+	public @NonNull Vec3 addLocalCoordinates(@NonNull Vec3 direction) {
+		return direction instanceof Vec4 direction4
+			? Vec4.applyLocalCoordinatesToRotation(this.rotation(), direction4)
+		    : super.addLocalCoordinates(direction);
 	}
 
 	@Override
