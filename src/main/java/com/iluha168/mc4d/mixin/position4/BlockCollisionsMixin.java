@@ -1,11 +1,13 @@
 package com.iluha168.mc4d.mixin.position4;
 
+import com.iluha168.mc4d.core.BlockPos4;
 import com.iluha168.mc4d.core.Cursor4D;
 import com.iluha168.mc4d.world.phys.AABB4;
 import com.iluha168.mc4d.world.phys.IAABB4;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Cursor3D;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.BlockCollisions;
@@ -43,7 +45,14 @@ public class BlockCollisionsMixin {
 	}
 
 	// TODO getChunk when 4D world
-	// TODO BlockPosMutable
+
+	@Redirect(method = "computeNext", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/core/BlockPos$MutableBlockPos;set(III)Lnet/minecraft/core/BlockPos$MutableBlockPos;"
+	))
+	BlockPos.MutableBlockPos computeNext_set(BlockPos.MutableBlockPos pos, int x, int y, int z, @Share("w") LocalIntRef w) {
+		return ((BlockPos4.MutableBlockPos) pos).set(x, y, z, w.get());
+	}
 
 	@Redirect(method = "computeNext", at = @At(
 		value = "INVOKE",

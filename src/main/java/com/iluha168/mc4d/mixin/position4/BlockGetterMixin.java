@@ -6,6 +6,7 @@ import com.iluha168.mc4d.world.phys.AABB4;
 import com.iluha168.mc4d.world.phys.Vec4;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.phys.AABB;
@@ -18,8 +19,9 @@ import java.util.Optional;
 
 @Mixin(BlockGetter.class)
 public interface BlockGetterMixin {
+	@SuppressWarnings("SuspiciousNameCombination")
 	@Unique
-	private static Vec4i getFurthestCorner(Vec4 direction) {
+	private static Vec3i getFurthestCorner(Vec4 direction) {
 		double wDot = Math.abs(direction.w);
 		double xDot = Math.abs(direction.x);
 		double yDot = Math.abs(direction.y);
@@ -33,38 +35,38 @@ public interface BlockGetterMixin {
 		if (wDot <= xDot && wDot <= yDot && wDot <= zDot) {
 			// w is min
 			if (xDot >= yDot && xDot >= zDot) {
-				return new Vec4i(-wSign, -xSign, ySign, zSign);
+				return Vec4i.from(-wSign, -xSign, ySign, zSign);
 			} else if (yDot >= zDot) {
-				return new Vec4i(-wSign, xSign, -ySign, zSign);
+				return Vec4i.from(-wSign, xSign, -ySign, zSign);
 			} else {
-				return new Vec4i(-wSign, xSign, ySign, -zSign);
+				return Vec4i.from(-wSign, xSign, ySign, -zSign);
 			}
 		} else if (xDot <= yDot && xDot <= zDot) {
 			// x is min
 			if (wDot >= yDot && wDot >= zDot) {
-				return new Vec4i(-wSign, -xSign, ySign, zSign);
+				return Vec4i.from(-wSign, -xSign, ySign, zSign);
 			} else if (yDot >= zDot) {
-				return new Vec4i(wSign, -xSign, -ySign, zSign);
+				return Vec4i.from(wSign, -xSign, -ySign, zSign);
 			} else {
-				return new Vec4i(wSign, -xSign, ySign, -zSign);
+				return Vec4i.from(wSign, -xSign, ySign, -zSign);
 			}
 		} else if (yDot <= zDot) {
 			// y is min
 			if (wDot >= xDot && wDot >= zDot) {
-				return new Vec4i(-wSign, xSign, -ySign, zSign);
+				return Vec4i.from(-wSign, xSign, -ySign, zSign);
 			} else if (xDot >= zDot) {
-				return new Vec4i(wSign, -xSign, -ySign, zSign);
+				return Vec4i.from(wSign, -xSign, -ySign, zSign);
 			} else {
-				return new Vec4i(wSign, xSign, -ySign, -zSign);
+				return Vec4i.from(wSign, xSign, -ySign, -zSign);
 			}
 		} else {
 			// z is min
 			if (wDot >= xDot && wDot >= yDot) {
-				return new Vec4i(-wSign, xSign, ySign, -zSign);
+				return Vec4i.from(-wSign, xSign, ySign, -zSign);
 			} else if (xDot >= yDot) {
-				return new Vec4i(wSign, -xSign, ySign, -zSign);
+				return Vec4i.from(wSign, -xSign, ySign, -zSign);
 			} else {
-				return new Vec4i(wSign, xSign, -ySign, -zSign);
+				return Vec4i.from(wSign, xSign, -ySign, -zSign);
 			}
 		}
 	}
@@ -83,13 +85,13 @@ public interface BlockGetterMixin {
 		double boxSizeZ = aabbAtTarget.getZsize();
 		double boxSizeW = aabbAtTarget.getWsize();
 
-		Vec4i cornerDir = getFurthestCorner(deltaMove);
+		Vec3i cornerDir = getFurthestCorner(deltaMove);
 		Vec4 toCenter = aabbAtTarget.getCenter();
 		Vec4 toCorner = new Vec4(
 			toCenter.x() + boxSizeX * 0.5 * cornerDir.getX(),
 			toCenter.y() + boxSizeY * 0.5 * cornerDir.getY(),
 			toCenter.z() + boxSizeZ * 0.5 * cornerDir.getZ(),
-			toCenter.w() + boxSizeW * 0.5 * cornerDir.getW()
+			toCenter.w() + boxSizeW * 0.5 * Vec4i.getW(cornerDir)
 		);
 		Vec4 fromCorner = toCorner.subtract(deltaMove);
 
@@ -191,7 +193,7 @@ public interface BlockGetterMixin {
 				int oppositeCornerX = Mth.floor(cornerHitX - boxSizeX * cornerDir.getX());
 				int oppositeCornerY = Mth.floor(cornerHitY - boxSizeY * cornerDir.getY());
 				int oppositeCornerZ = Mth.floor(cornerHitZ - boxSizeZ * cornerDir.getZ());
-				int oppositeCornerW = Mth.floor(cornerHitW - boxSizeW * cornerDir.getW());
+				int oppositeCornerW = Mth.floor(cornerHitW - boxSizeW * Vec4i.getW(cornerDir));
 
 				int currentIteration = iterations;
 

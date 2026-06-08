@@ -1,7 +1,7 @@
 package com.iluha168.mc4d.mixin.commands4;
 
 import com.iluha168.mc4d.commands.SharedSuggestionProvider4;
-import com.iluha168.mc4d.core.Position4i;
+import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -33,7 +33,7 @@ class ClientSuggestionProviderMixin {
 		SharedSuggestionProvider.TextCoordinates original,
 		@Local(name = "pos") BlockPos pos
 	) {
-		((SharedSuggestionProvider4.TextCoordinates) original).setW(prettyPrint(((Position4i) pos).getW()));
+		((SharedSuggestionProvider4.TextCoordinates) original).setW(prettyPrint(Vec4i.getW(pos)));
 		return original;
 	}
 

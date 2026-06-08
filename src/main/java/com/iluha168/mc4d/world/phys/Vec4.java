@@ -2,11 +2,12 @@ package com.iluha168.mc4d.world.phys;
 
 import com.iluha168.mc4d.core.Direction4;
 import com.iluha168.mc4d.core.Position4;
-import com.iluha168.mc4d.core.Position4i;
+import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.network.LpVec4;
 import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -58,6 +59,10 @@ public class Vec4 extends Vec3 implements Position4 {
 	public static final Vec4 W_AXIS = new Vec4(0.0, 0.0, 0.0, 1.0);
 
 	public final double w;
+
+	public static Vec4 atLowerCornerWithOffset(Vec3i pos, double x, double y, double z, double w) {
+		return new Vec4(pos.getX() + x, pos.getY() + y, pos.getZ() + z, Vec4i.getW(pos) + w);
+	}
 
 	public Vec4(double x, double y, double z, double w) {
 		super(x, y, z);
@@ -347,12 +352,12 @@ public class Vec4 extends Vec3 implements Position4 {
 
 	@Override
 	public @NonNull Vec4 relative(@NonNull Direction direction, double distance) {
-		Position4i normal = (Position4i) direction.getUnitVec3i();
+		Vec3i normal = direction.getUnitVec3i();
 		return new Vec4(
 			this.x + distance * normal.getX(),
 			this.y + distance * normal.getY(),
 			this.z + distance * normal.getZ(),
-			this.w + distance * normal.getW()
+			this.w + distance * Vec4i.getW(normal)
 		);
 	}
 

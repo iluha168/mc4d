@@ -2,7 +2,7 @@ package com.iluha168.mc4d.mixin.voxelshape4;
 
 import com.iluha168.mc4d.core.Direction4;
 import com.iluha168.mc4d.core.Position4;
-import com.iluha168.mc4d.core.Position4i;
+import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.world.phys.AABB4;
 import com.iluha168.mc4d.world.phys.Vec4;
 import com.iluha168.mc4d.world.phys.shapes.ArrayVoxelShape4;
@@ -86,7 +86,7 @@ class VoxelShapeMixin implements VoxelShape4 {
 		target = "Lnet/minecraft/world/phys/shapes/VoxelShape;move(DDD)Lnet/minecraft/world/phys/shapes/VoxelShape;"
 	))
 	VoxelShape move(VoxelShape instance, double dx, double dy, double dz, @Local(argsOnly = true, name = "delta") Vec3i delta) {
-		return ((VoxelShape4) instance).move(dx, dy, dz, ((Position4i) delta).getW());
+		return ((VoxelShape4) instance).move(dx, dy, dz, Vec4i.getW(delta));
 	}
 
 	/**
@@ -207,7 +207,7 @@ class VoxelShapeMixin implements VoxelShape4 {
 		if (!(testPoint instanceof Vec4 testPoint4)) {
 			throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: supply a Vec4."));
 		}
-		int w = this.findIndex(Direction4.Axis.W, testPoint4.w - ((Position4i) pos).getW());
+		final int w = this.findIndex(Direction4.Axis.W, testPoint4.w - Vec4i.getW(pos));
 		return ((DiscreteVoxelShape4) shape).isFullWide(x, y, z, w);
 	}
 

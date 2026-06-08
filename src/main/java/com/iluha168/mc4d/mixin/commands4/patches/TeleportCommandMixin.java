@@ -1,6 +1,7 @@
 package com.iluha168.mc4d.mixin.commands4.patches;
 
 import com.iluha168.mc4d.commands.arguments.coordinates.Coordinates4;
+import com.iluha168.mc4d.core.BlockPos4;
 import com.iluha168.mc4d.world.entity.Entity4;
 import com.iluha168.mc4d.world.entity.Relative4;
 import com.iluha168.mc4d.world.phys.Vec4;
@@ -123,7 +124,7 @@ class TeleportCommandMixin {
 		@Nullable LookAt lookAt
 	) throws CommandSyntaxException {
 		// TODO neo forge event support?
-		BlockPos blockPos = BlockPos.containing(x, y, z); // TODO BlockPos4
+		BlockPos blockPos = BlockPos4.containing(x, y, z, w);
 		if (!Level.isInSpawnableBounds(blockPos)) {
 			throw INVALID_POSITION.create();
 		}

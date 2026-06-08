@@ -1,8 +1,9 @@
 package com.iluha168.mc4d.mixin.position4;
 
+import com.iluha168.mc4d.core.BlockPos4;
 import com.iluha168.mc4d.core.Direction4;
 import com.iluha168.mc4d.core.Position4;
-import com.iluha168.mc4d.core.Position4i;
+import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.world.entity.Entity4;
 import com.iluha168.mc4d.world.phys.AABB4;
 import com.iluha168.mc4d.world.phys.Vec4;
@@ -56,7 +57,7 @@ abstract class LocalPlayerMixin {
 		double maxX, double maxY, double maxZ,
 		@Local(argsOnly = true, name = "pos") BlockPos pos
 	) {
-		double minW = ((Position4i) pos).getW();
+		double minW = Vec4i.getW(pos);
 		return new AABB4(
 			minX, minY, minZ, minW,
 			maxX, maxY, maxZ, minW + 1
@@ -90,11 +91,11 @@ abstract class LocalPlayerMixin {
 
 	@Unique
 	private void moveTowardsClosestSpace(LocalPlayer This, double x, double z, double w) {
-		BlockPos pos = BlockPos.containing(x, This.getY(), z); // TODO add W support
+		BlockPos pos = BlockPos4.containing(x, This.getY(), z, w);
 		if (this.suffocatesAt(pos)) {
 			double xd = x - pos.getX();
 			double zd = z - pos.getZ();
-			double wd = w - ((Position4i) pos).getW();
+			double wd = w - Vec4i.getW(pos);
 
 			Direction dir = null;
 			double closest = Double.MAX_VALUE;

@@ -2,7 +2,7 @@ package com.iluha168.mc4d.world.phys;
 
 import com.iluha168.mc4d.core.Direction4;
 import com.iluha168.mc4d.core.Position4;
-import com.iluha168.mc4d.core.Position4i;
+import com.iluha168.mc4d.core.Vec4i;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
@@ -293,8 +293,8 @@ public class AABB4 extends AABB implements IAABB4 {
 	@Override
 	public @NonNull AABB4 move(BlockPos pos) {
 		return new AABB4(
-			this.minX + pos.getX(), this.minY + pos.getY(), this.minZ + pos.getZ(), this.minW + ((Position4i) pos).getW(),
-			this.maxX + pos.getX(), this.maxY + pos.getY(), this.maxZ + pos.getZ(), this.maxW + ((Position4i) pos).getW()
+			this.minX + pos.getX(), this.minY + pos.getY(), this.minZ + pos.getZ(), this.minW + Vec4i.getW(pos),
+			this.maxX + pos.getX(), this.maxY + pos.getY(), this.maxZ + pos.getZ(), this.maxW + Vec4i.getW(pos)
 		);
 	}
 
@@ -344,8 +344,8 @@ public class AABB4 extends AABB implements IAABB4 {
 	@Override
 	public boolean intersects(BlockPos pos) {
 		return this.intersects(
-			pos.getX(), pos.getY(), pos.getZ(), ((Position4i) pos).getW(),
-			pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1, ((Position4i) pos).getW() + 1
+			pos.getX(), pos.getY(), pos.getZ(), Vec4i.getW(pos),
+			pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1, Vec4i.getW(pos) + 1
 		);
 	}
 

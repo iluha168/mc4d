@@ -1,6 +1,8 @@
 package com.iluha168.mc4d.mixin.position4;
 
+import com.iluha168.mc4d.core.BlockPos4;
 import com.iluha168.mc4d.core.Position4;
+import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.world.entity.Entity4;
 import com.iluha168.mc4d.world.phys.AABB4;
 import com.iluha168.mc4d.world.phys.Vec4;
@@ -155,8 +157,9 @@ public abstract class EntityMixin implements Entity4 {
 			int fx = Mth.floor(newPos.x);
 			int fy = Mth.floor(newPos.y);
 			int fz = Mth.floor(newPos.z);
-			if (fx != this.blockPosition.getX() || fy != this.blockPosition.getY() || fz != this.blockPosition.getZ()) { // TODO || fw != this.blockPosition.getW()
-				this.blockPosition = new BlockPos(fx, fy, fz); // TODO new BlockPos(fx, fy, fz, fw);
+			int fw = Mth.floor(newPos.w);
+			if (fx != this.blockPosition.getX() || fy != this.blockPosition.getY() || fz != this.blockPosition.getZ() || fw != Vec4i.getW(this.blockPosition)) {
+				this.blockPosition = BlockPos4.from(fx, fy, fz, fw);
 				this.inBlockState = null;
 				if (SectionPos.blockToSectionCoord(fx) != this.chunkPosition.x()
 					|| SectionPos.blockToSectionCoord(fz) != this.chunkPosition.z()

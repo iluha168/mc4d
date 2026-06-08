@@ -1,19 +1,37 @@
 package com.iluha168.mc4d.mixin.position4;
 
+import com.iluha168.mc4d.world.level.redstone.Orientation4;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
+import net.minecraft.util.Util;
 import net.minecraft.world.level.redstone.Orientation;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(Orientation.class)
 public class OrientationMixin {
-	@Redirect(method = "generateContext", at = @At(
+	/**
+	 * @author iluha168
+	 * @reason This would take 3 mixins to patch, and I am lazy.
+	 */
+	@Overwrite
+	private static Orientation[] lambda$static$0() {
+		Orientation4[] orientations = new Orientation4[384];
+		Orientation4.generateContext(new Orientation4(Direction.UP, Direction.NORTH, Direction.EAST, Orientation.SideBias.LEFT), orientations);
+		return orientations;
+	}
+
+	@Redirect(method = "<init>", at = @At(
 		value = "INVOKE",
-		target = "Lnet/minecraft/core/Direction;values()[Lnet/minecraft/core/Direction;"
+		target = "Lnet/minecraft/core/Vec3i;cross(Lnet/minecraft/core/Vec3i;)Lnet/minecraft/core/Vec3i;"
 	))
-	private static Direction[] DIRECTION_values() {
-		// TODO: remove the method and make Orientation actually 4D
-		return new Direction[] { Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST };
+	Vec3i stopCrash(Vec3i instance, Vec3i upVector) {
+		if (!((Orientation) (Object) this instanceof Orientation4)) {
+			throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use Orientation4::new instead."));
+		}
+		// The actual constructor is ignored and has fields overridden in Orientation4
+		return instance;
 	}
 }
