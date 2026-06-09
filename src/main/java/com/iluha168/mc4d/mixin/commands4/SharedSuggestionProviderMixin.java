@@ -1,4 +1,4 @@
-package com.iluha168.mc4d.mixin;
+package com.iluha168.mc4d.mixin.commands4;
 
 import com.iluha168.mc4d.commands.SharedSuggestionProvider4;
 import com.llamalad7.mixinextras.expression.Definition;

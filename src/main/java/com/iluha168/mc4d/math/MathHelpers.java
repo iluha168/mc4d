@@ -21,4 +21,8 @@ public interface MathHelpers {
 	) {
 		return absMax(x1 - x0, z1 - z0, w1 - w0);
 	}
+
+	static int cube(int x) {
+		return x * x * x;
+	}
 }
