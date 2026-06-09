@@ -1,6 +1,7 @@
 package com.iluha168.mc4d.mixin.commands4;
 
 import com.iluha168.mc4d.commands.SharedSuggestionProvider4;
+import com.iluha168.mc4d.util.Err4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
@@ -10,7 +11,6 @@ import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.util.Util;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -109,7 +109,7 @@ interface SharedSuggestionProviderMixin {
 		@Override
 		public String w() {
 			if (this.w == null) {
-				throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: w not set."));
+				throw Err4.field4missing("w");
 			}
 			return this.w;
 		}

@@ -1,11 +1,11 @@
 package com.iluha168.mc4d.mixin.level4.patches;
 
 import com.iluha168.mc4d.server.MinecraftServer4;
+import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.level.ChunkPos4;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ChunkMap;
-import net.minecraft.util.Util;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
@@ -31,13 +31,9 @@ class MinecraftServerMixin implements MinecraftServer4 {
 			this.centerChunkW = ChunkPos4.as(centerChunk).w();
 		}
 
-		/**
-		 * @author iluha168
-		 * @reason Uses 2 arguments for horizontal space. Removing the method, replacing with a method with 3 args.
-		 */
 		@Overwrite
 		public @Nullable ChunkStatus get(int x, int z) {
-			throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use MinecraftServer4::ChunkLoadStatusView#get instead"));
+			throw Err4.arguments2("MinecraftServer4.ChunkLoadStatusView#get");
 		}
 		@Override
 		public @Nullable ChunkStatus get(int x, int z, int w) {

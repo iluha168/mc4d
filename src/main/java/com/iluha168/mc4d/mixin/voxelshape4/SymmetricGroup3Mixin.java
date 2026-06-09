@@ -1,10 +1,10 @@
 package com.iluha168.mc4d.mixin.voxelshape4;
 
 import com.iluha168.mc4d.math.SymmetricGroup4;
+import com.iluha168.mc4d.util.Err4;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.math.SymmetricGroup3;
-import net.minecraft.util.Util;
 import org.joml.*;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
@@ -46,11 +46,6 @@ public enum SymmetricGroup3Mixin implements SymmetricGroup4 {
 
 	@Shadow
 	SymmetricGroup3Mixin(int p0, int p1, int p2) {}
-
-	@Mutable
-	@Shadow
-	@Final
-	private static SymmetricGroup3[][] CAYLEY_TABLE;
 
 	@Shadow
 	public int permute(int i) {
@@ -108,22 +103,14 @@ public enum SymmetricGroup3Mixin implements SymmetricGroup4 {
 		return i == 3 ? this.p3 : original.call(i);
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason The method is not even used anywhere, removing it, instead of patching.
-	 */
 	@Overwrite
 	public Vector3f permuteVector(Vector3f v) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: permuteVector"));
+		throw Err4.return3(null);
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Single use, patching the call site instead. Replacing with a method for a 4D vector.
-	 */
 	@Overwrite
 	public Vector3i permuteVector(Vector3i v) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use SymmetricGroup4#permutedVector instead."));
+		throw Err4.arguments3("SymmetricGroup4#permutedVector");
 	}
 
 	@Override
@@ -135,13 +122,9 @@ public enum SymmetricGroup3Mixin implements SymmetricGroup4 {
 		v.set(v0, v1, v2, v3);
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Returns a 3x3 matrix. Replacing with a method for a 4x4 matrix.
-	 */
 	@Overwrite
 	public Matrix3fc transformation() {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use SymmetricGroup4#transformation4 instead."));
+		throw Err4.return3("SymmetricGroup4#transformation4");
 	}
 
 	@Override

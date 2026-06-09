@@ -3,10 +3,10 @@ package com.iluha168.mc4d.world.phys.shapes;
 import com.iluha168.mc4d.core.AxisCycle4;
 import com.iluha168.mc4d.core.Direction4;
 import com.iluha168.mc4d.math.OctahedralGroup4;
+import com.iluha168.mc4d.util.Err4;
 import com.mojang.math.OctahedralGroup;
 import net.minecraft.core.AxisCycle;
 import net.minecraft.core.Direction;
-import net.minecraft.util.Util;
 import net.minecraft.world.phys.shapes.DiscreteVoxelShape;
 import org.joml.Vector4i;
 import org.jspecify.annotations.NonNull;
@@ -72,7 +72,7 @@ public abstract class DiscreteVoxelShape4 extends DiscreteVoxelShape {
 	@Override
 	@Deprecated
 	public boolean isFullWide(@Nullable AxisCycle transform, int x, int y, int z) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use DiscreteVoxelShape4#isFullWide instead"));
+		throw Err4.arguments3("DiscreteVoxelShape4#isFullWide");
 	}
 	public boolean isFullWide(AxisCycle transform, int x, int y, int z, int w) {
 		AxisCycle4 transform4 = AxisCycle4.as(transform);
@@ -87,7 +87,7 @@ public abstract class DiscreteVoxelShape4 extends DiscreteVoxelShape {
 	@Override
 	@Deprecated
 	public boolean isFullWide(int x, int y, int z) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use DiscreteVoxelShape4#isFullWide instead"));
+		throw Err4.arguments3("DiscreteVoxelShape4#isFullWide");
 	}
 	public boolean isFullWide(int x, int y, int z, int w) {
 		if (x < 0 || y < 0 || z < 0 || w < 0) {
@@ -99,7 +99,7 @@ public abstract class DiscreteVoxelShape4 extends DiscreteVoxelShape {
 	@Override
 	@Deprecated
 	public boolean isFull(@Nullable AxisCycle transform, int x, int y, int z) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use DiscreteVoxelShape4#isFull instead"));
+		throw Err4.arguments3("DiscreteVoxelShape4#isFull");
 	}
 	public boolean isFull(AxisCycle transform, int x, int y, int z, int w) {
 		AxisCycle4 transform4 = AxisCycle4.as(transform);
@@ -114,14 +114,14 @@ public abstract class DiscreteVoxelShape4 extends DiscreteVoxelShape {
 	@Override
 	@Deprecated
 	public final boolean isFull(final int x, final int y, final int z) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use DiscreteVoxelShape4#isFull instead"));
+		throw Err4.arguments3("DiscreteVoxelShape4#isFull");
 	}
 	public abstract boolean isFull(final int x, final int y, final int z, final int w);
 
 	@Override
 	@Deprecated
 	public final void fill(final int x, final int y, final int z) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use DiscreteVoxelShape4#fill instead"));
+		throw Err4.arguments3("DiscreteVoxelShape4#fill");
 	}
 	public abstract void fill(final int x, final int y, final int z, final int w);
 
@@ -136,7 +136,7 @@ public abstract class DiscreteVoxelShape4 extends DiscreteVoxelShape {
 	@Override
 	@Deprecated
 	public int firstFull(Direction.@Nullable Axis aAxis, int b, int c) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use DiscreteVoxelShape4#firstFull instead."));
+		throw Err4.arguments3("DiscreteVoxelShape4#firstFull");
 	}
 	public int firstFull(Direction.Axis aAxis, int b, int c, int d) {
 		int aSize = this.getSize(aAxis);
@@ -161,7 +161,7 @@ public abstract class DiscreteVoxelShape4 extends DiscreteVoxelShape {
 	@Override
 	@Deprecated
 	public int lastFull(Direction.@Nullable Axis aAxis, int b, int c) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use DiscreteVoxelShape4#lastFull instead."));
+		throw Err4.arguments3("DiscreteVoxelShape4#lastFull");
 	}
 	public int lastFull(Direction.Axis aAxis, int b, int c, int d) {
 		if (b < 0 || c < 0 || d < 0) {
@@ -196,7 +196,7 @@ public abstract class DiscreteVoxelShape4 extends DiscreteVoxelShape {
 	@Override
 	@Deprecated
 	public void forAllEdges(DiscreteVoxelShape.@NonNull IntLineConsumer consumer, boolean mergeNeighbors) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use DiscreteVoxelShape4#forAllEdges instead."));
+		throw Err4.arguments3("DiscreteVoxelShape4#forAllEdges");
 	}
 	public void forAllEdges(DiscreteVoxelShape4.@NonNull IntLineConsumer consumer, boolean mergeNeighbors) {
 		this.forAllAxisEdges(consumer, AxisCycle.NONE, mergeNeighbors);
@@ -268,7 +268,7 @@ public abstract class DiscreteVoxelShape4 extends DiscreteVoxelShape {
 	@Override
 	@Deprecated
 	public void forAllBoxes(DiscreteVoxelShape.@NonNull IntLineConsumer consumer, boolean mergeNeighbors) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use DiscreteVoxelShape4#forAllBoxes instead."));
+		throw Err4.arguments3("DiscreteVoxelShape4#forAllBoxes");
 	}
 	public void forAllBoxes(DiscreteVoxelShape4.IntLineConsumer consumer, boolean mergeNeighbors) {
 		BitSetDiscreteVoxelShape4.forAllBoxes(this, consumer, mergeNeighbors);
@@ -277,7 +277,7 @@ public abstract class DiscreteVoxelShape4 extends DiscreteVoxelShape {
 	@Override
 	@Deprecated
 	public void forAllFaces(DiscreteVoxelShape.@Nullable IntFaceConsumer consumer) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use DiscreteVoxelShape4#forAllFaces instead."));
+		throw Err4.arguments3("DiscreteVoxelShape4#forAllFaces");
 	}
 	public void forAllFaces(DiscreteVoxelShape4.IntFaceConsumer consumer) {
 		this.forAllAxisFaces(consumer, AxisCycle.NONE);

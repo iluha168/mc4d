@@ -3,13 +3,13 @@ package com.iluha168.mc4d.mixin.position4;
 import com.google.common.collect.ImmutableList;
 import com.iluha168.mc4d.core.Direction4;
 import com.iluha168.mc4d.core.Vec4i;
+import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
-import net.minecraft.util.Util;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.ArrayUtils;
 import org.spongepowered.asm.mixin.Final;
@@ -97,13 +97,9 @@ public enum DirectionMixin implements Direction4 {
 	// TODO getApproximateNearest
 	// TODO getApproximateNearest
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, making call sites use the other one.
-	 */
 	@Overwrite
 	public static Direction getNearest(int x, int y, int z, Direction orElse) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use getNearest(Vec3i, Direction) instead."));
+		throw Err4.arguments3("Direction#getNearest(Vec4, Direction)");
 	}
 	@Redirect(method = "getNearest(Lnet/minecraft/core/Vec3i;Lnet/minecraft/core/Direction;)Lnet/minecraft/core/Direction;", at = @At(
 		value = "INVOKE",
@@ -162,17 +158,17 @@ public enum DirectionMixin implements Direction4 {
 
 			@Override
 			public int choose(int x, int y, int z) {
-				throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: choose"));
+				throw Err4.arguments3("Direction4.Axis#choose");
 			}
 
 			@Override
 			public double choose(double x, double y, double z) {
-				throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: choose"));
+				throw Err4.arguments3("Direction4.Axis#choose");
 			}
 
 			@Override
 			public boolean choose(boolean x, boolean y, boolean z) {
-				throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: choose"));
+				throw Err4.arguments3("Direction4.Axis#choose");
 			}
 
 			@Override
@@ -251,31 +247,19 @@ public enum DirectionMixin implements Direction4 {
 			"net/minecraft/core/Direction$Axis$3",
 		})
 		static class XYZAxisMixin {
-			/**
-			 * @author iluha168
-			 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-			 */
 			@Inject(method = "choose(III)I", at = @At("HEAD"))
 			void choose(int x, int y, int z, CallbackInfoReturnable<Integer> cir) {
-				throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use Direction4.axis.choose instead."));
+				throw Err4.arguments3("Direction4.Axis#choose");
 			}
 
-			/**
-			 * @author iluha168
-			 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-			 */
 			@Inject(method = "choose(ZZZ)Z", at = @At("HEAD"))
 			void choose(boolean x, boolean y, boolean z, CallbackInfoReturnable<Boolean> cir) {
-				throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use Direction4.Axis.choose instead."));
+				throw Err4.arguments3("Direction4.Axis#choose");
 			}
 
-			/**
-			 * @author iluha168
-			 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-			 */
 			@Inject(method = "choose(DDD)D", at = @At("HEAD"))
 			void choose(double x, double y, double z, CallbackInfoReturnable<Double> cir) {
-				throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use Direction4.Axis.choose instead."));
+				throw Err4.arguments3("Direction4.Axis#choose");
 			}
 		}
 

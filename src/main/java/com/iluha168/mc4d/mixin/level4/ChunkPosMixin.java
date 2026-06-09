@@ -3,6 +3,7 @@ package com.iluha168.mc4d.mixin.level4;
 import com.iluha168.mc4d.core.BlockPos4;
 import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.math.MathHelpers;
+import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.level.ChunkPos4;
 import com.iluha168.mc4d.world.level.Level4;
 import com.llamalad7.mixinextras.expression.Definition;
@@ -19,7 +20,10 @@ import net.minecraft.util.Util;
 import net.minecraft.world.level.ChunkPos;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.*;
-import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
@@ -46,7 +50,7 @@ class ChunkPosMixin implements ChunkPos4 {
 	@Override
 	public int w() {
 		if (wNotSet) {
-			throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: ChunkPos#w not set."));
+			throw Err4.field4missing("w");
 		}
 		return w;
 	}
@@ -118,22 +122,14 @@ class ChunkPosMixin implements ChunkPos4 {
 		);
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 2 arguments for horizontal space. Removing the method, replacing with a method with 3 args.
-	 */
 	@Overwrite
 	public static ChunkPos minFromRegion(int regionX, int regionZ) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use ChunkPos4#minFromRegion instead"));
+		throw Err4.arguments2("ChunkPos4#minFromRegion");
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 2 arguments for horizontal space. Removing the method, replacing with a method with 3 args.
-	 */
 	@Overwrite
 	public static ChunkPos maxFromRegion(int regionX, int regionZ) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use ChunkPos4#maxFromRegion instead"));
+		throw Err4.arguments2("ChunkPos4#maxFromRegion");
 	}
 
 	@Redirect(method = "isValid()Z", at = @At(
@@ -144,13 +140,9 @@ class ChunkPosMixin implements ChunkPos4 {
 		return ChunkPos4.isValid(x, z, this.w());
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 2 arguments for horizontal space. Removing the method, replacing with a method with 3 args.
-	 */
 	@Overwrite
 	public static boolean isValid(int x, int z) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use ChunkPos4#isValid instead"));
+		throw Err4.arguments2("ChunkPos4#isValid");
 	}
 
 	@Redirect(method = "pack()J", at = @At(
@@ -161,13 +153,9 @@ class ChunkPosMixin implements ChunkPos4 {
 		return ChunkPos4.pack(x, z, this.w());
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 2 arguments for horizontal space. Removing the method, replacing with a method with 3 args.
-	 */
 	@Overwrite
 	public static long pack(int x, int z) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use ChunkPos4#pack instead"));
+		throw Err4.arguments2("ChunkPos4#pack");
 	}
 
 	@Redirect(method = "pack(Lnet/minecraft/core/BlockPos;)J", at = @At(
@@ -204,22 +192,14 @@ class ChunkPosMixin implements ChunkPos4 {
 		return ChunkPos4.hash(x, z, this.w());
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 2 arguments for horizontal space. Removing the method, replacing with a method with 3 args.
-	 */
 	@Overwrite
 	public static int hash(int x, int z) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use ChunkPos4#hash instead"));
+		throw Err4.arguments2("ChunkPos4#hash");
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-	 */
 	@Overwrite
 	public BlockPos getBlockAt(int x, int y, int z) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use SectionPos4#getBlockAt instead"));
+		throw Err4.arguments3("SectionPos4#getBlockAt");
 	}
 	@Override
 	public BlockPos getBlockAt(int x, int y, int z, int w) {
@@ -261,13 +241,9 @@ class ChunkPosMixin implements ChunkPos4 {
 		return ChunkPos4.as(This).getChessboardDistance(x, z, ChunkPos4.as(pos).w());
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 2 arguments for horizontal space. Removing the method, replacing with a method with 3 args.
-	 */
 	@Overwrite
 	public int getChessboardDistance(int x, int z) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use SectionPos4#getChessboardDistance instead"));
+		throw Err4.arguments2("SectionPos4#getChessboardDistance");
 	}
 	@Override
 	public int getChessboardDistance(int x, int z, int w) {
@@ -290,13 +266,9 @@ class ChunkPosMixin implements ChunkPos4 {
 		return this.distanceSquared(x, z, ChunkPos4.getW(pos));
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 2 arguments for horizontal space. Removing the method, replacing with a method with 3 args.
-	 */
 	@Overwrite
 	private int distanceSquared(int x, int z) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use SectionPos4#distanceSquared instead"));
+		throw Err4.arguments2("SectionPos4#distanceSquared");
 	}
 	@Unique
 	private int distanceSquared(int x, int z, int w) {

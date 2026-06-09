@@ -3,6 +3,7 @@ package com.iluha168.mc4d.mixin.voxelshape4;
 import com.google.common.collect.Maps;
 import com.iluha168.mc4d.core.Direction4;
 import com.iluha168.mc4d.math.OctahedralGroup4;
+import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.phys.AABB4;
 import com.iluha168.mc4d.world.phys.Vec4;
 import com.iluha168.mc4d.world.phys.shapes.ArrayVoxelShape4;
@@ -14,7 +15,6 @@ import com.mojang.math.OctahedralGroup;
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
 import net.minecraft.core.Direction;
-import net.minecraft.util.Util;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.*;
@@ -82,25 +82,17 @@ public class ShapesMixin {
 	// `empty` does not need an override.
 	// `block` does not need an override.
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-	 */
 	@Overwrite
 	public static VoxelShape box(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
 		if (minX == minZ && maxX == maxZ) {
 			return Shapes4.box(minX, minY, minZ, minZ, maxX, maxY, maxZ, maxZ);
 		}
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use Shapes4.box instead."));
+		throw Err4.arguments3("Shapes4#box");
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-	 */
 	@Overwrite
 	public static VoxelShape create(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use Shapes4.create instead."));
+		throw Err4.arguments3("Shapes4#create");
 	}
 
 	@Redirect(method = "create(Lnet/minecraft/world/phys/AABB;)Lnet/minecraft/world/phys/shapes/VoxelShape;", at = @At(
@@ -113,7 +105,7 @@ public class ShapesMixin {
 		@Local(name = "aabb", argsOnly = true) AABB aabb
 	) {
 		if (!(aabb instanceof AABB4 aabb4)) {
-			throw  Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: supply AABB4."));
+			throw Err4.container3();
 		}
 		return Shapes4.create(
 			minX, minY, minZ, aabb4.minW,
@@ -212,10 +204,6 @@ public class ShapesMixin {
 		);
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Could not make the linter shut up. Is there a way to type check this?
-	 */
 	@Overwrite
 	public static Map<Direction.Axis, VoxelShape> rotateHorizontalAxis(VoxelShape zAxis, Vec3 rotationCenter) {
 		return Maps.newEnumMap(Map.of(

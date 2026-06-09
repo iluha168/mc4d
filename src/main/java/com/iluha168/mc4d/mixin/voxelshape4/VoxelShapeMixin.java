@@ -3,6 +3,7 @@ package com.iluha168.mc4d.mixin.voxelshape4;
 import com.iluha168.mc4d.core.Direction4;
 import com.iluha168.mc4d.core.Position4;
 import com.iluha168.mc4d.core.Vec4i;
+import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.phys.AABB4;
 import com.iluha168.mc4d.world.phys.Vec4;
 import com.iluha168.mc4d.world.phys.shapes.ArrayVoxelShape4;
@@ -15,7 +16,6 @@ import net.minecraft.core.AxisCycle;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
-import net.minecraft.util.Util;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.*;
@@ -89,10 +89,6 @@ class VoxelShapeMixin implements VoxelShape4 {
 		return ((VoxelShape4) instance).move(dx, dy, dz, Vec4i.getW(delta));
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-	 */
 	@Overwrite
 	public VoxelShape move(double dx, double dy, double dz) {
 		// If only one axis is non-zero, the call site intends to move only along one axis, set dw to 0.
@@ -102,7 +98,7 @@ class VoxelShapeMixin implements VoxelShape4 {
 		) {
 			return this.move(dx, dy, dz, 0);
 		}
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use VoxelShape4#move instead."));
+		throw Err4.arguments3("VoxelShape4#move");
 	}
 
 	@Override
@@ -127,13 +123,9 @@ class VoxelShapeMixin implements VoxelShape4 {
 		);
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-	 */
 	@Overwrite
 	public void forAllEdges(Shapes.DoubleLineConsumer consumer) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use VoxelShape4#forAllEdges instead."));
+		throw Err4.arguments3("VoxelShape4#forAllEdges");
 	}
 	@Override
 	public void forAllEdges(Shapes4.DoubleLineConsumer consumer) {
@@ -152,13 +144,9 @@ class VoxelShapeMixin implements VoxelShape4 {
 		);
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-	 */
 	@Overwrite
 	public void forAllBoxes(Shapes.DoubleLineConsumer consumer) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use VoxelShape4#forAllBoxes instead."));
+		throw Err4.arguments3("VoxelShape4#forAllBoxes");
 	}
 	@Override
 	public void forAllBoxes(Shapes4.DoubleLineConsumer consumer) {
@@ -205,7 +193,7 @@ class VoxelShapeMixin implements VoxelShape4 {
 		@Local(argsOnly = true, name = "pos") BlockPos pos
 	) {
 		if (!(testPoint instanceof Vec4 testPoint4)) {
-			throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: supply a Vec4."));
+			throw Err4.container3();
 		}
 		final int w = this.findIndex(Direction4.Axis.W, testPoint4.w - Vec4i.getW(pos));
 		return ((DiscreteVoxelShape4) shape).isFullWide(x, y, z, w);

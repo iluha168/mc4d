@@ -1,12 +1,12 @@
 package com.iluha168.mc4d.mixin.position4.patches;
 
+import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mojang.serialization.Codec;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.Util;
 import net.minecraft.world.phys.Vec3;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
@@ -26,7 +26,7 @@ class ServerPlayerMixin {
 	@Inject(method = "setKnownMovement", at = @At("HEAD"))
 	void setKnownMovement(Vec3 lastKnownClientMovement, CallbackInfo ci) {
 		if (!(lastKnownClientMovement instanceof Vec4)) {
-			throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: supply a Vec4."));
+			throw Err4.container3();
 		}
 	}
 

@@ -3,10 +3,10 @@ package com.iluha168.mc4d.world.phys;
 import com.iluha168.mc4d.core.Direction4;
 import com.iluha168.mc4d.core.Position4;
 import com.iluha168.mc4d.core.Vec4i;
+import com.iluha168.mc4d.util.Err4;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
-import net.minecraft.util.Util;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
@@ -134,7 +134,7 @@ public class AABB4 extends AABB implements IAABB4 {
 	@Override
 	@Deprecated
 	public @NonNull AABB4 contract(double xa, double ya, double za) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: contract"));
+		throw Err4.arguments3("AABB4#contract");
 	}
 
 	public @NonNull AABB4 contract(double xa, double ya, double za, double wa) {
@@ -183,7 +183,7 @@ public class AABB4 extends AABB implements IAABB4 {
 			// Call site intends to modify only the Y axis
 			return this.expandTowards(xa, ya, za, za);
 		}
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use expandTowards(Vec3) instead."));
+		throw Err4.arguments3("AABB4#expandTowards");
 	}
 
 	public @NonNull AABB4 expandTowards(double xa, double ya, double za, double wa) {
@@ -227,7 +227,7 @@ public class AABB4 extends AABB implements IAABB4 {
 			// Y-only
 			return this.inflate(xAdd, yAdd, zAdd, zAdd);
 		}
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use AABB4.inflate instead."));
+		throw Err4.arguments3("AABB4#inflate");
 	}
 
 	public @NonNull AABB4 inflate(double xAdd, double yAdd, double zAdd, double wAdd) {
@@ -280,7 +280,7 @@ public class AABB4 extends AABB implements IAABB4 {
 			// Call site intends to modify only the Y axis
 			return this.move(xa, ya, za, za);
 		}
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use AABB4.move instead."));
+		throw Err4.arguments3("AABB4#move");
 	}
 
 	public @NonNull AABB4 move(double xa, double ya, double za, double wa) {
@@ -306,7 +306,7 @@ public class AABB4 extends AABB implements IAABB4 {
 	@Override
 	@Deprecated
 	public @NonNull AABB4 move(@NonNull Vector3f pos) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use AABB4.move instead."));
+		throw Err4.arguments3("AABB4#move");
 	}
 
 	public boolean intersects(AABB aabb) {
@@ -320,7 +320,7 @@ public class AABB4 extends AABB implements IAABB4 {
 	@Override
 	@Deprecated
 	public boolean intersects(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use AABB4.intersects instead."));
+		throw Err4.arguments3("AABB4#intersects");
 	}
 
 	public boolean intersects(double minX, double minY, double minZ, double minW, double maxX, double maxY, double maxZ, double maxW) {
@@ -357,7 +357,7 @@ public class AABB4 extends AABB implements IAABB4 {
 	@Override
 	@Deprecated
 	public boolean contains(double x, double y, double z) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use AABB4.contains instead."));
+		throw Err4.arguments3("AABB4#contains");
 	}
 
 	public boolean contains(double x, double y, double z, double w) {
@@ -381,7 +381,7 @@ public class AABB4 extends AABB implements IAABB4 {
 	@Override
 	@Deprecated
 	public @NonNull AABB4 deflate(double xSubtract, double ySubtract, double zSubtract) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use AABB4.deflate instead."));
+		throw Err4.arguments3("AABB4#deflate");
 	}
 
 	public @NonNull AABB4 deflate(double xSubtract, double ySubtract, double zSubtract, double wSubtract) {
@@ -500,8 +500,7 @@ public class AABB4 extends AABB implements IAABB4 {
 		Vec4 to = from.add(vector);
 
 		for (AABB shapePart : aabbs) {
-			if (!(shapePart instanceof AABB4 shapePart4))
-				throw Util.pauseInIde(new IllegalArgumentException("shapePart must be AABB4"));
+			if (!(shapePart instanceof AABB4 shapePart4)) throw Err4.container3();
 			AABB4 inflated = shapePart4.inflate(
 				this.getXsize() * 0.5 - EPSILON,
 				this.getYsize() * 0.5 - EPSILON,

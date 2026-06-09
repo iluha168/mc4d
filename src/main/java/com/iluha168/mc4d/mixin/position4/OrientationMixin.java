@@ -1,9 +1,9 @@
 package com.iluha168.mc4d.mixin.position4;
 
+import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.level.redstone.Orientation4;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
-import net.minecraft.util.Util;
 import net.minecraft.world.level.redstone.Orientation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public class OrientationMixin {
 	/**
 	 * @author iluha168
-	 * @reason This would take 3 mixins to patch, and I am lazy.
+	 * @reason TODO This would take 3 mixins to patch, and I am lazy.
 	 */
 	@Overwrite
 	private static Orientation[] lambda$static$0() {
@@ -27,11 +27,11 @@ public class OrientationMixin {
 		value = "INVOKE",
 		target = "Lnet/minecraft/core/Vec3i;cross(Lnet/minecraft/core/Vec3i;)Lnet/minecraft/core/Vec3i;"
 	))
-	Vec3i stopCrash(Vec3i instance, Vec3i upVector) {
+	Vec3i stopCrash(Vec3i frontVector, Vec3i upVector) {
 		if (!((Orientation) (Object) this instanceof Orientation4)) {
-			throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use Orientation4::new instead."));
+			throw Err4.container3();
 		}
 		// The actual constructor is ignored and has fields overridden in Orientation4
-		return instance;
+		return frontVector;
 	}
 }

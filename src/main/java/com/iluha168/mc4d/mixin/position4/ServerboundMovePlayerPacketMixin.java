@@ -1,11 +1,11 @@
 package com.iluha168.mc4d.mixin.position4;
 
 import com.iluha168.mc4d.network.protocol.game.ServerboundMovePlayerPacket4;
+import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
-import net.minecraft.util.Util;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -39,7 +39,7 @@ public class ServerboundMovePlayerPacketMixin implements ServerboundMovePlayerPa
 	public static abstract class PosMixin extends ServerboundMovePlayerPacketMixin {
 		@Inject(method = "<init>(DDDZZ)V", at = @At("HEAD"))
 		private static void remove3ArgsConstructor(double x, double y, double z, boolean onGround, boolean horizontalCollision, CallbackInfo ci) {
-			throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use new Pos(Vec3, ...) instead."));
+			throw Err4.arguments3("Pos::new(Vec4, boolean, boolean)");
 		}
 
 		@Inject(method = "<init>(Lnet/minecraft/world/phys/Vec3;ZZ)V", at = @At("TAIL"))
@@ -69,7 +69,7 @@ public class ServerboundMovePlayerPacketMixin implements ServerboundMovePlayerPa
 	public static abstract class PosRotMixin extends ServerboundMovePlayerPacketMixin {
 		@Inject(method = "<init>(DDDFFZZ)V", at = @At("HEAD"))
 		private static void remove3ArgsConstructor(double x, double y, double z, float yRot, float xRot, boolean onGround, boolean horizontalCollision, CallbackInfo ci) {
-			throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use new PosRot(Vec3, ...) instead."));
+			throw Err4.arguments3("PosRot::new(Vec4, ...)");
 		}
 
 		@Inject(method = "<init>(Lnet/minecraft/world/phys/Vec3;FFZZ)V", at = @At("TAIL"))

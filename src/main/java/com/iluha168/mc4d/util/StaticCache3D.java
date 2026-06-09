@@ -1,7 +1,6 @@
 package com.iluha168.mc4d.util;
 
 import net.minecraft.util.StaticCache2D;
-import net.minecraft.util.Util;
 import org.jspecify.annotations.NonNull;
 
 import java.util.Locale;
@@ -41,7 +40,7 @@ public class StaticCache3D<T> extends StaticCache2D<T> {
 
 	@Override
 	public @NonNull T get(int x, int z) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use StaticCache3D#get instead."));
+		throw Err4.arguments2("StaticCache3D#get");
 	}
 	public @NonNull T get(int x, int z, int w) {
 		if (this.contains(x, z, w)) {
@@ -53,7 +52,7 @@ public class StaticCache3D<T> extends StaticCache2D<T> {
 
 	@Override
 	public boolean contains(int x, int z) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use StaticCache3D#contains instead."));
+		throw Err4.arguments2("StaticCache3D#contains");
 	}
 	public boolean contains(int x, int z, int w) {
 		int deltaW = w - this.minW;

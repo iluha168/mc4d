@@ -1,9 +1,9 @@
 package com.iluha168.mc4d.mixin.position4.patches;
 
+import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.phys.AABB4;
 import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.sugar.Local;
-import net.minecraft.util.Util;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
@@ -89,14 +89,10 @@ abstract class PlayerMixin {
 		return this.canFallAtLeast(deltaX, deltaZ, 0, minHeight);
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-	 */
 	@Overwrite
 	@Deprecated
 	private boolean canFallAtLeast(double deltaX, double deltaZ, double minHeight) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space. Do not use a private method instead."));
+		throw Err4.arguments2(null);
 	}
 	@Unique
 	private boolean canFallAtLeast(double deltaX, double deltaZ, double deltaW, double minHeight) {

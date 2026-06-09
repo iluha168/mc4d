@@ -1,9 +1,9 @@
 package com.iluha168.mc4d.mixin.position4;
 
 import com.iluha168.mc4d.core.Position4;
+import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.phys.AABB4;
 import com.llamalad7.mixinextras.sugar.Local;
-import net.minecraft.util.Util;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -38,12 +38,8 @@ public class EntityDimensionsMixin {
 		);
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Use existing Vec3 method.
-	 */
 	@Overwrite
 	public AABB makeBoundingBox(double x, double y, double z) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use makeBoundingBox(Vec4) instead."));
+		throw Err4.arguments3("EntityDimensions#makeBoundingBox(Vec4)");
 	}
 }

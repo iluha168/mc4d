@@ -2,9 +2,9 @@ package com.iluha168.mc4d.mixin.voxelshape4;
 
 import com.iluha168.mc4d.core.AxisCycle4;
 import com.iluha168.mc4d.core.Direction4;
+import com.iluha168.mc4d.util.Err4;
 import net.minecraft.core.AxisCycle;
 import net.minecraft.core.Direction;
-import net.minecraft.util.Util;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
@@ -17,12 +17,12 @@ enum AxisCycleMixin implements AxisCycle4 {
 	TRANSPOSE {
 		@Override
 		public int cycle(int x, int y, int z, Direction.Axis axis) {
-			throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use AxisCycle4#cycle instead."));
+			throw Err4.arguments3("AxisCycle4#cycle");
 		}
 
 		@Override
 		public double cycle(double x, double y, double z, Direction.Axis axis) {
-			throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use AxisCycle4#cycle instead."));
+			throw Err4.arguments3("AxisCycle4#cycle");
 		}
 
 		@Override
@@ -52,22 +52,14 @@ enum AxisCycleMixin implements AxisCycle4 {
 		"net/minecraft/core/AxisCycle$3",
 	})
 	static class AxisCycleMembersMixin {
-		/**
-		 * @author iluha168
-		 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-		 */
 		@Inject(method = "cycle(IIILnet/minecraft/core/Direction$Axis;)I", at = @At("HEAD"))
 		void cycle(int x, int y, int z, Direction.Axis axis, CallbackInfoReturnable<Integer> cir)  {
-			throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use AxisCycle4#cycle instead."));
+			throw Err4.arguments3("AxisCycle4#cycle");
 		}
 
-		/**
-		 * @author iluha168
-		 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-		 */
 		@Inject(method = "cycle(DDDLnet/minecraft/core/Direction$Axis;)D", at = @At("HEAD"))
 		void cycle(double x, double y, double z, Direction.Axis axis, CallbackInfoReturnable<Double> cir)  {
-			throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use AxisCycle4#cycle instead."));
+			throw Err4.arguments3("AxisCycle4#cycle");
 		}
 	}
 

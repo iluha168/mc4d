@@ -2,6 +2,7 @@ package com.iluha168.mc4d.mixin.position4;
 
 import com.iluha168.mc4d.network.protocol.game.ServerboundMovePlayerPacket4;
 import com.iluha168.mc4d.server.network.ServerGamePacketListenerImpl4;
+import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.entity.Entity4;
 import com.iluha168.mc4d.world.phys.AABB4;
 import com.iluha168.mc4d.world.phys.Vec4;
@@ -15,7 +16,6 @@ import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.util.Mth;
-import net.minecraft.util.Util;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.PositionMoveRotation;
 import net.minecraft.world.entity.Relative;
@@ -62,13 +62,9 @@ public abstract class ServerGamePacketListenerImplMixin implements ServerGamePac
 	@Unique
 	private double lastGoodW;
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, making call sites use teleport(Vec4, yRot, xRot).
-	 */
 	@Overwrite
 	public void teleport(double x, double y, double z, float yRot, float xRot) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use ServerGamePacketListenerImpl4.teleport."));
+		throw Err4.arguments3("ServerGamePacketListenerImpl4#teleport");
 	}
 
 	@Override
@@ -415,13 +411,9 @@ public abstract class ServerGamePacketListenerImplMixin implements ServerGamePac
 	//     }
 	// }
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-	 */
 	@Overwrite
 	private boolean isEntityCollidingWithAnythingNew(LevelReader level, Entity entity, AABB oldAABB, double newX, double newY, double newZ) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use ServerGamePacketListenerImpl4#isEntityCollidingWithAnythingNew instead."));
+		throw Err4.arguments3("ServerGamePacketListenerImpl4#isEntityCollidingWithAnythingNew");
 	}
 	@Override
 	public boolean isEntityCollidingWithAnythingNew(LevelReader level, Entity entity, AABB oldAABB, Vec4 targetPos) {

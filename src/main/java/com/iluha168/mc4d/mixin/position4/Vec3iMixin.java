@@ -3,6 +3,7 @@ package com.iluha168.mc4d.mixin.position4;
 import com.google.common.base.MoreObjects;
 import com.iluha168.mc4d.core.Direction4;
 import com.iluha168.mc4d.core.Vec4i;
+import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
@@ -108,7 +109,7 @@ public abstract class Vec3iMixin implements Vec4i {
 	@Override
 	public int getW() {
 		if (wNotSet) {
-			throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: Vec4i#w not set."));
+			throw Err4.field4missing("w");
 		}
 		return w;
 	}
@@ -120,13 +121,9 @@ public abstract class Vec3iMixin implements Vec4i {
 		return this;
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-	 */
 	@Overwrite
 	public Vec3i offset(int x, int y, int z) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use Vec4i#offset instead"));
+		throw Err4.arguments3("Vec4i#offset");
 	}
 
 	@Redirect(method = "offset(Lnet/minecraft/core/Vec3i;)Lnet/minecraft/core/Vec3i;", at = @At(
@@ -153,13 +150,9 @@ public abstract class Vec3iMixin implements Vec4i {
 		return Vec4i.from(x, y, z, this.getW() * scale);
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-	 */
 	@Overwrite
 	public Vec3i multiply(int xScale, int yScale, int zScale) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use Vec4i#multiply instead"));
+		throw Err4.arguments3("Vec4i#multiply");
 	}
 
 	@Redirect(method = "relative(Lnet/minecraft/core/Direction;I)Lnet/minecraft/core/Vec3i;", at = @At(
@@ -187,13 +180,9 @@ public abstract class Vec3iMixin implements Vec4i {
 		return Vec4i.from(x, y, z, this.getW() + wStep);
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason What else am I supposed to do here?
-	 */
 	@Overwrite
 	public Vec3i cross(Vec3i upVector) {
-		throw Util.pauseInIde(new ArithmeticException("No cross product defined for 4D space"));
+		throw Err4.math("No cross product defined for 4D space");
 	}
 
 	// `closerThan` does not need an override.
@@ -217,22 +206,14 @@ public abstract class Vec3iMixin implements Vec4i {
 			: original.call(pos);
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-	 */
 	@Overwrite
 	public double distToCenterSqr(double x, double y, double z) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use Vec4i#distToCenterSqr instead"));
+		throw Err4.arguments3("Vec4i#distToCenterSqr");
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-	 */
 	@Overwrite
 	public double distToLowCornerSqr(double x, double y, double z) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use Vec4i#distToLowCornerSqr instead"));
+		throw Err4.arguments3("Vec4i#distToLowCornerSqr");
 	}
 
 	@Expression("return (int) (@(?))")
@@ -257,13 +238,9 @@ public abstract class Vec3iMixin implements Vec4i {
 		return Direction4.Axis.as(axis).choose(x, y, z, this.getW());
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Returns a 3D vector from org.joml.
-	 */
 	@Overwrite
 	public Vector3i toMutable()	{
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: this method returns a 3D vector."));
+		throw Err4.return3(null);
 	}
 
 	@Redirect(method = "toString", at = @At(

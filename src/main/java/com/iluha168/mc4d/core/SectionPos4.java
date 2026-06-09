@@ -13,7 +13,7 @@ import java.util.stream.StreamSupport;
 
 /**
  * The reason chunks are 16x16 horizontally, well, 16x16x16 now!
- * All {@link SectionPos} instances are secretly {@link SectionPos4}
+ * All {@link SectionPos} instances are secretly {@link SectionPos4}.
  */
 public interface SectionPos4 {
 	/** A bit for sign, plus bits to index any section in a Level4. */

@@ -1,11 +1,11 @@
 package com.iluha168.mc4d.mixin.position4;
 
+import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.entity.Relative4;
 import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.sugar.Local;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.util.Util;
 import net.minecraft.world.entity.PositionMoveRotation;
 import net.minecraft.world.entity.Relative;
 import net.minecraft.world.phys.Vec3;
@@ -47,7 +47,7 @@ public class PositionMoveRotationMixin {
 	@Inject(method = "<init>", at = @At("HEAD"))
 	private static void constructor(Vec3 position, Vec3 deltaMovement, float yRot, float xRot, CallbackInfo ci) {
 		if (!(position instanceof Vec4 && deltaMovement instanceof Vec4)) {
-			throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: supply a Vec4."));
+			throw Err4.container3();
 		}
 	}
 

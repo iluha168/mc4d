@@ -3,6 +3,7 @@ package com.iluha168.mc4d.mixin.position4;
 import com.iluha168.mc4d.core.BlockPos4;
 import com.iluha168.mc4d.core.Position4;
 import com.iluha168.mc4d.core.Vec4i;
+import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.entity.Entity4;
 import com.iluha168.mc4d.world.phys.AABB4;
 import com.iluha168.mc4d.world.phys.Vec4;
@@ -18,7 +19,6 @@ import net.minecraft.core.SectionPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
-import net.minecraft.util.Util;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.PositionMoveRotation;
@@ -141,13 +141,9 @@ public abstract class EntityMixin implements Entity4 {
 		return ((Vec4) this.position).w;
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-	 */
 	@Overwrite
 	public final void setPosRaw(double x, double y, double z) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use Entity4.setPosRaw instead."));
+		throw Err4.arguments3("Entity4#setPosRaw");
 	}
 
 	@Override
@@ -189,13 +185,9 @@ public abstract class EntityMixin implements Entity4 {
 		}
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, making call sites use setPos(Vec3).
-	 */
 	@Overwrite
 	public void setPos(double x, double y, double z) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use setPos(Vec3)."));
+		throw Err4.arguments3("Entity#setPos(Vec4)");
 	}
 
 	@Redirect(method = "setPos(Lnet/minecraft/world/phys/Vec3;)V", at = @At(
@@ -207,13 +199,9 @@ public abstract class EntityMixin implements Entity4 {
 		this.setBoundingBox(this.makeBoundingBox());
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, making call sites use snapTo(Vec3, yRot, xRot).
-	 */
 	@Overwrite
 	public void snapTo(double x, double y, double z, float yRot, float xRot) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use snapTo(Vec3, yRot, xRot)."));
+		throw Err4.arguments3("Entity#snapTo(Vec4, yRot, xRot).");
 	}
 
 	@Redirect(method = "snapTo(Lnet/minecraft/world/phys/Vec3;FF)V", at = @At(
@@ -229,13 +217,9 @@ public abstract class EntityMixin implements Entity4 {
 		this.reapplyPosition();
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, making call sites use snapTo(Vec3).
-	 */
 	@Overwrite
 	public void snapTo(double x, double y, double z) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use snapTo(Vec3)."));
+		throw Err4.arguments3("Entity#snapTo(Vec4)");
 	}
 
 	@Redirect(method = "snapTo(Lnet/minecraft/world/phys/Vec3;)V", at = @At(
@@ -246,13 +230,9 @@ public abstract class EntityMixin implements Entity4 {
 		entity.snapTo(pos, entity.getYRot(), entity.getXRot());
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, making call sites use absSnapTo(Vec3).
-	 */
 	@Overwrite
 	public void absSnapTo(double x, double y, double z) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use Entity4.absSnapTo instead."));
+		throw Err4.arguments3("Entity4#absSnapTo instead.");
 	}
 
 	@Override
@@ -267,13 +247,9 @@ public abstract class EntityMixin implements Entity4 {
 		this.setPos(new Vec4(cx, newPos.y, cz, cw));
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, making call sites use absSnapTo(Vec3, yRot, xRot).
-	 */
 	@Overwrite
 	public void absSnapTo(double x, double y, double z, float yRot, float xRot) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use Entity4.absSnapTo instead."));
+		throw Err4.arguments3("Entity4#absSnapTo");
 	}
 
 	@Override
@@ -553,18 +529,14 @@ public abstract class EntityMixin implements Entity4 {
 	//     }
 	// }
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-	 */
 	@Overwrite
 	public void setDeltaMovement(double xd, double yd, double zd) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use Entity.setDeltaMovement(Vec4) instead."));
+		throw Err4.arguments3("Entity#setDeltaMovement(Vec4)");
 	}
 	@Inject(method = "setDeltaMovement(Lnet/minecraft/world/phys/Vec3;)V", at = @At("HEAD"))
 	void setDeltaMovement(Vec3 deltaMovement, CallbackInfo ci) {
 		if (!(deltaMovement instanceof Vec4)) {
-			throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: supply Vec4."));
+			throw Err4.container3();
 		}
 	}
 
@@ -645,13 +617,9 @@ public abstract class EntityMixin implements Entity4 {
 		return new Vec4(x, y, z, ((Vec4) movement).w);
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-	 */
 	@Overwrite
 	public final void doCheckFallDamage(double xa, double ya, double za, boolean onGround) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use Entity4#doCheckFallDamage instead."));
+		throw Err4.arguments3("Entity4#doCheckFallDamage");
 	}
 	@Override
 	public void doCheckFallDamage(Vec4 movement, boolean onGround) {
@@ -663,13 +631,9 @@ public abstract class EntityMixin implements Entity4 {
 		}
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-	 */
 	@Overwrite
 	public boolean teleportTo(ServerLevel level, double x, double y, double z, Set<Relative> relatives, float newYRot, float newXRot, boolean resetCamera) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use Entity4#teleportTo instead."));
+		throw Err4.arguments3("Entity4#teleportTo");
 	}
 	@Override
 	public boolean teleportTo(ServerLevel level, Vec4 newPos, Set<Relative> relatives, float newYRot, float newXRot, boolean resetCamera) {

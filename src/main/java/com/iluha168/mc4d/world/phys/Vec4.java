@@ -4,6 +4,7 @@ import com.iluha168.mc4d.core.Direction4;
 import com.iluha168.mc4d.core.Position4;
 import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.network.LpVec4;
+import com.iluha168.mc4d.util.Err4;
 import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.Direction;
@@ -96,7 +97,7 @@ public class Vec4 extends Vec3 implements Position4 {
 	@Override
 	@Deprecated
 	public @NonNull Vec4 cross(@NonNull Vec3 vec) {
-		throw Util.pauseInIde(new ArithmeticException("No cross product defined for 4D space"));
+		throw Err4.math("No cross product defined for 4D space");
 	}
 
 	@Override
@@ -116,7 +117,7 @@ public class Vec4 extends Vec3 implements Position4 {
 			// Call site intends to modify only the Y axis
 			return this.subtract(x, y, z, z);
 		}
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: subtraction"));
+		throw Err4.arguments3("Vec4#subtract");
 	}
 
 	public @NonNull Vec4 subtract(double x, double y, double z, double w) {
@@ -140,7 +141,7 @@ public class Vec4 extends Vec3 implements Position4 {
 			// Call site intends to modify only the Y axis
 			return this.add(x, y, z, z);
 		}
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: addition"));
+		throw Err4.arguments3("Vec4#add");
 	}
 
 	public @NonNull Vec4 add(double x, double y, double z, double w) {
@@ -169,7 +170,7 @@ public class Vec4 extends Vec3 implements Position4 {
 	@Override
 	@Deprecated
 	public double distanceToSqr(double x, double y, double z) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: distance to sqr"));
+		throw Err4.arguments3("Vec4#distanceToSqr");
 	}
 
 	public double distanceToSqr(double x, double y, double z, double w) {
@@ -207,7 +208,7 @@ public class Vec4 extends Vec3 implements Position4 {
 	@Override
 	@Deprecated
 	public @NonNull Vec4 multiply(double xScale, double yScale, double zScale) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: multiplication"));
+		throw Err4.arguments3("Vec4#multiply");
 	}
 
 	public @NonNull Vec4 multiply(double xScale, double yScale, double zScale, double wScale) {
@@ -230,12 +231,7 @@ public class Vec4 extends Vec3 implements Position4 {
 	}
 
 	@Override
-	@Deprecated
 	public @NonNull Vec4 offsetRandomXZ(@NonNull RandomSource random, float offset) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: offsetRandomXZ"));
-	}
-
-	public @NonNull Vec4 offsetRandomXZW(RandomSource random, float offset) {
 		return this.add(
 			(random.nextFloat() - 0.5F) * offset,
 			0.0,
@@ -302,27 +298,23 @@ public class Vec4 extends Vec3 implements Position4 {
 	}
 
 	@Override
-	@Deprecated
 	public @NonNull Vec4 xRot(float radians) { // We are assuming rotation around XW.
 		return Vec4.of(super.xRot(radians), this.w);
 	}
 
 	@Override
-	@Deprecated
 	public @NonNull Vec4 yRot(float radians) { // We are assuming rotation around YW.
 		return Vec4.of(super.yRot(radians), this.w);
 	}
 
 	@Override
-	@Deprecated
 	public @NonNull Vec4 zRot(float radians) { // We are assuming rotation around ZW.
 		return Vec4.of(super.zRot(radians), this.w);
 	}
 
 	@Override
-	@Deprecated
-	public @NonNull Vec4 rotateClockwise90() {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: rotation around Y axis is ambiguous"));
+	public @NonNull Vec4 rotateClockwise90() { // We are assuming rotation around YW.
+		return Vec4.of(super.rotateClockwise90(), this.w);
 	}
 
 	// do not touch `rotation` for now
@@ -369,7 +361,7 @@ public class Vec4 extends Vec3 implements Position4 {
 	@Override
 	@Deprecated
 	public @NonNull Vector3f toVector3f() {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: toVector3f"));
+		throw Err4.return3(null);
 	}
 
 	// `projectedOn`, surprisingly, does not need an override
@@ -392,7 +384,6 @@ public class Vec4 extends Vec3 implements Position4 {
 	}
 
 	@Override
-	@Deprecated
 	public @NonNull Vec3 addLocalCoordinates(@NonNull Vec3 direction) {
 		return direction instanceof Vec4 direction4
 			? Vec4.applyLocalCoordinatesToRotation(this.rotation(), direction4)

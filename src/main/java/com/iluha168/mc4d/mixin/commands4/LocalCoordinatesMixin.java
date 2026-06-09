@@ -1,6 +1,7 @@
 package com.iluha168.mc4d.mixin.commands4;
 
 import com.iluha168.mc4d.commands.arguments.coordinates.Coordinates4;
+import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -8,7 +9,6 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.arguments.coordinates.LocalCoordinates;
 import net.minecraft.commands.arguments.coordinates.Vec3Argument;
-import net.minecraft.util.Util;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -38,7 +38,7 @@ class LocalCoordinatesMixin implements Coordinates4 {
 	))
 	Vec3 getPosition_new(double x, double y, double z) {
 		if (Double.isNaN(this.ana))
-			throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: no ana set."));
+			throw Err4.field4missing("ana");
 		return new Vec4(x, y, z, this.ana);
 	}
 	@Redirect(method = "getPosition", at = @At(

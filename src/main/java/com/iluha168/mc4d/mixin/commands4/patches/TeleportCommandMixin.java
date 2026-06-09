@@ -2,6 +2,7 @@ package com.iluha168.mc4d.mixin.commands4.patches;
 
 import com.iluha168.mc4d.commands.arguments.coordinates.Coordinates4;
 import com.iluha168.mc4d.core.BlockPos4;
+import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.entity.Entity4;
 import com.iluha168.mc4d.world.entity.Relative4;
 import com.iluha168.mc4d.world.phys.Vec4;
@@ -15,7 +16,6 @@ import net.minecraft.server.commands.LookAt;
 import net.minecraft.server.commands.TeleportCommand;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
-import net.minecraft.util.Util;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
@@ -89,10 +89,6 @@ class TeleportCommandMixin {
 		return Relative4.position(relativeX, relativeY, relativeZ, relativeW);
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-	 */
 	@Overwrite
 	private static void performTeleport(
 		CommandSourceStack source,
@@ -106,7 +102,7 @@ class TeleportCommandMixin {
 		float xRot,
 		@Nullable LookAt lookAt
 	) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: do not use this private method."));
+		throw Err4.arguments3(null);
 	}
 
 	@Unique

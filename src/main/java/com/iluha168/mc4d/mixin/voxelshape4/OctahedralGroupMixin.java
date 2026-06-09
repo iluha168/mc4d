@@ -3,12 +3,12 @@ package com.iluha168.mc4d.mixin.voxelshape4;
 import com.iluha168.mc4d.core.Direction4;
 import com.iluha168.mc4d.math.OctahedralGroup4;
 import com.iluha168.mc4d.math.SymmetricGroup4;
+import com.iluha168.mc4d.util.Err4;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.math.OctahedralGroup;
 import com.mojang.math.SymmetricGroup3;
 import net.minecraft.core.Direction;
-import net.minecraft.util.Util;
 import org.joml.*;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
@@ -486,24 +486,15 @@ public enum OctahedralGroupMixin implements OctahedralGroup4 {
 
 
 	// TODO: re-enable
-//	/**
-//	 * @author iluha168
-//	 * @reason Returns a 3x3 matrix. Replacing with a method for a 4x4 matrix.
-//	 */
 //	@Overwrite
 //	public Matrix3fc transformation() {
-//		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use OctahedralGroup4#transformation4 instead."));
+//		throw Err4.return3();
 //	}
 
-	/**
-	 * @author iluha168
-	 * @reason Returns a 3D vector. Replacing with a method for a 4D vector.
-	 */
 	@Overwrite
 	public Vector3i rotate(Vector3i v) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use OctahedralGroup4#rotate instead."));
+		throw Err4.arguments3("OctahedralGroup4#rotate");
 	}
-
 	@Override
 	public Vector4i rotate(Vector4i v) {
 		SymmetricGroup4.as(this.permutation).permuteVector(v);

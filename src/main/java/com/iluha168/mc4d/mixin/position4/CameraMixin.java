@@ -1,5 +1,6 @@
 package com.iluha168.mc4d.mixin.position4;
 
+import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.entity.Entity4;
 import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.expression.Definition;
@@ -8,7 +9,6 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.Camera;
 import net.minecraft.util.Mth;
-import net.minecraft.util.Util;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
@@ -42,7 +42,7 @@ class CameraMixin {
 	@Inject(method = "setPosition(Lnet/minecraft/world/phys/Vec3;)V", at = @At("HEAD"))
 	private void setPosition(Vec3 position, CallbackInfo ci) {
 		if (!(position instanceof Vec4)) {
-			throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: supply a Vec4."));
+			throw Err4.container3();
 		}
 	}
 

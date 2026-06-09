@@ -4,6 +4,7 @@ import com.iluha168.mc4d.core.BlockPos4;
 import com.iluha168.mc4d.core.Direction4;
 import com.iluha168.mc4d.core.Position4;
 import com.iluha168.mc4d.core.Vec4i;
+import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.level.Level4;
 import com.iluha168.mc4d.world.phys.AABB4;
 import com.iluha168.mc4d.world.phys.Vec4;
@@ -17,7 +18,6 @@ import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.*;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.util.Util;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
@@ -92,13 +92,9 @@ public abstract class BlockPosMixin implements BlockPos4 {
 	private static long offsetDirection(long blockNode, int stepX, int stepY, int stepZ, @Local(argsOnly = true, name = "offset") Direction offset) {
 		return BlockPos4.offset(blockNode, stepX, stepY, stepZ, Direction4.as(offset).getStepW());
 	}
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-	 */
 	@Overwrite
 	public static long offset(long blockNode, int stepX, int stepY, int stepZ) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use BlockPos4#offset instead."));
+		throw Err4.arguments3("BlockPos4#offset");
 	}
 
 	@WrapMethod(method = "of")
@@ -108,13 +104,9 @@ public abstract class BlockPosMixin implements BlockPos4 {
 		return pos;
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-	 */
 	@Overwrite
 	public static BlockPos containing(double x, double y, double z) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use BlockPos4#containing instead."));
+		throw Err4.arguments3("BlockPos4#containing");
 	}
 
 	@Redirect(method = "containing(Lnet/minecraft/core/Position;)Lnet/minecraft/core/BlockPos;", at = @At(
@@ -125,7 +117,7 @@ public abstract class BlockPosMixin implements BlockPos4 {
 		if (pos instanceof Vec4 pos4) {
 			return BlockPos4.containing(x, y, z, pos4.w());
 		}
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use BlockPos4#containing instead."));
+		throw Err4.arguments3("BlockPos4#containing");
 	}
 
 	@WrapMethod(method = "min")
@@ -146,24 +138,16 @@ public abstract class BlockPosMixin implements BlockPos4 {
 	long asLong_this(int x, int y, int z) {
 		return BlockPos4.asLong(x, y, z, ((Vec4i) this).getW());
 	}
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-	 */
 	@Overwrite
 	public static long asLong(int x, int y, int z) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use BlockPos4#asLong instead."));
+		throw Err4.arguments3("BlockPos4#asLong");
 	}
 
 	// TODO getFlatIndex? Sets last 4 bits of long to 0, what for?
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-	 */
 	@Overwrite
 	public BlockPos offset(int x, int y, int z) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use BlockPos4#offset instead."));
+		throw Err4.arguments3("BlockPos4#offset");
 	}
 
 	// `getCenter` handled by Vec4
@@ -232,13 +216,9 @@ public abstract class BlockPosMixin implements BlockPos4 {
 
 	// TODO rotate
 
-	/**
-	 * @author iluha168
-	 * @reason It is true. Cross product of 2 vectors does not make sense. 3 however...
-	 */
 	@Overwrite
 	public BlockPos cross(Vec3i upVector) {
-		throw Util.pauseInIde(new ArithmeticException("No cross product defined for 4D space"));
+		throw Err4.math("No cross product defined for 4D space");
 	}
 
 	@WrapMethod(method = "atY")
@@ -261,7 +241,7 @@ public abstract class BlockPosMixin implements BlockPos4 {
 	))
 	Vec3 clampLocationWithin(double x, double y, double z, @Local(argsOnly = true, name = "location") Vec3 location) {
 		if (!(location instanceof Vec4 location4)) {
-			throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: supply a Vec4 for location."));
+			throw Err4.container3();
 		}
 		final int thisW = ((Vec4i) this).getW();
 		final double w = Mth.clamp(location4.w, thisW + Mth.EPSILON, thisW + 1 - Mth.EPSILON);
@@ -289,22 +269,14 @@ public abstract class BlockPosMixin implements BlockPos4 {
 
 	// I dont think squareOutSouthEast needs a patch
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-	 */
 	@Overwrite
 	public static Iterable<BlockPos> randomBetweenClosed(RandomSource random, int limit, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use BlockPos4#randomBetweenClosed instead."));
+		throw Err4.arguments3("BlockPos4#randomBetweenClosed");
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-	 */
 	@Overwrite
 	public static Iterable<BlockPos> withinManhattan(BlockPos origin, int reachX, int reachY, int reachZ) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use BlockPos4#withinManhattan instead."));
+		throw Err4.arguments3("BlockPos4#withinManhattan");
 	}
 
 	@Redirect(method = "findClosestMatch", at = @At(
@@ -315,13 +287,9 @@ public abstract class BlockPosMixin implements BlockPos4 {
 		return BlockPos4.withinManhattan(origin, reachX, reachY, reachZ, reachZ);
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-	 */
 	@Overwrite
 	public static Stream<BlockPos> withinManhattanStream(BlockPos origin, int reachX, int reachY, int reachZ) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use BlockPos4#withinManhattanStream instead."));
+		throw Err4.arguments3("BlockPos4#withinManhattanStream");
 	}
 
 	@Definition(id = "containing", method = "Lnet/minecraft/core/BlockPos;containing(DDD)Lnet/minecraft/core/BlockPos;")
@@ -330,7 +298,7 @@ public abstract class BlockPosMixin implements BlockPos4 {
 	@Redirect(method = "betweenClosed(Lnet/minecraft/world/phys/AABB;)Ljava/lang/Iterable;", at = @At("MIXINEXTRAS:EXPRESSION"))
 	private static BlockPos betweenClosed_containingMin(double x, double y, double z, @Local(argsOnly = true, name = "box") AABB box) {
 		if (!(box instanceof AABB4 box4)) {
-			throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: supply an AABB4."));
+			throw Err4.container3();
 		}
 		return BlockPos4.containing(x, y, z, box4.minW);
 	}
@@ -373,7 +341,7 @@ public abstract class BlockPosMixin implements BlockPos4 {
 		@Local(argsOnly = true, name = "box") AABB box
 	) {
 		if (!(box instanceof AABB4 box4)) {
-			throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: supply an AABB4."));
+			throw Err4.container3();
 		}
 		return BlockPos4.betweenClosedStream(
 			minX, minY, minZ, Mth.floor(box4.minW),
@@ -381,31 +349,19 @@ public abstract class BlockPosMixin implements BlockPos4 {
 		);
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-	 */
 	@Overwrite
 	public static Stream<BlockPos> betweenClosedStream(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use BlockPos4#betweenClosedStream instead."));
+		throw Err4.arguments3("BlockPos4#betweenClosedStream");
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-	 */
 	@Overwrite
 	public static Iterable<BlockPos> betweenClosed(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use BlockPos4#betweenClosed instead."));
+		throw Err4.arguments3("BlockPos4#betweenClosed");
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-	 */
 	@Overwrite
 	public static Iterable<BlockPos.MutableBlockPos> spiralAround(BlockPos center, int radius, Direction firstDirection, Direction secondDirection) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use BlockPos4#spiralAround instead."));
+		throw Err4.arguments2("BlockPos4#spiralAround");
 	}
 
 	// Surprisingly `breadthFirstTraversal` does not need an override.
@@ -422,7 +378,7 @@ public abstract class BlockPosMixin implements BlockPos4 {
 		@Local(name = "maxCorner") Vec3 maxCorner
 	) {
 		if (!(direction instanceof Vec4 direction4)) {
-			throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: supply a Vec4 instead."));
+			throw Err4.container3();
 		}
 		int firstCornerW = Mth.floor(((Position4) minCorner).w());
 		int secondCornerW = Mth.floor(((Position4) maxCorner).w());
@@ -444,7 +400,7 @@ public abstract class BlockPosMixin implements BlockPos4 {
 		@Local(argsOnly = true, name = "secondCorner") BlockPos secondCorner
 	) {
 		if (!(direction instanceof Vec4 direction4)) {
-			throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: supply a Vec4 instead."));
+			throw Err4.container3();
 		}
 		return BlockPos4.betweenCornersInDirection(
 			firstCornerX, firstCornerY, firstCornerZ, Vec4i.getW(firstCorner),
@@ -453,17 +409,13 @@ public abstract class BlockPosMixin implements BlockPos4 {
 		);
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-	 */
 	@Overwrite
 	public static Iterable<BlockPos> betweenCornersInDirection(
 		int firstCornerX, int firstCornerY, int firstCornerZ,
 		int secondCornerX, int secondCornerY, int secondCornerZ,
 		Vec3 direction
 	) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use BlockPos4#betweenCornersInDirection instead."));
+		throw Err4.arguments3("BlockPos4#betweenCornersInDirection");
 	}
 
 	@Mixin(BlockPos.MutableBlockPos.class)
@@ -473,22 +425,14 @@ public abstract class BlockPosMixin implements BlockPos4 {
 			((Vec4i) this).setW(0);
 		}
 
-		/**
-		 * @author iluha168
-		 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-		 */
 		@Overwrite
 		public BlockPos.MutableBlockPos set(int x, int y, int z) {
-			throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use BlockPos4.MutableBlockPos#set instead."));
+			throw Err4.arguments3("BlockPos4.MutableBlockPos#set");
 		}
 
-		/**
-		 * @author iluha168
-		 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-		 */
 		@Overwrite
 		public BlockPos.MutableBlockPos set(double x, double y, double z) {
-			throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use BlockPos4.MutableBlockPos#set instead."));
+			throw Err4.arguments3("BlockPos4.MutableBlockPos#set");
 		}
 
 		@Redirect(method = "set(Lnet/minecraft/core/Vec3i;)Lnet/minecraft/core/BlockPos$MutableBlockPos;", at = @At(
@@ -507,13 +451,9 @@ public abstract class BlockPosMixin implements BlockPos4 {
 			return ((BlockPos4.MutableBlockPos) This).set(x, y, z, BlockPos4.getW(pos));
 		}
 
-		/**
-		 * @author iluha168
-		 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-		 */
 		@Overwrite
 		public BlockPos.MutableBlockPos set(AxisCycle transform, int x, int y, int z) {
-			throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use BlockPos4.MutableBlockPos#set instead."));
+			throw Err4.arguments3("BlockPos4.MutableBlockPos#set");
 		}
 
 		@Redirect(method = "setWithOffset(Lnet/minecraft/core/Vec3i;Lnet/minecraft/core/Direction;)Lnet/minecraft/core/BlockPos$MutableBlockPos;", at = @At(
@@ -528,13 +468,9 @@ public abstract class BlockPosMixin implements BlockPos4 {
 			return ((BlockPos4.MutableBlockPos) This).set(x, y, z, Vec4i.getW(pos) + Direction4.as(direction).getStepW());
 		}
 
-		/**
-		 * @author iluha168
-		 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-		 */
 		@Overwrite
 		public BlockPos.MutableBlockPos setWithOffset(Vec3i pos, int x, int y, int z) {
-			throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use BlockPos4.MutableBlockPos#setWithOffset instead."));
+			throw Err4.arguments3("BlockPos4.MutableBlockPos#setWithOffset");
 		}
 
 		@Redirect(method = "setWithOffset(Lnet/minecraft/core/Vec3i;Lnet/minecraft/core/Vec3i;)Lnet/minecraft/core/BlockPos$MutableBlockPos;", at = @At(
@@ -561,13 +497,9 @@ public abstract class BlockPosMixin implements BlockPos4 {
 			return ((BlockPos4.MutableBlockPos) This).set(x, y, z, ((Vec4i) this).getW() + Direction4.as(direction).getStepW() * steps);
 		}
 
-		/**
-		 * @author iluha168
-		 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-		 */
 		@Overwrite
 		public BlockPos.MutableBlockPos move(int x, int y, int z) {
-			throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space: use BlockPos4.MutableBlockPos#move instead."));
+			throw Err4.arguments3("BlockPos4.MutableBlockPos#move");
 		}
 
 		@Redirect(method = "move(Lnet/minecraft/core/Vec3i;)Lnet/minecraft/core/BlockPos$MutableBlockPos;", at = @At(

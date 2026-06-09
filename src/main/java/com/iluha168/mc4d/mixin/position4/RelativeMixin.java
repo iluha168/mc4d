@@ -1,11 +1,11 @@
 package com.iluha168.mc4d.mixin.position4;
 
 import com.google.common.collect.ImmutableSet;
+import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.entity.Relative4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import net.minecraft.util.Util;
 import net.minecraft.world.entity.Relative;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -34,21 +34,13 @@ public enum RelativeMixin implements Relative4 {
 		return ImmutableSet.copyOf(set);
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-	 */
 	@Overwrite
 	public static Set<Relative> position(boolean relativeX, boolean relativeY, boolean relativeZ) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space. Use Relative4#position instead."));
+		throw Err4.arguments3("Relative4#position");
 	}
 
-	/**
-	 * @author iluha168
-	 * @reason Uses 3 arguments for space. Removing the method, replacing with a method with 4 args.
-	 */
 	@Overwrite
 	public static Set<Relative> direction(boolean relativeX, boolean relativeY, boolean relativeZ) {
-		throw Util.pauseInIde(new IllegalArgumentException("Not patched 3D space. Use Relative4#direction instead."));
+		throw Err4.arguments3("Relative4#direction");
 	}
 }
