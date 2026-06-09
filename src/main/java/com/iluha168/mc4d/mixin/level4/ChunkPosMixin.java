@@ -1,4 +1,4 @@
-package com.iluha168.mc4d.mixin.position4;
+package com.iluha168.mc4d.mixin.level4;
 
 import com.iluha168.mc4d.core.BlockPos4;
 import com.iluha168.mc4d.core.Vec4i;
