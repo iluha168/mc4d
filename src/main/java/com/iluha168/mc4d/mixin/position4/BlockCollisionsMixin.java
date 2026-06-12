@@ -2,19 +2,26 @@ package com.iluha168.mc4d.mixin.position4;
 
 import com.iluha168.mc4d.core.BlockPos4;
 import com.iluha168.mc4d.core.Cursor4D;
+import com.iluha168.mc4d.util.Err4;
+import com.iluha168.mc4d.world.level.ChunkPos4;
+import com.iluha168.mc4d.world.level.CollisionGetter4;
 import com.iluha168.mc4d.world.phys.AABB4;
 import com.iluha168.mc4d.world.phys.IAABB4;
+import com.llamalad7.mixinextras.expression.Definition;
+import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Cursor3D;
+import net.minecraft.core.SectionPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.BlockCollisions;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.CollisionGetter;
 import net.minecraft.world.phys.AABB;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
+import org.jspecify.annotations.Nullable;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
@@ -25,6 +32,16 @@ public class BlockCollisionsMixin {
 	@Shadow
 	@Final
 	private Cursor3D cursor;
+
+	@Shadow
+	private @Nullable BlockGetter cachedBlockGetter;
+
+	@Shadow
+	private long cachedBlockGetterPos;
+
+	@Shadow
+	@Final
+	private CollisionGetter collisionGetter;
 
 	@Redirect(method = "<init>(Lnet/minecraft/world/level/CollisionGetter;Lnet/minecraft/world/phys/shapes/CollisionContext;Lnet/minecraft/world/phys/AABB;ZLjava/util/function/BiFunction;)V", at = @At(
 		value = "NEW",
@@ -44,7 +61,33 @@ public class BlockCollisionsMixin {
 		return Cursor4D.TYPE_CORNER4;
 	}
 
-	// TODO getChunk when 4D world
+	@Overwrite
+	@Deprecated
+	private @Nullable BlockGetter getChunk(int x, int z) {
+		throw Err4.arguments2(null);
+	}
+	@Unique
+	private @Nullable BlockGetter getChunk(int x, int z, int w) {
+		int chunkX = SectionPos.blockToSectionCoord(x);
+		int chunkZ = SectionPos.blockToSectionCoord(z);
+		int chunkW = SectionPos.blockToSectionCoord(w);
+		long chunkPos = ChunkPos4.pack(chunkX, chunkZ, chunkW);
+		if (this.cachedBlockGetter != null && this.cachedBlockGetterPos == chunkPos) {
+			return this.cachedBlockGetter;
+		} else {
+			BlockGetter result = ((CollisionGetter4) this.collisionGetter).getChunkForCollisions(chunkX, chunkZ, chunkW);
+			this.cachedBlockGetter = result;
+			this.cachedBlockGetterPos = chunkPos;
+			return result;
+		}
+	}
+
+	@Definition(id = "getChunk", method = "Lnet/minecraft/world/level/BlockCollisions;getChunk(II)Lnet/minecraft/world/level/BlockGetter;")
+	@Expression("this.getChunk(?, ?)")
+	@Redirect(method = "computeNext", at = @At("MIXINEXTRAS:EXPRESSION"))
+	BlockGetter computeNext_getChunk(BlockCollisions<?> This, int x, int z, @Share("w") LocalIntRef w) {
+		return this.getChunk(x, z, w.get());
+	}
 
 	@Redirect(method = "computeNext", at = @At(
 		value = "INVOKE",

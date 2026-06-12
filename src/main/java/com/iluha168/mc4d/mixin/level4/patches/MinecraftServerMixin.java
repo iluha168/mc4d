@@ -1,8 +1,11 @@
 package com.iluha168.mc4d.mixin.level4.patches;
 
+import com.iluha168.mc4d.core.BlockPos4;
 import com.iluha168.mc4d.server.MinecraftServer4;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.level.ChunkPos4;
+import com.llamalad7.mixinextras.sugar.Local;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ChunkMap;
@@ -13,6 +16,8 @@ import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(MinecraftServer.class)
@@ -44,4 +49,25 @@ class MinecraftServerMixin implements MinecraftServer4 {
 			));
 		}
 	}
+
+	// TODO everything else
+
+	@Redirect(method = "setInitialSpawn", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/core/BlockPos;offset(III)Lnet/minecraft/core/BlockPos;"
+	))
+	private static BlockPos setInitialSpawn_offset(BlockPos worldPosition, int x, int y, int z) {
+		return ((BlockPos4) worldPosition).offset(x, y, z, z);
+	}
+	@ModifyArg(method = "setInitialSpawn", index = 1, at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/server/level/PlayerSpawnFinder;getSpawnPosInChunk(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/level/ChunkPos;)Lnet/minecraft/core/BlockPos;"
+	))
+	private static ChunkPos setInitialSpawn_getSpawnPosInChunk(ChunkPos chunkPos, @Local(name = "spawnChunk") ChunkPos spawnChunk) {
+		// TODO spawnChunk.w() + wChunkOffset <-- need to add W offsets
+		ChunkPos4.as(chunkPos).setW(ChunkPos4.as(spawnChunk).w());
+		return chunkPos;
+	}
+
+	// TODO everything else
 }

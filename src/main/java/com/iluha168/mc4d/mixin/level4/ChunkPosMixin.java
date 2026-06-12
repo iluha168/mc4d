@@ -223,7 +223,7 @@ class ChunkPosMixin implements ChunkPos4 {
 	@Expression("return ? + this.z + @(?)")
 	@ModifyExpressionValue(method = "toString", at = @At("MIXINEXTRAS:EXPRESSION"))
 	public String toString(String rightBracket) {
-		return ", " + this.w() + rightBracket;
+		return ", " + (this.wNotSet ? "missingno" : this.w) + rightBracket;
 	}
 
 	@WrapMethod(method = "getWorldPosition")

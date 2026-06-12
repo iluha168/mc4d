@@ -2,6 +2,7 @@ package com.iluha168.mc4d.mixin.level4;
 
 import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.world.level.Level4;
+import com.iluha168.mc4d.world.level.LevelReader4;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -13,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 
 @Mixin(LevelReader.class)
-interface LevelReaderMixin {
+interface LevelReaderMixin extends LevelReader4 {
 	// TODO the rest
 
 	@ModifyConstant(method = "getMaxLocalRawBrightness(Lnet/minecraft/core/BlockPos;I)I", constant = @Constant(intValue = 30000000))

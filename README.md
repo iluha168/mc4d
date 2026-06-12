@@ -3,7 +3,7 @@ A Vanilla+ Minecraft mod that Adds a 4th spatial dimension.
 The goal of this mod is to make that dimension act identical to the existing 3.
 
 > [!NOTE]
-> **Not** to be confused with dimensions like **the End and the Nether**.
+> **Not** to be confused with dimensions like **the End and the Nether** (_Levels_).
 > We are talking about a [mathematical dimension](https://en.wikipedia.org/wiki/Dimension) here, as a degree of freedom.
 
 > [!NOTE]
@@ -16,9 +16,10 @@ The goal of this mod is to make that dimension act identical to the existing 3.
 - All entities and blocks have 4D positions.
 - 4D world:
   - Horizontal sizes are capped at `±100000` in all 3 directions, compared to vanilla's `±30000000` in 2 directions.
-  - This means vanilla world has area of `36e14` square meters, but in this mod the area is `8e15` cubic meters.
+    This means vanilla world has area of `36e14` square meters, but in this mod the area is `8e15` cubic meters.
   - Vertical axis has been reduced from `[-4064; 4062]` to `[-992; 990]` in size. Vanilla does not use the entirety of this huge limit, but mods and datapacks that do will break.
-  - The changes affect Overworld, Nether, and all the other… um… uh…
+  - Chunks are 16x16x16 in horizontal size, instead of 16x16.
+  - The changes affect Overworld, Nether, and all other _Levels_.
 
 > [!CAUTION]
 > 3D saves are not compatible with 4D saves, in both directions. Create a new world after installing the mod.

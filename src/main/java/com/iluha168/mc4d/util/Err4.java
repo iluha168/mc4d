@@ -5,6 +5,8 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 public final class Err4 {
+	private Err4() {}
+
 	private static @NonNull RuntimeException err(@NonNull String description) {
 		return Util.pauseInIde(new IllegalArgumentException("Detected an attempt to use 3D-only features. " + description));
 	}

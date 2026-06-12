@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
+// TODO static methods
 @Mixin(Vec3.class)
 class Vec3Mixin {
 	@Redirect(method = "atCenterOf", at = @At(
