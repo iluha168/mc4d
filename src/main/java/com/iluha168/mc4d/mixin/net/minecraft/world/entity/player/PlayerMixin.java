@@ -1,0 +1,115 @@
+package com.iluha168.mc4d.mixin.net.minecraft.world.entity.player;
+
+import com.iluha168.mc4d.util.Err4;
+import com.iluha168.mc4d.world.phys.AABB4;
+import com.iluha168.mc4d.world.phys.Vec4;
+import com.llamalad7.mixinextras.sugar.Local;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
+
+@Mixin(Player.class)
+abstract class PlayerMixin {
+	@Redirect(method = "aiStep", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/phys/AABB;inflate(DDD)Lnet/minecraft/world/phys/AABB;"
+	))
+	AABB pickupArea(AABB instance, double xAdd, double yAdd, double zAdd) {
+		assert xAdd == zAdd;
+		return ((AABB4) instance).inflate(xAdd, yAdd, zAdd, xAdd);
+	}
+
+	@Redirect(method = "maybeBackOffFromEdge", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/player/Player;canFallAtLeast(DDD)Z"
+	))
+	boolean maybeBackOffFromEdge_canFallAtLeast4(Player instance, double deltaX, double deltaZ, double minHeight) {
+		assert (Object) this == instance;
+		return this.canFallAtLeast(deltaX, deltaZ, 0, minHeight);
+	}
+
+	@Redirect(method = "maybeBackOffFromEdge", at = @At(
+		value = "NEW",
+		target = "(DDD)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 maybeBackOffFromEdge(
+		double deltaX, double deltaY, double deltaZ,
+		@Local(name = "delta", argsOnly = true) Vec3 delta,
+		@Local(name = "step") double step,
+		@Local(name = "maxDownStep") float maxDownStep,
+		@Local(name = "stepX") double stepX,
+		@Local(name = "stepZ") double stepZ
+	) {
+		double deltaW = ((Vec4) delta).w;
+		double stepW = Math.signum(deltaW) * step;
+
+		while (deltaW != 0 && this.canFallAtLeast(0, deltaZ, deltaW, maxDownStep)) {
+			if (Math.abs(deltaW) <= step) {
+				deltaW = 0;
+				break;
+			}
+			deltaW -= stepW;
+		}
+
+		while (deltaX != 0 && deltaZ != 0 && deltaW != 0 && this.canFallAtLeast(deltaX, deltaZ, deltaW, maxDownStep)) {
+			if (Math.abs(deltaX) <= step) {
+				deltaX = 0;
+			} else {
+				deltaX -= stepX;
+			}
+
+			if (Math.abs(deltaZ) <= step) {
+				deltaZ = 0;
+			} else {
+				deltaZ -= stepZ;
+			}
+
+			if (Math.abs(deltaW) <= step) {
+				deltaW = 0;
+			} else {
+				deltaW -= stepW;
+			}
+		}
+
+		return new Vec4(deltaX, deltaY, deltaZ, deltaW);
+	}
+
+	@Redirect(method = "isAboveGround", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/player/Player;canFallAtLeast(DDD)Z"
+	))
+	boolean isAboveGround(Player instance, double deltaX, double deltaZ, double minHeight) {
+		assert (Object) this == instance;
+		return this.canFallAtLeast(deltaX, deltaZ, 0, minHeight);
+	}
+
+	@Overwrite
+	@Deprecated
+	private boolean canFallAtLeast(double deltaX, double deltaZ, double minHeight) {
+		throw Err4.arguments2(null);
+	}
+	@Unique
+	private boolean canFallAtLeast(double deltaX, double deltaZ, double deltaW, double minHeight) {
+		Entity player = (Entity) (Object) this;
+		AABB4 boundingBox = (AABB4) player.getBoundingBox();
+		return player.level().noCollision(
+			player,
+			new AABB4(
+				boundingBox.minX + AABB4.EPSILON + deltaX,
+				boundingBox.minY - minHeight - AABB4.EPSILON,
+				boundingBox.minZ + AABB4.EPSILON + deltaZ,
+				boundingBox.minW + AABB4.EPSILON + deltaW,
+				boundingBox.maxX - AABB4.EPSILON + deltaX,
+				boundingBox.minY,
+				boundingBox.maxZ - AABB4.EPSILON + deltaZ,
+				boundingBox.maxW - AABB4.EPSILON + deltaW
+			)
+		);
+	}
+}
