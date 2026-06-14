@@ -21,5 +21,13 @@ class SectionStorageMixin {
 		return SectionPos4.asLong(x, y, z, ChunkPos4.as(chunkPos).w());
 	}
 
+	@Redirect(method = "setDirty", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/level/ChunkPos;pack(II)J"
+	))
+	long setDirty(int x, int z, @Local(argsOnly = true, name = "sectionPos") long sectionPos) {
+		return ChunkPos4.pack(x, z, SectionPos4.w(sectionPos));
+	}
+
 	// TODO the rest
 }

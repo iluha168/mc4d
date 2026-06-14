@@ -4,6 +4,7 @@ import com.iluha168.mc4d.core.BlockPos4;
 import com.iluha168.mc4d.core.Direction4;
 import com.iluha168.mc4d.core.Position4;
 import com.iluha168.mc4d.core.Vec4i;
+import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.entity.Entity4;
 import com.iluha168.mc4d.world.phys.AABB4;
 import com.iluha168.mc4d.world.phys.Vec4;
@@ -17,6 +18,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -24,74 +26,16 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(LocalPlayer.class)
 abstract class LocalPlayerMixin {
-	@Redirect(method = "resetPos", at = @At(
-		value = "INVOKE",
-		target = "Lnet/minecraft/client/player/LocalPlayer;setPos(DDD)V"
-	))
-	void resetPos(LocalPlayer player, double x, double y, double z) {
-		player.setPos(new Vec4(x, y, z, ((Entity4) this).getW()));
-	}
-
-	@Redirect(method = "resetPos", at = @At(
-		value = "INVOKE",
-		target = "Lnet/minecraft/client/player/LocalPlayer;setDeltaMovement(Lnet/minecraft/world/phys/Vec3;)V"
-	))
-	void resetDeltaMovement(LocalPlayer This, Vec3 vec3) {
-		This.setDeltaMovement(Vec4.ZERO);
-	}
-
 	@Shadow
 	protected abstract boolean suffocatesAt(BlockPos pos);
 
-	@Redirect(method = "pick", at = @At(
-		value = "INVOKE",
-		target = "Lnet/minecraft/world/phys/AABB;inflate(DDD)Lnet/minecraft/world/phys/AABB;"
-	))
-	private static AABB inflate(AABB instance, double xAdd, double yAdd, double zAdd) {
-		return instance.inflate(xAdd);
-	}
+	// TODO sendPosition
 
-	@Redirect(method = "suffocatesAt", at = @At(
-		value = "NEW",
-		target = "(DDDDDD)Lnet/minecraft/world/phys/AABB;"
-	))
-	private static AABB suffocatesAt(
-		double minX, double minY, double minZ,
-		double maxX, double maxY, double maxZ,
-		@Local(argsOnly = true, name = "pos") BlockPos pos
-	) {
-		double minW = Vec4i.getW(pos);
-		return new AABB4(
-			minX, minY, minZ, minW,
-			maxX, maxY, maxZ, minW + 1
-		);
+	@Overwrite
+	@Deprecated
+	private void moveTowardsClosestSpace(double x, double z) {
+		throw Err4.arguments2(null);
 	}
-
-	@Redirect(method = "pick", at = @At(
-		value = "INVOKE",
-		target = "Lnet/minecraft/world/phys/Vec3;add(DDD)Lnet/minecraft/world/phys/Vec3;"
-	))
-	private static Vec3 pick(
-		Vec3 from, double x, double y, double z,
-		@Local(name = "direction") Vec3 direction,
-		@Local(name = "maxDistance") double maxDistance
-	) {
-		double w = ((Position4) direction).w() * maxDistance;
-		return ((Vec4) from).add(x, y, z, w);
-	}
-
-	@Redirect(method = "aiStep", at = @At(
-		value = "INVOKE",
-		target = "Lnet/minecraft/client/player/LocalPlayer;moveTowardsClosestSpace(DD)V"
-	))
-	void aiStep_moveTowardsClosestSpace4(LocalPlayer This, double x, double z) {
-		final double w = ((Entity4) this).getW();
-		final double wPlus  = w + This.getBbWidth() * 0.35;
-		final double wMinus = w - This.getBbWidth() * 0.35;
-		this.moveTowardsClosestSpace(This, x, z, wPlus);
-		this.moveTowardsClosestSpace(This, x, z, wMinus);
-	}
-
 	@Unique
 	private void moveTowardsClosestSpace(LocalPlayer This, double x, double z, double w) {
 		BlockPos pos = BlockPos4.containing(x, This.getY(), z, w);
@@ -126,6 +70,22 @@ abstract class LocalPlayerMixin {
 		}
 	}
 
+	@Redirect(method = "suffocatesAt", at = @At(
+		value = "NEW",
+		target = "(DDDDDD)Lnet/minecraft/world/phys/AABB;"
+	))
+	private static AABB suffocatesAt(
+		double minX, double minY, double minZ,
+		double maxX, double maxY, double maxZ,
+		@Local(argsOnly = true, name = "pos") BlockPos pos
+	) {
+		double minW = Vec4i.getW(pos);
+		return new AABB4(
+			minX, minY, minZ, minW,
+			maxX, maxY, maxZ, minW + 1
+		);
+	}
+
 	@Redirect(method = "playSound", at = @At(
 		value = "INVOKE",
 		target = "Lnet/minecraft/world/level/Level;playLocalSound(DDDLnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FFZ)V"
@@ -133,4 +93,63 @@ abstract class LocalPlayerMixin {
 	void playLocalSound(Level instance, double x, double y, double z, SoundEvent sound, SoundSource source, float volume, float pitch, boolean distanceDelay) {
 		// TODO obviously remove this in favor of 4D sound engine
 	}
+
+	// TODO applyInput
+	// TODO distanceToUnitSquare
+
+	@Redirect(method = "resetPos", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/client/player/LocalPlayer;setPos(DDD)V"
+	))
+	void resetPos(LocalPlayer player, double x, double y, double z) {
+		player.setPos(new Vec4(x, y, z, ((Entity4) this).getW()));
+	}
+
+	@Redirect(method = "resetPos", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/client/player/LocalPlayer;setDeltaMovement(Lnet/minecraft/world/phys/Vec3;)V"
+	))
+	void resetPos_resetDeltaMovement(LocalPlayer This, Vec3 vec3) {
+		This.setDeltaMovement(Vec4.ZERO);
+	}
+
+	@Redirect(method = "aiStep", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/client/player/LocalPlayer;moveTowardsClosestSpace(DD)V"
+	))
+	void aiStep_moveTowardsClosestSpace4(LocalPlayer This, double x, double z) {
+		final double w = ((Entity4) this).getW();
+		final double wPlus  = w + This.getBbWidth() * 0.35;
+		final double wMinus = w - This.getBbWidth() * 0.35;
+		this.moveTowardsClosestSpace(This, x, z, wPlus);
+		this.moveTowardsClosestSpace(This, x, z, wMinus);
+	}
+
+	// TODO move
+	// TODO updateAutoJump
+	// TODO isHorizontalCollisionMinor
+	// TODO updateIsUnderwater
+	// TODO getRopeHoldPosition?
+
+	@Redirect(method = "pick", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/phys/Vec3;add(DDD)Lnet/minecraft/world/phys/Vec3;"
+	))
+	private static Vec3 pick(
+		Vec3 from, double x, double y, double z,
+		@Local(name = "direction") Vec3 direction,
+		@Local(name = "maxDistance") double maxDistance
+	) {
+		double w = ((Position4) direction).w() * maxDistance;
+		return ((Vec4) from).add(x, y, z, w);
+	}
+	@Redirect(method = "pick", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/phys/AABB;inflate(DDD)Lnet/minecraft/world/phys/AABB;"
+	))
+	private static AABB pick(AABB instance, double xAdd, double yAdd, double zAdd) {
+		return instance.inflate(xAdd);
+	}
+
+	// TODO filterHitResult
 }

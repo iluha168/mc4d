@@ -1,16 +1,22 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.phys;
 
 import com.iluha168.mc4d.core.Position4;
+import com.iluha168.mc4d.core.Vec4i;
+import com.iluha168.mc4d.util.Err4;
+import com.iluha168.mc4d.world.level.levelgen.structure.BoundingBox4;
 import com.iluha168.mc4d.world.phys.AABB4;
 import com.iluha168.mc4d.world.phys.IAABB4;
 import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalDoubleRef;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -18,6 +24,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static com.iluha168.mc4d.world.phys.AABB4.EPSILON;
@@ -32,6 +39,48 @@ public class AABBMixin implements IAABB4 {
 	@Override
 	public double maxW() {
 		return EPSILON;
+	}
+
+	@Inject(method = "<init>(Lnet/minecraft/core/BlockPos;)V", at = @At("HEAD"))
+	private static void init_blockPos(BlockPos pos, CallbackInfo ci) {
+		throw Err4.return3("AABB4#new");
+	}
+
+	@Redirect(method = "of", at = @At(
+		value = "NEW",
+		target = "(DDDDDD)Lnet/minecraft/world/phys/AABB;"
+	))
+	private static AABB of(double minX, double minY, double minZ, double maxX, double maxY, double maxZ, @Local(argsOnly = true, name = "box") BoundingBox box) {
+		BoundingBox4 bb4 = (BoundingBox4) box;
+		return new AABB4(
+			minX, minY, minZ, bb4.minW(),
+			maxX, maxY, maxZ, bb4.maxW() + 1
+		);
+	}
+
+	@WrapMethod(method = "unitCubeFromLowerCorner")
+	private static AABB unitCubeFromLowerCorner(Vec3 pos, Operation<AABB> original) {
+		return pos instanceof Vec4 pos4 ? new AABB4(
+			pos.x, pos.y, pos.z, pos4.w,
+			pos.x + 1, pos.y + 1, pos.z + 1, pos4.w + 1
+		) : original.call(pos);
+	}
+
+	@Redirect(method = "encapsulatingFullBlocks", at = @At(
+		value = "NEW",
+		target = "(DDDDDD)Lnet/minecraft/world/phys/AABB;"
+	))
+	private static AABB encapsulatingFullBlocks(
+		double minX, double minY, double minZ, double maxX, double maxY, double maxZ,
+		@Local(argsOnly = true, name = "pos0") BlockPos pos0,
+		@Local(argsOnly = true, name = "pos1") BlockPos pos1
+	) {
+		final int pos0w = Vec4i.getW(pos0);
+		final int pos1w = Vec4i.getW(pos1);
+		return new AABB4(
+			minX, minY, minZ, Math.min(pos0w, pos1w),
+			maxX, maxY, maxZ, Math.max(pos0w, pos1w) + 1
+		);
 	}
 
 	@Definition(id = "to", local = @Local(type = Vec3.class, name = "to", argsOnly = true))

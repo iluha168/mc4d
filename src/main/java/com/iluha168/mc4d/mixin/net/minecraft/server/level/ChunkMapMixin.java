@@ -1,6 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.server.level;
 
 import com.iluha168.mc4d.math.MathHelpers;
+import com.iluha168.mc4d.network.protocol.game.ClientboundSetChunkCacheCenterPacket4;
 import com.iluha168.mc4d.server.level.ThreadedLevelLightEngine4;
 import com.iluha168.mc4d.util.StaticCache3D;
 import com.iluha168.mc4d.world.level.ChunkPos4;
@@ -11,7 +12,9 @@ import com.llamalad7.mixinextras.lib.apache.commons.ArrayUtils;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
+import net.minecraft.network.protocol.game.ClientboundSetChunkCacheCenterPacket;
 import net.minecraft.server.level.ChunkMap;
+import net.minecraft.server.level.ChunkTrackingView;
 import net.minecraft.server.level.ThreadedLevelLightEngine;
 import net.minecraft.util.StaticCache2D;
 import net.minecraft.world.level.ChunkPos;
@@ -94,6 +97,17 @@ class ChunkMapMixin {
 	))
 	long applyStep_reportPositionHash(int x, int z, @Local(name = "pos") ChunkPos pos) {
 		return ChunkPos4.pack(x, z, ChunkPos4.as(pos).w());
+	}
+
+	// TODO other methods
+
+	@ModifyExpressionValue(method = "applyChunkTrackingView", at = @At(
+		value = "NEW",
+		target = "(II)Lnet/minecraft/network/protocol/game/ClientboundSetChunkCacheCenterPacket;"
+	))
+	ClientboundSetChunkCacheCenterPacket applyChunkTrackingView(ClientboundSetChunkCacheCenterPacket original, @Local(name = "to") ChunkTrackingView.Positioned to) {
+		((ClientboundSetChunkCacheCenterPacket4) original).setW(ChunkPos4.as(to.center()).w());
+		return original;
 	}
 
 	// TODO other methods

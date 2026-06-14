@@ -11,10 +11,17 @@ import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
+import net.minecraft.CrashReport;
+import net.minecraft.CrashReportCategory;
+import net.minecraft.ReportedException;
 import net.minecraft.SharedConstants;
+import net.minecraft.core.Holder;
 import net.minecraft.core.QuartPos;
 import net.minecraft.core.SectionPos;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.LevelHeightAccessor;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeResolver;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -35,7 +42,7 @@ import java.util.EnumSet;
 import java.util.Map;
 
 @Mixin(ChunkAccess.class)
-public class ChunkAccessMixin implements ChunkAccess4 {
+public abstract class ChunkAccessMixin implements ChunkAccess4 {
 	// TODO everything else
 
 	@Shadow
@@ -45,6 +52,16 @@ public class ChunkAccessMixin implements ChunkAccess4 {
 	@Shadow
 	@Final
 	private static Logger LOGGER;
+
+	@Shadow
+	public abstract int getMinY();
+
+	@Shadow
+	public abstract int getHeight();
+
+	@Shadow
+	@Final
+	public LevelChunkSection[] sections;
 
 	@Overwrite
 	@Deprecated
@@ -72,6 +89,27 @@ public class ChunkAccessMixin implements ChunkAccess4 {
 	}
 
 	// TODO everything else
+
+	@Overwrite
+	@Deprecated
+	public Holder<Biome> getNoiseBiome(int quartX, int quartY, int quartZ) {
+		throw Err4.arguments3("ChunkAccess4#getNoiseBiome");
+	}
+	@Override
+	public Holder<Biome> getNoiseBiome(int quartX, int quartY, int quartZ, int quartW) {
+		try {
+			int quartMinY = QuartPos.fromBlock(this.getMinY());
+			int quartMaxY = quartMinY + QuartPos.fromBlock(this.getHeight()) - 1;
+			int clampedQuartY = Mth.clamp(quartY, quartMinY, quartMaxY);
+			int sectionIndex = ((LevelHeightAccessor) this).getSectionIndex(QuartPos.toBlock(clampedQuartY));
+			return ((LevelChunkSection4) this.sections[sectionIndex]).getNoiseBiome(quartX & 3, clampedQuartY & 3, quartZ & 3, quartW & 3);
+		} catch (Throwable var8) {
+			CrashReport report = CrashReport.forThrowable(var8, "Getting biome");
+			CrashReportCategory category = report.addCategory("Biome being got");
+			category.setDetail("Location", () -> CrashReportCategory.formatLocation((LevelHeightAccessor) this, quartX, quartY, quartZ)); // TODO formatLocation4
+			throw new ReportedException(report);
+		}
+	}
 
 	@Definition(id = "quartMinZ", local = @Local(type = int.class, name = "quartMinZ"))
 	@Expression("quartMinZ = @(?)")

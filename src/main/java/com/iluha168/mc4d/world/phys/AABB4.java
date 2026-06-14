@@ -40,6 +40,14 @@ public class AABB4 extends AABB implements IAABB4 {
 		this.maxW = Math.max(minW, maxW);
 	}
 
+	public AABB4(BlockPos pos) {
+		final int posW = Vec4i.getW(pos);
+		this(
+			pos.getX(), pos.getY(), pos.getZ(), posW,
+			pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1, posW + 1
+		);
+	}
+
 	public AABB4(Vec4 begin, Vec4 end) {
 		this(
 			begin.x, begin.y, begin.z, begin.w,

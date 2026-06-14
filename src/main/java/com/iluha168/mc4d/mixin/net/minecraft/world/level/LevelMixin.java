@@ -5,7 +5,8 @@ import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.level.ChunkPos4;
 import com.iluha168.mc4d.world.level.Level4;
-import com.iluha168.mc4d.world.level.LevelReader4;
+import com.iluha168.mc4d.world.level.LevelAccessor4;
+import com.iluha168.mc4d.world.level.border.WorldBorder4;
 import com.iluha168.mc4d.world.level.chunk.ChunkAccess4;
 import com.iluha168.mc4d.world.level.chunk.ChunkSource4;
 import com.llamalad7.mixinextras.expression.Definition;
@@ -14,16 +15,23 @@ import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.SectionPos;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ChunkSource;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.material.FluidState;
 import org.jspecify.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -33,9 +41,26 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(Level.class)
-class LevelMixin implements Level4, LevelReader4 {
+public abstract class LevelMixin implements Level4, LevelAccessor4 {
 	@Shadow
 	protected int randValue;
+
+	@Shadow
+	public RegistryAccess registryAccess() {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
+
+	@Shadow @Final protected RandomSource random;
+
+	@Shadow
+	public BlockState getBlockState(BlockPos pos) {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
+
+	@Shadow
+	public FluidState getFluidState(BlockPos pos) {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
 
 	@ModifyConstant(method = "isInWorldBoundsHorizontal", constant = @Constant(intValue = 30000000))
 	private static int isInWorldBoundsHorizontal(int value) {
@@ -92,11 +117,6 @@ class LevelMixin implements Level4, LevelReader4 {
 		}
 	}
 
-	@Override
-	public boolean hasChunk(int chunkX, int chunkZ, int chunkW) {
-		return ((LevelAccessor) this).getChunkSource().hasChunk(chunkX, chunkZ); // TODO chunkW
-	}
-
 	@Overwrite
 	@Deprecated
 	public int getHeight(Heightmap.Types type, int x, int z) {
@@ -138,7 +158,14 @@ class LevelMixin implements Level4, LevelReader4 {
 	// TODO explode
 	// TODO explode
 	// TODO explode
-	// TODO isLoaded
+
+	@Redirect(method = "isLoaded", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/level/chunk/ChunkSource;hasChunk(II)Z"
+	))
+	boolean isLoaded(ChunkSource instance, int x, int z, @Local(argsOnly = true, name = "pos") BlockPos pos) {
+		return ((ChunkSource4) instance).hasChunk(x, z, SectionPos.blockToSectionCoord(Vec4i.getW(pos)));
+	}
 
 	@Definition(id = "getChunk", method = "Lnet/minecraft/world/level/Level;getChunk(IILnet/minecraft/world/level/chunk/status/ChunkStatus;Z)Lnet/minecraft/world/level/chunk/ChunkAccess;")
 	@Expression("this.getChunk(?, ?, ?, ?)")
@@ -147,7 +174,13 @@ class LevelMixin implements Level4, LevelReader4 {
 		return this.getChunk(chunkX, chunkZ, SectionPos.blockToSectionCoord(Vec4i.getW(pos)), status, loadOrGenerate);
 	}
 
-	// TODO getWorldBorderAdjustedRespawnData
+	@Redirect(method = "getWorldBorderAdjustedRespawnData", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/core/BlockPos;containing(DDD)Lnet/minecraft/core/BlockPos;"
+	))
+	BlockPos getWorldBorderAdjustedRespawnData(double x, double y, double z, @Local(name = "worldBorder") WorldBorder worldBorder) {
+		return BlockPos4.containing(x, y, z, ((WorldBorder4) worldBorder).getCenterW());
+	}
 
 	@Overwrite
 	@Deprecated

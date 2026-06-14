@@ -1,6 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.chunk;
 
 import com.iluha168.mc4d.core.Vec4i;
+import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.level.ChunkPos4;
 import com.iluha168.mc4d.world.level.chunk.ChunkAccess4;
 import com.iluha168.mc4d.world.level.chunk.LevelChunkSection4;
@@ -14,21 +15,26 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.SectionPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.ProtoChunk;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.lighting.ChunkSkyLightSources;
 import net.minecraft.world.level.material.FluidState;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(ProtoChunk.class)
-abstract class ProtoChunkMixin implements ChunkAccess4 {
+abstract class ProtoChunkMixin extends ChunkAccessMixin implements ChunkAccess4 {
 	@Redirect(method = "getBlockState", at = @At(
 		value = "INVOKE",
 		target = "Lnet/minecraft/world/level/chunk/LevelChunkSection;getBlockState(III)Lnet/minecraft/world/level/block/state/BlockState;"
@@ -74,7 +80,20 @@ abstract class ProtoChunkMixin implements ChunkAccess4 {
 		return ((Heightmap4) heightmap).update(localX, localY, localZ, localW.get(), state);
 	}
 
-	// TODO getNoiseBiome
+	@SuppressWarnings("deprecation")
+	@Overwrite
+	@Deprecated
+	public Holder<Biome> getNoiseBiome(int quartX, int quartY, int quartZ) {
+		throw Err4.arguments3("BiomeManager4.NoiseBiomeSource#getNoiseBiome");
+	}
+	@Override
+	public Holder<Biome> getNoiseBiome(int quartX, int quartY, int quartZ, int quartW) {
+		if (((ChunkAccess) (Object) this).getHighestGeneratedStatus().isOrAfter(ChunkStatus.BIOMES)) {
+			return super.getNoiseBiome(quartX, quartY, quartZ, quartW);
+		} else {
+			throw new IllegalStateException("Asking for biomes before we have biomes");
+		}
+	}
 
 	@Expression("return (short) @(?)")
 	@ModifyExpressionValue(method = "packOffsetCoordinates", at = @At("MIXINEXTRAS:EXPRESSION"))

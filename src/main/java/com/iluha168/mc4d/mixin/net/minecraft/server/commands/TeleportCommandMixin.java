@@ -90,6 +90,7 @@ class TeleportCommandMixin {
 	}
 
 	@Overwrite
+	@Deprecated
 	private static void performTeleport(
 		CommandSourceStack source,
 		Entity victim,
@@ -104,7 +105,6 @@ class TeleportCommandMixin {
 	) {
 		throw Err4.arguments3(null);
 	}
-
 	@Unique
 	private static void performTeleport(
 		CommandSourceStack source,
@@ -126,17 +126,15 @@ class TeleportCommandMixin {
 		}
 
 		Entity4 victim4 = (Entity4) victim;
-		Vec4 relativeOrAbsolute = new Vec4(
-			relatives.contains(Relative.X) ? x - victim.getX() : x,
-			relatives.contains(Relative.Y) ? y - victim.getY() : y,
-			relatives.contains(Relative.Z) ? z - victim.getZ() : z,
-			relatives.contains(Relative4.W) ? w - victim4.getW() : w
-		);
+		double relativeOrAbsoluteX = relatives.contains(Relative.X) ? x - victim.getX() : x;
+		double relativeOrAbsoluteY = relatives.contains(Relative.Y) ? y - victim.getY() : y;
+		double relativeOrAbsoluteZ = relatives.contains(Relative.Z) ? z - victim.getZ() : z;
+		double relativeOrAbsoluteW = relatives.contains(Relative4.W) ? w - victim4.getW() : w;
 		float relativeOrAbsoluteYRot = relatives.contains(Relative.Y_ROT) ? yRot - victim.getYRot() : yRot;
 		float relativeOrAbsoluteXRot = relatives.contains(Relative.X_ROT) ? xRot - victim.getXRot() : xRot;
 		float newYRot = Mth.wrapDegrees(relativeOrAbsoluteYRot);
 		float newXRot = Mth.wrapDegrees(relativeOrAbsoluteXRot);
-		if (victim4.teleportTo(level, relativeOrAbsolute, relatives, newYRot, newXRot, true)) {
+		if (victim4.teleportTo(level, relativeOrAbsoluteX, relativeOrAbsoluteY, relativeOrAbsoluteZ, relativeOrAbsoluteW, relatives, newYRot, newXRot, true)) {
 			if (lookAt != null) {
 				lookAt.perform(source, victim);
 			}

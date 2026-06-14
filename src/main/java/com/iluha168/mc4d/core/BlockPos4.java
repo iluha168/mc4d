@@ -348,6 +348,12 @@ public interface BlockPos4 {
 	}
 
 	interface MutableBlockPos {
+		static BlockPos.MutableBlockPos from(int x, int y, int z, int w) {
+			BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(x, y, z);
+			Vec4i.setW(pos, w);
+			return pos;
+		}
+
 		default BlockPos.MutableBlockPos set(int x, int y, int z, int w) {
 			BlockPos.MutableBlockPos This = (BlockPos.MutableBlockPos) this;
 			This.setX(x);

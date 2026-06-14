@@ -14,12 +14,12 @@ The goal of this mod is to make that dimension act identical to the existing 3.
 - The 4th axis, labeled "W". It is the 3rd **horizontal** axis.
 - 2 new `Direction`s: "Ana" for positive W and "kata" for negative W.
 - All entities and blocks have 4D positions.
-- 4D world:
-  - Horizontal sizes are capped at `±100000` in all 3 directions, compared to vanilla's `±30000000` in 2 directions.
-    This means vanilla world has area of `36e14` square meters, but in this mod the area is `8e15` cubic meters.
-  - Vertical axis has been reduced from `[-4064; 4062]` to `[-992; 990]` in size. Vanilla does not use the entirety of this huge limit, but mods and datapacks that do will break.
-  - Chunks are 16x16x16 in horizontal size, instead of 16x16.
-  - The changes affect Overworld, Nether, and all other _Levels_.
+- Horizontal sizes are capped at `±100000` in all 3 directions, compared to vanilla's `±30000000` in 2 directions.
+  - This means vanilla world has area of `36e14` square meters, but in this mod the area is `8e15` cubic meters.
+  - The horizontal world limits are enforced by a 4D world border.
+- Vertical axis has been reduced from `[-4064; 4062]` to `[-992; 990]` in size. Vanilla does not use the entirety of this huge limit, but mods and datapacks that do will break.
+- Chunks are 16x16x16 in horizontal size, instead of 16x16. 
+- The changes affect Overworld, Nether, and all other _Levels_.
 
 > [!CAUTION]
 > 3D saves are not compatible with 4D saves, in both directions. Create a new world after installing the mod.

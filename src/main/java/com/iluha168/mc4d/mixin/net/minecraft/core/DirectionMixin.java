@@ -95,7 +95,11 @@ public enum DirectionMixin implements Direction4 {
 
 	// TODO getApproximateNearest
 	// TODO getApproximateNearest
-	// TODO getApproximateNearest
+
+	@WrapMethod(method = "getApproximateNearest(Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/core/Direction;")
+	private static Direction getApproximateNearest(Vec3 vec, Operation<Direction> original) {
+		return vec instanceof Vec4 vec4 ? Direction4.getApproximateNearest(vec4) : original.call(vec);
+	}
 
 	@Overwrite
 	public static Direction getNearest(int x, int y, int z, Direction orElse) {

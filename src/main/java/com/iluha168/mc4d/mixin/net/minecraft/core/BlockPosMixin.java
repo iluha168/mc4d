@@ -6,6 +6,7 @@ import com.iluha168.mc4d.core.Position4;
 import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.level.Level4;
+import com.iluha168.mc4d.world.level.levelgen.structure.BoundingBox4;
 import com.iluha168.mc4d.world.phys.AABB4;
 import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.expression.Definition;
@@ -18,6 +19,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.*;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
@@ -329,7 +331,20 @@ public abstract class BlockPosMixin implements BlockPos4 {
 	}
 
 	// `betweenClosedStream(a,b)` does not need a patch.
-	// TODO betweenClosedStream(BoundingBox boundingBox)
+
+	@Redirect(method = "betweenClosedStream(Lnet/minecraft/world/level/levelgen/structure/BoundingBox;)Ljava/util/stream/Stream;", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/core/BlockPos;betweenClosedStream(IIIIII)Ljava/util/stream/Stream;"
+	))
+	private static Stream<BlockPos> betweenClosedStream(int minX, int minY, int minZ, int maxX, int maxY, int maxZ, @Local(argsOnly = true, name = "boundingBox") BoundingBox boundingBox) {
+		BoundingBox4 bb4 = (BoundingBox4) boundingBox;
+		final int minW = bb4.minW();
+		final int maxW = bb4.maxW();
+		return BlockPos4.betweenClosedStream(
+			minX, minY, minZ, Math.min(minW, maxW),
+			maxX, maxY, maxZ, Math.max(minW, maxW)
+		);
+	}
 
 	@Redirect(method = "betweenClosedStream(Lnet/minecraft/world/phys/AABB;)Ljava/util/stream/Stream;", at = @At(
 		value = "INVOKE",

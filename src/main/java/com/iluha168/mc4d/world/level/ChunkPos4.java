@@ -1,8 +1,8 @@
 package com.iluha168.mc4d.world.level;
 
+import com.iluha168.mc4d.math.MathHelpers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
-import net.minecraft.util.Mth;
 import net.minecraft.world.level.ChunkPos;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -47,7 +47,7 @@ public interface ChunkPos4 {
 	}
 
 	static boolean isValid(int x, int z, int w) {
-		return Math.max(Mth.absMax(x, z), Math.abs(w)) <= ChunkPos.MAX_COORDINATE_VALUE;
+		return MathHelpers.absMax(x, z, w) <= ChunkPos.MAX_COORDINATE_VALUE;
 	}
 
 	static long pack(int x, int z, int w) {

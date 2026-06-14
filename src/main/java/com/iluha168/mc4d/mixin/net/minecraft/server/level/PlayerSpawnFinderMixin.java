@@ -5,6 +5,7 @@ import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.level.ChunkPos4;
 import com.iluha168.mc4d.world.level.Level4;
+import com.iluha168.mc4d.world.level.border.WorldBorder4;
 import com.iluha168.mc4d.world.level.chunk.ChunkAccess4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
@@ -25,6 +26,7 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.CollisionGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
@@ -86,7 +88,13 @@ class PlayerSpawnFinderMixin {
 		return Math.min(32768L, b * squareSide);
 	}
 
-	// TODO findSpawn when 4D world border
+	@Redirect(method = "findSpawn", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/level/border/WorldBorder;getDistanceToBorder(DD)D"
+	))
+	private static double findSpawn(WorldBorder instance, double x, double z, @Local(argsOnly = true, name = "spawnSuggestion") BlockPos spawnSuggestion) {
+		return ((WorldBorder4) instance).getDistanceToBorder(x, z, Vec4i.getW(spawnSuggestion));
+	}
 
 	@Definition(id = "deltaZ", local = @Local(type = int.class, name = "deltaZ"))
 	@Expression("deltaZ = @(?)")

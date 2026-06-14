@@ -1,7 +1,9 @@
 package com.iluha168.mc4d.core;
 
 import com.google.common.collect.ImmutableList;
+import com.iluha168.mc4d.world.phys.Vec4;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 
 /**
  * <b>All {@link Direction}</b> instances implement {@link Direction4}.
@@ -22,6 +24,33 @@ public interface Direction4 {
 
 	static Direction4 as(Direction direction) {
 		return (Direction4) (Object) direction;
+	}
+
+	static Direction getApproximateNearest(double dx, double dy, double dz, double dw) {
+		return getApproximateNearest((float) dx, (float) dy, (float) dz, (float) dw);
+	}
+
+	static Direction getApproximateNearest(float dx, float dy, float dz, float dw) {
+		Direction result = Direction.NORTH;
+		float highestDot = Float.MIN_VALUE;
+
+		for (Direction direction : Direction.values()) {
+			Vec3i normal = direction.getUnitVec3i();
+			float dot = dx * normal.getX()
+				      + dy * normal.getY()
+				      + dz * normal.getZ()
+				      + dw * Vec4i.getW(normal);
+			if (dot > highestDot) {
+				highestDot = dot;
+				result = direction;
+			}
+		}
+
+		return result;
+	}
+
+	static Direction getApproximateNearest(Vec4 vec) {
+		return Direction4.getApproximateNearest(vec.x, vec.y, vec.z, vec.w);
 	}
 
 	/**

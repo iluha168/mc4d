@@ -25,4 +25,8 @@ public interface MathHelpers {
 	static int cube(int x) {
 		return x * x * x;
 	}
+
+	static double absMax(double a, double b, double c) {
+		return Math.max(Math.abs(a), Math.max(Math.abs(b), Math.abs(c)));
+	}
 }

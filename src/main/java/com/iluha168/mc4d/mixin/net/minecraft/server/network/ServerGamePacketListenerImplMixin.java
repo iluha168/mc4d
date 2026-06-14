@@ -82,10 +82,7 @@ public abstract class ServerGamePacketListenerImplMixin implements ServerGamePac
 		target = "Lnet/minecraft/server/level/ServerPlayer;absSnapTo(DDDFF)V"
 	))
 	void tickPlayer(ServerPlayer player, double x, double y, double z, float yRot, float xRot) {
-		((Entity4) player).absSnapTo(
-			new Vec4(x, y, z, this.firstGoodW),
-			yRot, xRot
-		);
+		((Entity4) player).absSnapTo(x, y, z, this.firstGoodW, yRot, xRot);
 	}
 
 	@Redirect(method = "handleAcceptTeleportPacket", at = @At(
@@ -95,10 +92,7 @@ public abstract class ServerGamePacketListenerImplMixin implements ServerGamePac
 	void handleAcceptTeleportPacket(ServerPlayer player, double x, double y, double z, float yRot, float xRot) {
 		assert this.awaitingPositionFromClient != null;
 		double w = ((Vec4) this.awaitingPositionFromClient).w;
-		((Entity4) player).absSnapTo(
-			new Vec4(x, y, z, w),
-			yRot, xRot
-		);
+		((Entity4) player).absSnapTo(x, y, z, w, yRot, xRot);
 		this.lastGoodW = w;
 	}
 
@@ -148,7 +142,7 @@ public abstract class ServerGamePacketListenerImplMixin implements ServerGamePac
 	@Redirect(method = "handleMovePlayer", at = @At("MIXINEXTRAS:EXPRESSION"))
 	void handleMovePlayer_absSnapTo(ServerPlayer player, double x, double y, double z, float yRot, float xRot) {
 		Entity4 player4 = (Entity4) player;
-		player4.absSnapTo(new Vec4(x, y, z, player4.getW()), yRot, xRot);
+		player4.absSnapTo(x, y, z, player4.getW(), yRot, xRot);
 	}
 	//                     this.player.level().getChunkSource().move(this.player);
 	//                 } else {
@@ -307,10 +301,7 @@ public abstract class ServerGamePacketListenerImplMixin implements ServerGamePac
 		ordinal = 1
 	))
 	void handleMovePlayer_snapTo(ServerPlayer player, double x, double y, double z, float yRot, float xRot, @Share("targetW") LocalDoubleRef targetW) {
-		((Entity4) player).absSnapTo(
-			new Vec4(x, y, z, targetW.get()),
-			yRot, xRot
-		);
+		((Entity4) player).absSnapTo(x, y, z, targetW.get(), yRot, xRot);
 	}
 	//                             boolean isAutoSpinAttack = this.player.isAutoSpinAttack();
 	//                             this.clientIsFloating = oyDist >= -0.03125
@@ -345,7 +336,7 @@ public abstract class ServerGamePacketListenerImplMixin implements ServerGamePac
 		@Local(name = "clientDeltaMovement") Vec3 clientDeltaMovement
 	) {
 		double w = ((Vec4) clientDeltaMovement).w;
-		((Entity4) instance).doCheckFallDamage(new Vec4(x, y, z, w), onGround);
+		((Entity4) instance).doCheckFallDamage(x, y, z, w, onGround);
 	}
 	//                             this.handlePlayerKnownMovement(clientDeltaMovement);
 	//                             if (movedUpwards) {
@@ -400,7 +391,7 @@ public abstract class ServerGamePacketListenerImplMixin implements ServerGamePac
 	) {
 		Entity4 player4 = ((Entity4) instance);
 		double w = player4.getW() - startW.get();
-		player4.doCheckFallDamage(new Vec4(x, y, z, w), onGround);
+		player4.doCheckFallDamage(x, y, z, w, onGround);
 	}
 	//                             this.player.removeLatestMovementRecording();
 	//                         }

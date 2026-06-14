@@ -248,7 +248,7 @@ public abstract class Vec3iMixin implements Vec4i {
 		target = "Lcom/google/common/base/MoreObjects$ToStringHelper;toString()Ljava/lang/String;"
 	))
 	String toString(MoreObjects.ToStringHelper helper) {
-		return helper.add("w", this.getW()).toString();
+		return helper.add("w", (this.wNotSet ? "missingno" : this.w)).toString();
 	}
 
 	@Expression("return @(?)")

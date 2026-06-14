@@ -3,15 +3,19 @@ package com.iluha168.mc4d.mixin.net.minecraft.server.level;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.util.StaticCache3D;
 import com.iluha168.mc4d.world.level.ChunkPos4;
+import com.iluha168.mc4d.world.level.LevelAccessor4;
 import com.iluha168.mc4d.world.level.LevelReader4;
 import com.iluha168.mc4d.world.level.chunk.ChunkAccess4;
 import net.minecraft.CrashReport;
 import net.minecraft.CrashReportCategory;
 import net.minecraft.ReportedException;
+import net.minecraft.core.Holder;
 import net.minecraft.core.SectionPos;
 import net.minecraft.server.level.GenerationChunkHolder;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.util.StaticCache2D;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.chunk.status.ChunkStep;
@@ -25,7 +29,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import java.util.Locale;
 
 @Mixin(WorldGenRegion.class)
-abstract class WorldGenRegionMixin implements LevelReader4 {
+abstract class WorldGenRegionMixin implements LevelAccessor4 {
 	@Shadow
 	@Final
 	private ChunkAccess center;
@@ -37,6 +41,10 @@ abstract class WorldGenRegionMixin implements LevelReader4 {
 	@Shadow
 	@Final
 	private StaticCache2D<GenerationChunkHolder> cache;
+
+	@Shadow
+	@Final
+	private ServerLevel level;
 
 	@Overwrite
 	public @Nullable ChunkAccess getChunk(int chunkX, int chunkZ, ChunkStatus targetStatus, boolean loadOrGenerate) {
@@ -95,7 +103,12 @@ abstract class WorldGenRegionMixin implements LevelReader4 {
 
 	// TODO getBlockState
 	// TODO getNearestPlayer
-	// TODO getUncachedNoiseBiome
+
+	@Override
+	public Holder<Biome> getUncachedNoiseBiome(int quartX, int quartY, int quartZ, int quartW) {
+		return ((LevelReader4) this.level).getUncachedNoiseBiome(quartX, quartY, quartZ, quartW);
+	}
+
 	// TODO ensureCanWrite
 	// TODO setBlock
 	// TODO addFreshEntity

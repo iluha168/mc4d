@@ -1,5 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client;
 
+import com.iluha168.mc4d.core.BlockPos4;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.entity.Entity4;
 import com.iluha168.mc4d.world.phys.Vec4;
@@ -8,6 +9,7 @@ import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.Camera;
+import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
@@ -15,9 +17,7 @@ import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Camera.class)
 abstract
@@ -39,12 +39,7 @@ class CameraMixin {
 		return Vec4.ZERO;
 	}
 
-	@Inject(method = "setPosition(Lnet/minecraft/world/phys/Vec3;)V", at = @At("HEAD"))
-	private void setPosition(Vec3 position, CallbackInfo ci) {
-		if (!(position instanceof Vec4)) {
-			throw Err4.container3();
-		}
-	}
+	// TODO prepareCullFrustum
 
 	@Redirect(method = "alignWithEntity", at = @At(
 		value = "INVOKE",
@@ -64,10 +59,12 @@ class CameraMixin {
 		value = "INVOKE",
 		target = "Lnet/minecraft/world/phys/Vec3;add(DDD)Lnet/minecraft/world/phys/Vec3;"
 	))
-	Vec3 getMaxZoom(Vec3 instance, double x, double y, double z, @Local(name = "i") int i) {
+	Vec3 getMaxZoom(Vec3 position, double x, double y, double z, @Local(name = "i") int i) {
 		float offsetW = (i >> 3 & 1) * 2 - 1;
-		return ((Vec4) instance).add(x, y, z, offsetW * 0.1F);
+		return ((Vec4) position).add(x, y, z, offsetW * 0.1F);
 	}
+
+	// TODO move
 
 	@Definition(id = "setPosition", method = "Lnet/minecraft/client/Camera;setPosition(Lnet/minecraft/world/phys/Vec3;)V")
 	@Expression("this.setPosition(?)")
@@ -75,4 +72,17 @@ class CameraMixin {
 	void move(Camera This, Vec3 position) {
 		this.setPosition(Vec4.of(position, ((Vec4) this.position).w));
 	}
+
+	@Redirect(method = "setPosition(Lnet/minecraft/world/phys/Vec3;)V", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/core/BlockPos$MutableBlockPos;set(DDD)Lnet/minecraft/core/BlockPos$MutableBlockPos;"
+	))
+	private BlockPos.MutableBlockPos setPosition(BlockPos.MutableBlockPos blockPosition, double x, double y, double z, @Local(argsOnly = true, name = "position") Vec3 position) {
+		if (!(position instanceof Vec4 pos4)) {
+			throw Err4.container3();
+		}
+		return ((BlockPos4.MutableBlockPos) blockPosition).set(x, y, z, pos4.w);
+	}
+
+	// TODO? NearPlane
 }

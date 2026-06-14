@@ -265,7 +265,7 @@ class SkyLightEngineMixin {
 			case SOUTH -> z == 0;
 			case WEST -> x == SectionPos.SECTION_MAX_INDEX;
 			case EAST -> x == 0;
-			default -> throw new IllegalArgumentException();
+			default -> false;
 		};
 	}
 
