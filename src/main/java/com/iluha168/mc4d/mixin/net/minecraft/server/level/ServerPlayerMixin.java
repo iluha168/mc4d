@@ -1,21 +1,28 @@
 package com.iluha168.mc4d.mixin.net.minecraft.server.level;
 
 import com.iluha168.mc4d.util.Err4;
+import com.iluha168.mc4d.world.entity.player.Input4;
 import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mojang.serialization.Codec;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Input;
 import net.minecraft.world.phys.Vec3;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerPlayer.class)
 class ServerPlayerMixin {
+	@Shadow
+	private Input lastClientInput;
+
 	@Definition(id = "lastKnownClientMovement", field = "Lnet/minecraft/server/level/ServerPlayer;lastKnownClientMovement:Lnet/minecraft/world/phys/Vec3;")
 	@Expression("this.lastKnownClientMovement = @(?)")
 	@ModifyExpressionValue(method = "<init>", at = @At("MIXINEXTRAS:EXPRESSION"))
@@ -28,6 +35,16 @@ class ServerPlayerMixin {
 		if (!(lastKnownClientMovement instanceof Vec4)) {
 			throw Err4.container3();
 		}
+	}
+
+	@Redirect(method = "getLastClientMoveIntent", at = @At(
+		value = "NEW",
+		target = "(DDD)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 getLastClientMoveIntent(double x, double y, double z) {
+		final Input4 lastClientInput4 = Input4.as(this.lastClientInput);
+		final float anaIntent = lastClientInput4.ana() == lastClientInput4.kata() ? 0.0F : (lastClientInput4.ana() ? 1.0F : -1.0F);
+		return new Vec4(x, y, z, anaIntent);
 	}
 
 	@Mixin(ServerPlayer.SavedPosition.class)

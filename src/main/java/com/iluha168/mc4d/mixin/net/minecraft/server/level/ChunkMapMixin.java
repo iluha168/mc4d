@@ -2,7 +2,9 @@ package com.iluha168.mc4d.mixin.net.minecraft.server.level;
 
 import com.iluha168.mc4d.math.MathHelpers;
 import com.iluha168.mc4d.network.protocol.game.ClientboundSetChunkCacheCenterPacket4;
+import com.iluha168.mc4d.server.level.ChunkTrackingView4;
 import com.iluha168.mc4d.server.level.ThreadedLevelLightEngine4;
+import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.util.StaticCache3D;
 import com.iluha168.mc4d.world.level.ChunkPos4;
 import com.llamalad7.mixinextras.expression.Definition;
@@ -15,10 +17,13 @@ import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import net.minecraft.network.protocol.game.ClientboundSetChunkCacheCenterPacket;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ChunkTrackingView;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ThreadedLevelLightEngine;
 import net.minecraft.util.StaticCache2D;
 import net.minecraft.world.level.ChunkPos;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -30,6 +35,36 @@ import java.util.concurrent.CompletableFuture;
 @Mixin(ChunkMap.class)
 class ChunkMapMixin {
 	// TODO other methods
+
+	@Overwrite
+	@Deprecated
+	public boolean isChunkTracked(ServerPlayer player, int chunkX, int chunkZ) {
+		throw Err4.arguments2("ChunkMap#isChunkTracked(ServerPlayer, int, int, int)");
+	}
+	@Unique
+	public boolean isChunkTracked(ServerPlayer player, int chunkX, int chunkZ, int chunkW) {
+		return ChunkTrackingView4.as(player.getChunkTrackingView()).contains(chunkX, chunkZ, chunkW)
+			&& !player.connection.chunkSender.isPending(ChunkPos4.pack(chunkX, chunkZ, chunkW));
+	}
+
+	@Overwrite
+	@Deprecated
+	private boolean isChunkOnTrackedBorder(ServerPlayer player, int chunkX, int chunkZ) {
+		throw Err4.arguments2(null);
+	}
+	@Unique
+	private boolean isChunkOnTrackedBorder(ServerPlayer player, int chunkX, int chunkZ, int chunkW) {
+		if (!this.isChunkTracked(player, chunkX, chunkZ, chunkW)) {
+			return false;
+		}
+		for (int dx = -1; dx <= 1; dx++)
+			for (int dz = -1; dz <= 1; dz++)
+				for (int dw = -1; dw <= 1; dw++)
+					if ((dx != 0 || dz != 0 || dw != 0) && !this.isChunkTracked(player, chunkX + dx, chunkZ + dz, chunkW + dw))
+						return true;
+
+		return false;
+	}
 
 	@Redirect(method = "getChunkRangeFuture", at = @At(
 		value = "INVOKE",
@@ -111,6 +146,21 @@ class ChunkMapMixin {
 	}
 
 	// TODO other methods
+
+	@Redirect(method = "getPlayers", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/server/level/ChunkMap;isChunkOnTrackedBorder(Lnet/minecraft/server/level/ServerPlayer;II)Z"
+	))
+	boolean getPlayers_isChunkOnTrackedBorder(ChunkMap self, ServerPlayer player, int x, int z, @Local(argsOnly = true, name = "pos") ChunkPos pos) {
+		return this.isChunkOnTrackedBorder(player, x, z, ChunkPos4.as(pos).w());
+	}
+	@Redirect(method = "getPlayers", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/server/level/ChunkMap;isChunkTracked(Lnet/minecraft/server/level/ServerPlayer;II)Z"
+	))
+	boolean getPlayers_isChunkTracked(ChunkMap self, ServerPlayer player, int x, int z, @Local(argsOnly = true, name = "pos") ChunkPos pos) {
+		return this.isChunkTracked(player, x, z, ChunkPos4.as(pos).w());
+	}
 
 	@Redirect(method = "lambda$waitForLightBeforeSending$0", at = @At(
 		value = "INVOKE",

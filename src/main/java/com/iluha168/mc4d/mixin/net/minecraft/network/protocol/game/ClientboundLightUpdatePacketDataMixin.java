@@ -13,6 +13,4 @@ class ClientboundLightUpdatePacketDataMixin {
 	private static int size(int constant) {
 		return DataLayer4.SIZE;
 	}
-
-	// TODO the rest
 }

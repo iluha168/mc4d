@@ -67,6 +67,28 @@ class ClientChunkCacheMixin implements ClientChunkCache4, ChunkSource4 {
 		return pos.x() == x && pos.z() == z && ChunkPos4.as(pos).w() == w;
 	}
 
+	@Redirect(method = "drop", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/client/multiplayer/ClientChunkCache$Storage;inRange(II)Z"
+	))
+	boolean drop_inRange(ClientChunkCache.Storage storage, int chunkX, int chunkZ, @Local(argsOnly = true, name = "pos") ChunkPos pos) {
+		return ClientChunkCache4.Storage.as(storage).inRange(chunkX, chunkZ, ChunkPos4.as(pos).w());
+	}
+	@Redirect(method = "drop", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/client/multiplayer/ClientChunkCache$Storage;getIndex(II)I"
+	))
+	int drop_getIndex(ClientChunkCache.Storage storage, int chunkX, int chunkZ, @Local(argsOnly = true, name = "pos") ChunkPos pos) {
+		return ClientChunkCache4.Storage.as(storage).getIndex(chunkX, chunkZ, ChunkPos4.as(pos).w());
+	}
+	@Redirect(method = "drop", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/client/multiplayer/ClientChunkCache;isValidChunk(Lnet/minecraft/world/level/chunk/LevelChunk;II)Z"
+	))
+	boolean drop_isValidChunk(@Nullable LevelChunk chunk, int x, int z, @Local(argsOnly = true, name = "pos") ChunkPos pos) {
+		return isValidChunk(chunk, x, z, ChunkPos4.as(pos).w());
+	}
+
 	@Overwrite
 	public @Nullable LevelChunk getChunk(int x, int z, ChunkStatus targetStatus, boolean loadOrGenerate) {
 		throw Err4.arguments2("ChunkSource4#getChunk");

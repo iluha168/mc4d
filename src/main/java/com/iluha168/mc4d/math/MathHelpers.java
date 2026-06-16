@@ -10,6 +10,15 @@ public interface MathHelpers {
 			+ (m02 * m10 - m00 * m12) * m21
 			+ (m01 * m12 - m02 * m11) * m20;
 	}
+	static double det3(
+		double m00, double m01, double m02,
+		double m10, double m11, double m12,
+		double m20, double m21, double m22
+	) {
+		return (m00 * m11 - m01 * m10) * m22
+			+ (m02 * m10 - m00 * m12) * m21
+			+ (m01 * m12 - m02 * m11) * m20;
+	}
 
 	static int absMax(int a, int b, int c) {
 		return Math.max(Math.abs(a), Math.max(Math.abs(b), Math.abs(c)));

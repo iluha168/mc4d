@@ -20,6 +20,7 @@ import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.SectionPos;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -154,7 +155,13 @@ class ServerLevelMixin extends LevelMixin implements ServerLevel4 {
 	// TODO sendParticles
 	// TODO sendParticles
 	// TODO sendParticles
-	// TODO sendParticles
+
+	@Overwrite
+	@Deprecated
+	private boolean sendParticles(ServerPlayer player, boolean overrideLimiter, double x, double y, double z, Packet<?> packet) {
+		// TODO 4D particle engine
+		return true;
+	}
 
 	@Overwrite
 	@Deprecated

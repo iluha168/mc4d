@@ -22,13 +22,32 @@ class RegionFileMixin {
 	private static int header_capacity(int capacity) {
 		return capacity * ChunkPos.REGION_SIZE; // Original is Long.SIZE / 8 * ChunkPos.REGION_SIZE * ChunkPos.REGION_SIZE, I guess?
 	}
-
 	@Definition(id = "offsets", field = "Lnet/minecraft/world/level/chunk/storage/RegionFile;offsets:Ljava/nio/IntBuffer;")
 	@Definition(id = "limit", method = "Ljava/nio/IntBuffer;limit(I)Ljava/nio/IntBuffer;")
 	@Expression("this.offsets.limit(?)")
 	@ModifyArg(method = "<init>(Lnet/minecraft/world/level/chunk/storage/RegionStorageInfo;Ljava/nio/file/Path;Ljava/nio/file/Path;Lnet/minecraft/world/level/chunk/storage/RegionFileVersion;Z)V", at = @At("MIXINEXTRAS:EXPRESSION"))
-	int offsets_limit(int limit2D) {
+	int init_offsets_limit(int limit2D) {
 		return limit2D * ChunkPos.REGION_SIZE; // Original is REGION_SIZE squared
+	}
+	@Definition(id = "header", field = "Lnet/minecraft/world/level/chunk/storage/RegionFile;header:Ljava/nio/ByteBuffer;")
+	@Definition(id = "position", method = "Ljava/nio/ByteBuffer;position(I)Ljava/nio/ByteBuffer;")
+	@Expression("this.header.position(4096)")
+	@ModifyArg(method = "<init>(Lnet/minecraft/world/level/chunk/storage/RegionStorageInfo;Ljava/nio/file/Path;Ljava/nio/file/Path;Lnet/minecraft/world/level/chunk/storage/RegionFileVersion;Z)V", at = @At("MIXINEXTRAS:EXPRESSION"))
+	int init_timestamps_position(int position) { // SECTOR_BYTES
+		return position * ChunkPos.REGION_SIZE;
+	}
+	@Definition(id = "readHeaderBytes", local = @Local(type = int.class, name = "readHeaderBytes"))
+	@Expression("readHeaderBytes != @(8192)")
+	@ModifyExpressionValue(method = "<init>(Lnet/minecraft/world/level/chunk/storage/RegionStorageInfo;Ljava/nio/file/Path;Ljava/nio/file/Path;Lnet/minecraft/world/level/chunk/storage/RegionFileVersion;Z)V", at = @At("MIXINEXTRAS:EXPRESSION"))
+	int init_headerSize(int headerSize) {
+		return headerSize * ChunkPos.REGION_SIZE;
+	}
+	// Why does ide just randomly fail to see a valid mixin?
+	@Definition(id = "i", local = @Local(type = int.class, name = "i"))
+	@Expression("i < @(1024)")
+	@ModifyExpressionValue(method = "<init>(Lnet/minecraft/world/level/chunk/storage/RegionStorageInfo;Ljava/nio/file/Path;Ljava/nio/file/Path;Lnet/minecraft/world/level/chunk/storage/RegionFileVersion;Z)V", at = @At("MIXINEXTRAS:EXPRESSION"))
+	int init_offsetsCount(int count) { // SECTOR_INTS
+		return count * ChunkPos.REGION_SIZE;
 	}
 
 	@Definition(id = "pos", local = @Local(type = ChunkPos.class, name = "pos", argsOnly = true))

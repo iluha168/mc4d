@@ -1,21 +1,27 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.entity.player;
 
+import com.iluha168.mc4d.mixin.net.minecraft.world.entity.LivingEntityMixin;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.phys.AABB4;
 import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.sugar.Local;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(Player.class)
-abstract class PlayerMixin {
+public abstract class PlayerMixin extends LivingEntityMixin {
+	@Shadow
+	public abstract float getSpeed();
+
 	@Redirect(method = "aiStep", at = @At(
 		value = "INVOKE",
 		target = "Lnet/minecraft/world/phys/AABB;inflate(DDD)Lnet/minecraft/world/phys/AABB;"
@@ -39,7 +45,7 @@ abstract class PlayerMixin {
 		target = "(DDD)Lnet/minecraft/world/phys/Vec3;"
 	))
 	Vec3 maybeBackOffFromEdge(
-		double deltaX, double deltaY, double deltaZ,
+		double x, double y, double z,
 		@Local(name = "delta", argsOnly = true) Vec3 delta,
 		@Local(name = "step") double step,
 		@Local(name = "maxDownStep") float maxDownStep,
@@ -49,7 +55,7 @@ abstract class PlayerMixin {
 		double deltaW = ((Vec4) delta).w;
 		double stepW = Math.signum(deltaW) * step;
 
-		while (deltaW != 0 && this.canFallAtLeast(0, deltaZ, deltaW, maxDownStep)) {
+		while (deltaW != 0 && this.canFallAtLeast(0, z, deltaW, maxDownStep)) {
 			if (Math.abs(deltaW) <= step) {
 				deltaW = 0;
 				break;
@@ -57,17 +63,17 @@ abstract class PlayerMixin {
 			deltaW -= stepW;
 		}
 
-		while (deltaX != 0 && deltaZ != 0 && deltaW != 0 && this.canFallAtLeast(deltaX, deltaZ, deltaW, maxDownStep)) {
-			if (Math.abs(deltaX) <= step) {
-				deltaX = 0;
+		while (x != 0 && z != 0 && deltaW != 0 && this.canFallAtLeast(x, z, deltaW, maxDownStep)) {
+			if (Math.abs(x) <= step) {
+				x = 0;
 			} else {
-				deltaX -= stepX;
+				x -= stepX;
 			}
 
-			if (Math.abs(deltaZ) <= step) {
-				deltaZ = 0;
+			if (Math.abs(z) <= step) {
+				z = 0;
 			} else {
-				deltaZ -= stepZ;
+				z -= stepZ;
 			}
 
 			if (Math.abs(deltaW) <= step) {
@@ -77,7 +83,7 @@ abstract class PlayerMixin {
 			}
 		}
 
-		return new Vec4(deltaX, deltaY, deltaZ, deltaW);
+		return new Vec4(x, y, z, deltaW);
 	}
 
 	@Redirect(method = "isAboveGround", at = @At(
@@ -111,5 +117,13 @@ abstract class PlayerMixin {
 				boundingBox.maxW - AABB4.EPSILON + deltaW
 			)
 		);
+	}
+
+	@Redirect(method = "isWithinBlockInteractionRange", at = @At(
+		value = "NEW",
+		target = "(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/phys/AABB;"
+	))
+	AABB isWithinBlockInteractionRange(BlockPos pos) {
+		return new AABB4(pos);
 	}
 }

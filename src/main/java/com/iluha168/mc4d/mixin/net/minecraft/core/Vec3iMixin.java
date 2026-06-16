@@ -8,8 +8,6 @@ import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
@@ -199,11 +197,13 @@ public abstract class Vec3iMixin implements Vec4i {
 		return ((Vec4i) This).distToLowCornerSqr(x, y, z, Vec4i.getW(pos));
 	}
 
-	@WrapMethod(method = "distToCenterSqr(Lnet/minecraft/core/Position;)D")
-	double distToCenterSqr(Position pos, Operation<Double> original) {
-		return pos instanceof Vec4 vec4
-			? this.distToCenterSqr(pos.x(), pos.y(), pos.z(), vec4.w())
-			: original.call(pos);
+	@Redirect(method = "distToCenterSqr(Lnet/minecraft/core/Position;)D", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/core/Vec3i;distToCenterSqr(DDD)D"
+	))
+	double distToCenterSqr(Vec3i instance, double x, double y, double z, @Local(argsOnly = true, name = "pos") Position pos) {
+		if (!(pos instanceof Vec4 pos4)) throw Err4.container3();
+		return this.distToCenterSqr(x, y, z, pos4.w());
 	}
 
 	@Overwrite

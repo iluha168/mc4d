@@ -3,10 +3,7 @@ package com.iluha168.mc4d.mixin.net.minecraft.client.multiplayer;
 import com.iluha168.mc4d.client.multiplayer.ClientChunkCache4;
 import com.iluha168.mc4d.client.multiplayer.ClientLevel4;
 import com.iluha168.mc4d.core.SectionPos4;
-import com.iluha168.mc4d.network.protocol.game.ClientboundInitializeBorderPacket4;
-import com.iluha168.mc4d.network.protocol.game.ClientboundLevelChunkPacketData4;
-import com.iluha168.mc4d.network.protocol.game.ClientboundLevelChunkWithLightPacket4;
-import com.iluha168.mc4d.network.protocol.game.ClientboundSetChunkCacheCenterPacket4;
+import com.iluha168.mc4d.network.protocol.game.*;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.entity.Entity4;
 import com.iluha168.mc4d.world.level.ChunkPos4;
@@ -162,6 +159,21 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
 	}
 
 	// TODO the rest
+
+	@ModifyArg(method = "handleLightUpdatePacket", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/client/multiplayer/ClientLevel;queueLightUpdate(Ljava/lang/Runnable;)V"
+	))
+	Runnable handleLightUpdatePacket(
+		Runnable update,
+		@Local(name = "x") int x,
+		@Local(name = "z") int z,
+		@Local(name = "lightData") ClientboundLightUpdatePacketData lightData,
+		@Local(argsOnly = true, name = "packet") ClientboundLightUpdatePacket packet
+	) {
+		final int w = ((ClientboundLightUpdatePacket4) packet).getW();
+		return () -> this.applyLightData(x, z, w, lightData, true);
+	}
 
 	@Overwrite
 	@Deprecated

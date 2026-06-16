@@ -155,6 +155,12 @@ class ViewAreaMixin implements ViewArea4 {
 			section.setDirty(playerChanged);
 		}
 	}
+	@Override
+	public void setAllDirty(boolean playerChanged) {
+		for (SectionRenderDispatcher.RenderSection section : this.sections) {
+			section.setDirty(playerChanged);
+		}
+	}
 
 	@Definition(id = "getRenderSection", method = "Lnet/minecraft/client/renderer/ViewArea;getRenderSection(III)Lnet/minecraft/client/renderer/chunk/SectionRenderDispatcher$RenderSection;")
 	@Expression("this.getRenderSection(?, ?, ?)")

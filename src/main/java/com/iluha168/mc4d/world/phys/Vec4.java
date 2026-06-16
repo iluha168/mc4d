@@ -15,11 +15,12 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.util.Util;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Vector3f;
 import org.jspecify.annotations.NonNull;
 
 import java.util.EnumSet;
 import java.util.List;
+
+import static com.iluha168.mc4d.math.MathHelpers.det3;
 
 /**
  * Adds 4th dimension to 3D vectors.
@@ -98,6 +99,21 @@ public class Vec4 extends Vec3 implements Position4 {
 	@Deprecated
 	public @NonNull Vec4 cross(@NonNull Vec3 vec) {
 		throw Err4.math("No cross product defined for 4D space");
+	}
+
+	/**
+	 * {@return the vector perpendicular to the arguments}
+	 */
+	static public @NonNull Vec4 cross(Vec4 a, Vec4 b, Vec4 c) {
+		double ax = a.x, ay = a.y, az = a.z, aw = a.w;
+		double bx = b.x, by = b.y, bz = b.z, bw = b.w;
+		double cx = c.x, cy = c.y, cz = c.z, cw = c.w;
+		return new Vec4(
+			-det3(ay, az, aw, by, bz, bw, cy, cz, cw),
+			det3(ax, az, aw, bx, bz, bw, cx, cz, cw),
+			-det3(ax, ay, aw, bx, by, bw, cx, cy, cw),
+			det3(ax, ay, az, bx, by, bz, cx, cy, cz)
+		);
 	}
 
 	@Override
@@ -358,11 +374,7 @@ public class Vec4 extends Vec3 implements Position4 {
 		return this.w;
 	}
 
-	@Override
-	@Deprecated
-	public @NonNull Vector3f toVector3f() {
-		throw Err4.return3(null);
-	}
+	// do not remove `toVector3f`, it is used in rendering
 
 	// `projectedOn`, surprisingly, does not need an override
 

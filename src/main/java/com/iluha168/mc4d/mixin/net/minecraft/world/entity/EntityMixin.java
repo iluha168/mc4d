@@ -146,6 +146,32 @@ public abstract class EntityMixin implements Entity4 {
 	@Shadow
 	public abstract void setOldPosAndRot();
 
+	@Shadow public abstract Vec3 position();
+
+	@Shadow
+	public abstract Vec3 getForward();
+
+	@Shadow
+	public abstract double getX();
+
+	@Shadow
+	public abstract AABB getBoundingBox();
+
+	@Shadow
+	public abstract double getZ();
+
+	@Shadow
+	public abstract Level level();
+
+	@Shadow
+	public abstract float getBbWidth();
+
+	@Shadow
+	public abstract float getBbHeight();
+
+	@Shadow
+	public abstract double getY();
+
 	@Override
 	public void setWO(double wo) {
 		this.wo = wo;
@@ -350,7 +376,14 @@ public abstract class EntityMixin implements Entity4 {
 
 	// TODO doWaterSplashEffect
 	// TODO spawnSprintParticle
-	// TODO? getInputVector
+
+	@Redirect(method = "getInputVector", at = @At(
+		value = "NEW",
+		target = "(DDD)Lnet/minecraft/world/phys/Vec3;"
+	))
+	private static Vec3 getInputVector(double x, double y, double z, @Local(name = "movement") Vec3 movement) {
+		return new Vec4(x, y, z, ((Vec4) movement).w);
+	}
 
 	@Redirect(method = "getLightLevelDependentMagicValue", at = @At(
 		value = "INVOKE",
@@ -609,7 +642,15 @@ public abstract class EntityMixin implements Entity4 {
 	// TODO getCollisionHorizontalEscapeVector
 	// TODO getDismountLocationForPassenger
 	// TODO? lookAt
-	// TODO touchingUnloadedChunk
+
+	@Redirect(method = "touchingUnloadedChunk", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/level/Level;hasChunksAt(IIII)Z"
+	))
+	boolean touchingUnloadedChunk(Level level, int x0, int z0, int x1, int z1, @Local(name = "box") AABB box) {
+		if (!(box instanceof AABB4 box4)) throw Err4.container3();
+		return ((LevelReader4) level).hasChunksAt4(x0, z0, Mth.floor(box4.minW), x1, z1, Mth.ceil(box4.maxW));
+	}
 
 	@Inject(method = "setDeltaMovement(Lnet/minecraft/world/phys/Vec3;)V", at = @At("HEAD"))
 	void setDeltaMovement(Vec3 deltaMovement, CallbackInfo ci) {
