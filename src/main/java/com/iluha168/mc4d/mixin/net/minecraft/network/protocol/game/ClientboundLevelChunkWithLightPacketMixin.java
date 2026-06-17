@@ -36,8 +36,8 @@ class ClientboundLevelChunkWithLightPacketMixin implements ClientboundLevelChunk
 	@Expression("this.x = @(?)")
 	@ModifyExpressionValue(method = "<init>(Lnet/minecraft/network/RegistryFriendlyByteBuf;)V", at = @At("MIXINEXTRAS:EXPRESSION"))
 	int read(int original, @Local(argsOnly = true, name = "input") RegistryFriendlyByteBuf input) {
-		this.w = input.readInt();
-		return original;
+		this.w = original;
+		return input.readInt();
 	}
 
 	@WrapMethod(method = "write")

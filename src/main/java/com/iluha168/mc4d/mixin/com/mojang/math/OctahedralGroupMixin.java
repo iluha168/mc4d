@@ -514,8 +514,8 @@ public enum OctahedralGroupMixin implements OctahedralGroup4 {
 		value = "INVOKE",
 		target = "Lcom/mojang/math/SymmetricGroup3;transformation()Lorg/joml/Matrix3fc;"
 	))
-	Matrix3fc preventCrash(SymmetricGroup3 instance) {
-		// Removes call to SymmetricGroup3#transformation.
-		return new Matrix3f();
+	Matrix3fc init(SymmetricGroup3 instance) {
+		// TODO: do not strip 4th rows and columns when 4D renderer
+		return new Matrix3f(SymmetricGroup4.as(instance).transformation4());
 	}
 }

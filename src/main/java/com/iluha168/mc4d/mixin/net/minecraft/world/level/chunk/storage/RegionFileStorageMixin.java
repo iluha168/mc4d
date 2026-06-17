@@ -9,6 +9,8 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.storage.RegionFileStorage;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(RegionFileStorage.class)
@@ -20,7 +22,10 @@ public class RegionFileStorageMixin {
 	long getRegionFile_key(int x, int z, @Local(argsOnly = true, name = "pos") ChunkPos pos) {
 		return ChunkPos4.pack(x, z, ChunkPos4.as(pos).getRegionW());
 	}
-
+	@ModifyConstant(method = "getRegionFile", constant = @Constant(intValue = 16*16))
+	int getRegionFile_MAX_CACHE_SIZE(int constant) {
+		return 16*16*16;
+	}
 	@Definition(id = "resolve", method = "Ljava/nio/file/Path;resolve(Ljava/lang/String;)Ljava/nio/file/Path;")
 	@Definition(id = "pos", local = @Local(type = ChunkPos.class, name = "pos", argsOnly = true))
 	@Definition(id = "getRegionZ", method = "Lnet/minecraft/world/level/ChunkPos;getRegionZ()I")
