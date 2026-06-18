@@ -156,9 +156,10 @@ class ViewAreaMixin implements ViewArea4 {
 		}
 	}
 	@Override
-	public void setAllDirty(boolean playerChanged) {
+	public void setAllSectionWDirty(int sectionW, boolean playerChanged) {
 		for (SectionRenderDispatcher.RenderSection section : this.sections) {
-			section.setDirty(playerChanged);
+			if (SectionPos4.w(section.getSectionNode()) == sectionW)
+				section.setDirty(playerChanged);
 		}
 	}
 

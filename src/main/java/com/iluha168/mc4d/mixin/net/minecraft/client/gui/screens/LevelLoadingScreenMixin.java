@@ -21,8 +21,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(LevelLoadingScreen.class)
 class LevelLoadingScreenMixin {
 	/** How many squares to render to each side? */
-	@Unique	private static final int TRUNCATE_W_VIEW = 3;
-	@Unique	private static final int MARGIN = 5;
+	@Unique	private static final int TRUNCATE_W_VIEW = 7;
+	@Unique	private static final int MARGIN = 3;
+
+	/** DO NOT USE @Share it introduces so much lag its crazy */
 
 	@Definition(id = "z", local = @Local(type = int.class, name = "z"))
 	@Expression("z = @(0)")
@@ -37,7 +39,7 @@ class LevelLoadingScreenMixin {
 	@Definition(id = "z", local = @Local(type = int.class, name = "z"))
 	@Expression("z = z + @(1)")
 	@ModifyExpressionValue(method = "extractChunksForRendering", at = @At("MIXINEXTRAS:EXPRESSION"))
-	private static int extractChunksForRendering_incrementW(int original, @Share("w") LocalIntRef w, @Local(name = "diameter") int diameter) {
+	private static int extractChunksForRendering_incrementW(int original, @Share("w") LocalIntRef w) {
 		w.set(w.get() + 1);
 		if (w.get() <= TRUNCATE_W_VIEW) return 0;
 		w.set(-TRUNCATE_W_VIEW);

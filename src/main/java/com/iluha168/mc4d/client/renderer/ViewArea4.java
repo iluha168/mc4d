@@ -7,7 +7,7 @@ public interface ViewArea4 {
 	void setDirty(int sectionX, int sectionY, int sectionZ, int sectionW, boolean playerChanged);
 
 	/**
-	 * This is not actually a vanilla method - we use it to refresh every single mesh when switching slices.
+	 * This is not actually a vanilla method - we use it to refresh every mesh of the current 3D level slice.
 	 */
-	void setAllDirty(boolean playerChanged);
+	void setAllSectionWDirty(int sectionW, boolean playerChanged);
 }

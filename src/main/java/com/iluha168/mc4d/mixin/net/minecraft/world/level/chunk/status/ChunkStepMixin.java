@@ -11,6 +11,7 @@ class ChunkStepMixin {
 	@WrapMethod(method = "addRequirement")
 	ChunkStep.Builder addRequirement(ChunkStatus status, int radius, Operation<ChunkStep.Builder> original) {
 		// Here we make chunk generation radius never bigger than 1, because 4D chunks are huge
+		// See ChunkGeneratorMixin
 		return original.call(status, Math.min(radius, 1));
 	}
 }

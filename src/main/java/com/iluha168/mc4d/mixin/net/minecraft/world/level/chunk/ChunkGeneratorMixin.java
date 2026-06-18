@@ -14,9 +14,7 @@ import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ChunkGenerator.class)
@@ -33,6 +31,12 @@ class ChunkGeneratorMixin {
 
 	// TODO the rest
 
+	@ModifyConstant(method = "createReferences", constant = @Constant(intValue = 8))
+	int createReferences_range(int constant) {
+		// Here we make chunk generation radius never bigger than 1, because 4D chunks are huge
+		// See ChunkStepMixin
+		return 1;
+	}
 	@Definition(id = "targetZ", local = @Local(type = int.class, name = "targetZ"))
 	@Definition(id = "chunkPos", local = @Local(type = ChunkPos.class, name = "chunkPos"))
 	@Definition(id = "z", method = "Lnet/minecraft/world/level/ChunkPos;z()I")

@@ -84,7 +84,7 @@ class LevelRendererMixin implements LevelRenderer4 {
 		// Ideally we should update all sections when camera moves, but that is way too taxing on performance.
 		if (Math.floor(cameraPosW * 4.0) != Math.floor(this.lastCameraW * 4.0)) {
 			//noinspection DataFlowIssue
-			((ViewArea4) this.viewArea).setAllDirty(true);
+			((ViewArea4) this.viewArea).setAllSectionWDirty(SectionPos.blockToSectionCoord(cameraPosW), true);
 		}
 		this.lastCameraW = Minecraft.getInstance().debugEntries.isCurrentlyEnabled(MC4DClient.NEIGHBOURING_3D_SLICE_RENDERER)
 			? cameraPosW

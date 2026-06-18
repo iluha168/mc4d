@@ -12,6 +12,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.ArrayUtils;
+import org.joml.Quaternionf;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -57,7 +58,13 @@ public enum DirectionMixin implements Direction4 {
 	// TODO makeDirectionArray
 	// TODO rotate
 	// TODO getYRot
-	// TODO getRotation
+
+	@WrapMethod(method = "getRotation")
+	Quaternionf getRotation(Operation<Quaternionf> original) {
+		if (this == ANA || this == KATA) return new Quaternionf(); // TODO fix when 4D renderer
+		return original.call();
+	}
+
 	// TODO getFacingAxis
 	// TODO getClockWise
 	// TODO getCounterClockWise

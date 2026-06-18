@@ -12,7 +12,7 @@ The goal of this mod is to make that dimension act identical to the existing 3.
 
 ## Features
 - The 4th axis, labeled "W". It is the 3rd **horizontal** axis.
-- 2 new `Direction`s: "Ana" for positive W and "kata" for negative W.
+- 2 new directions: "ana" for W+ and "kata" for W-. Remember the south-east rule? It is ana-south-east now.
 - All entities and blocks have 4D positions.
 - Horizontal sizes are capped at `±100000` in all 3 directions, compared to vanilla's `±30000000` in 2 directions.
   - This means vanilla world has area of `36e14` square meters, but in this mod the area is `8e15` cubic meters.
