@@ -2,10 +2,10 @@ package com.iluha168.mc4d.mixin.net.minecraft.client.renderer.chunk;
 
 import com.iluha168.mc4d.client.renderer.chunk.SectionCompiler4;
 import com.iluha168.mc4d.core.BlockPos4;
-import com.iluha168.mc4d.core.Position4;
 import com.iluha168.mc4d.core.SectionPos4;
 import com.iluha168.mc4d.world.level.LevelReader4;
 import com.iluha168.mc4d.world.phys.AABB4;
+import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
@@ -14,7 +14,6 @@ import net.minecraft.client.renderer.chunk.SectionCompiler;
 import net.minecraft.client.renderer.chunk.SectionRenderDispatcher;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
-import net.minecraft.util.Mth;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.phys.AABB;
@@ -34,7 +33,7 @@ class SectionRenderDispatcherMixin {
 	@Inject(method = "setCameraPosition", at = @At("TAIL"))
 	void setCameraPosition(Vec3 cameraPosition, CallbackInfo ci) {
 		// The method is valid as is, this just tells the renderer the current slice.
-		((SectionCompiler4) this.sectionCompiler).setSliceW(Mth.floor(((Position4) cameraPosition).w()));
+		((SectionCompiler4) this.sectionCompiler).setCameraW(((Vec4) cameraPosition).w);
 	}
 
 	@Mixin(SectionRenderDispatcher.RenderSection.class)

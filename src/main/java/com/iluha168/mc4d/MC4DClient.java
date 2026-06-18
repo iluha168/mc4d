@@ -1,6 +1,8 @@
 package com.iluha168.mc4d;
 
 import net.minecraft.client.KeyMapping;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -12,6 +14,11 @@ import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
 @EventBusSubscriber(modid = MC4D.MODID, value = Dist.CLIENT)
 public class MC4DClient {
+    public static final int COLOR_ANA  = ARGB.color(170, 80 , 255);
+    public static final int COLOR_KATA = ARGB.color(80 , 255, 80 );
+
+    public static final Identifier NEIGHBOURING_3D_SLICE_RENDERER = Identifier.fromNamespaceAndPath(MC4D.MODID, "neighbouring_3d_slice_renderer");
+
     public static final KeyMapping keyAna = new KeyMapping("key.ana", -1, KeyMapping.Category.MOVEMENT);
     public static final KeyMapping keyKata = new KeyMapping("key.kata", -1, KeyMapping.Category.MOVEMENT);
 

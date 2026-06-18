@@ -1,5 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.renderer;
 
+import com.iluha168.mc4d.MC4DClient;
 import com.iluha168.mc4d.client.renderer.LevelRenderer4;
 import com.iluha168.mc4d.client.renderer.ViewArea4;
 import com.iluha168.mc4d.core.Vec4i;
@@ -14,6 +15,7 @@ import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.ViewArea;
@@ -21,7 +23,6 @@ import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.state.level.LevelRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
@@ -35,6 +36,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LevelRenderer.class)
+abstract
 class LevelRendererMixin implements LevelRenderer4 {
 	// TODO the rest
 
@@ -42,12 +44,11 @@ class LevelRendererMixin implements LevelRenderer4 {
 	private @Nullable ViewArea viewArea;
 
 	@Unique private int lastCameraSectionW;
-	@Unique private int lastCameraBlockW;
+	@Unique private double lastCameraW;
 
 	@Inject(method = "setLevel", at = @At("HEAD"))
 	void setLevel(@Nullable ClientLevel level, CallbackInfo ci) {
 		this.lastCameraSectionW = Integer.MIN_VALUE;
-		this.lastCameraBlockW = Integer.MIN_VALUE;
 	}
 
 	@Definition(id = "lastCameraSectionX", field = "Lnet/minecraft/client/renderer/LevelRenderer;lastCameraSectionX:I")
@@ -66,14 +67,29 @@ class LevelRendererMixin implements LevelRenderer4 {
 	@Inject(method = "cullTerrain", at = @At(
 		value = "INVOKE",
 		target = "Lnet/minecraft/client/renderer/chunk/SectionRenderDispatcher;setCameraPosition(Lnet/minecraft/world/phys/Vec3;)V"
-	))
+	)) // TODO remove when rewriting rendering to 4D
 	void cullTerrain_repositionCamera(Camera camera, Frustum frustum, boolean spectator, CallbackInfo ci, @Local(name = "cameraPos") Vec3 cameraPos) {
 		// Here we make client recalculate meshes for EVERY chunk when switching slices. See SectionCompilerMixin.
-		final int cameraBlockW = Mth.floor(((Vec4) cameraPos).w());
-		if (cameraBlockW == this.lastCameraBlockW) return;
-		this.lastCameraBlockW = cameraBlockW;
-		assert this.viewArea != null;
-		((ViewArea4) this.viewArea).setAllDirty(true);
+		final double cameraPosW = ((Vec4) cameraPos).w;
+		if (Math.floor(cameraPosW * 16.0) != Math.floor(this.lastCameraW * 16.0)) {
+			// Update the camera's section more frequently cuz it is cheap.
+			this.setSectionDirty(
+				SectionPos.blockToSectionCoord(cameraPos.x),
+				SectionPos.blockToSectionCoord(cameraPos.y),
+				SectionPos.blockToSectionCoord(cameraPos.z),
+				SectionPos.blockToSectionCoord(cameraPosW),
+				false
+			);
+		}
+		// Ideally we should update all sections when camera moves, but that is way too taxing on performance.
+		if (Math.floor(cameraPosW * 4.0) != Math.floor(this.lastCameraW * 4.0)) {
+			//noinspection DataFlowIssue
+			((ViewArea4) this.viewArea).setAllDirty(true);
+		}
+		this.lastCameraW = Minecraft.getInstance().debugEntries.isCurrentlyEnabled(MC4DClient.NEIGHBOURING_3D_SLICE_RENDERER)
+			? cameraPosW
+			: Double.NaN; // Rendering not enabled, setting a value that will always be different from camera pos, but same every tick
+				// This way it dirties chunks when toggled on and off.
 	}
 
 	@Definition(id = "zOld", field = "Lnet/minecraft/world/entity/Entity;zOld:D")

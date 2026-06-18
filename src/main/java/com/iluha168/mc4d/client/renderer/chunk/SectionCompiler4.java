@@ -6,6 +6,5 @@ import net.minecraft.client.renderer.chunk.SectionCompiler;
  * Implemented by {@link SectionCompiler}.
  */
 public interface SectionCompiler4 {
-	int sliceW();
-	void setSliceW(int blockW);
+	void setCameraW(double cameraW);
 }
