@@ -20,6 +20,7 @@ class DebugScreenEntriesMixin {
 
 	@Inject(method = "<clinit>", at = @At("TAIL"))
 	private static void register_neighbouringSliceRenderer(CallbackInfo ci) {
-		 register(MC4DClient.NEIGHBOURING_3D_SLICE_RENDERER, new DebugEntryNoop());
+		register(MC4DClient.NEIGHBOURING_3D_SLICE_RENDERER, new DebugEntryNoop());
+		register(MC4DClient.NO_BLOCK_MODEL_RENDERER, new DebugEntryNoop());
 	}
 }

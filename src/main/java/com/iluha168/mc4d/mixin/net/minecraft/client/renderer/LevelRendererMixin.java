@@ -2,6 +2,7 @@ package com.iluha168.mc4d.mixin.net.minecraft.client.renderer;
 
 import com.iluha168.mc4d.MC4DClient;
 import com.iluha168.mc4d.client.renderer.LevelRenderer4;
+import com.iluha168.mc4d.client.renderer.ShapeRenderer4;
 import com.iluha168.mc4d.client.renderer.ViewArea4;
 import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.util.Err4;
@@ -13,6 +14,8 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -26,11 +29,9 @@ import net.minecraft.core.SectionPos;
 import net.minecraft.server.level.BlockDestructionProgress;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.Nullable;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -41,6 +42,10 @@ abstract
 class LevelRendererMixin implements LevelRenderer4 {
 	@Shadow
 	private @Nullable ViewArea viewArea;
+
+	@Shadow
+	@Final
+	LevelRenderState levelRenderState;
 
 	@Unique private int lastCameraSectionW;
 	@Unique private double lastCameraW;
@@ -118,7 +123,15 @@ class LevelRendererMixin implements LevelRenderer4 {
 
 	// TODO submitBlockDestroyAnimation when 4D renderer
 	// TODO renderBlockOutline when 4D renderer
-	// TODO renderHitOutline when 4D renderer
+
+	@Redirect(method = "renderHitOutline", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/client/renderer/ShapeRenderer;renderShape(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;Lnet/minecraft/world/phys/shapes/VoxelShape;DDDIF)V"
+	))
+	void renderHitOutline(PoseStack poseStack, VertexConsumer builder, VoxelShape shape, double x, double y, double z, int color, float width, @Local(name = "pos") BlockPos pos) {
+		final double camW = ((Vec4) this.levelRenderState.cameraRenderState.pos).w;
+		ShapeRenderer4.renderShape(poseStack, builder, shape, x, y, z, Vec4i.getW(pos) - camW, color, width);
+	}
 
 	@Redirect(method = "setBlockDirty(Lnet/minecraft/core/BlockPos;Z)V", at = @At(
 		value = "INVOKE",

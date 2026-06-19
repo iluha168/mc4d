@@ -229,6 +229,7 @@
     "net.minecraft.client.renderer.block.dispatch.BlockModelRotationMixin",
     "net.minecraft.client.renderer.blockentity.AbstractEndPortalRendererMixin",
     "net.minecraft.client.renderer.blockentity.ChestRendererMixin",
+    "net.minecraft.client.renderer.chunk.ChunkSectionsToRenderMixin",
     "net.minecraft.client.renderer.chunk.RenderRegionCacheMixin",
     "net.minecraft.client.renderer.chunk.RenderSectionRegionMixin",
     "net.minecraft.client.renderer.chunk.SectionCompilerMixin",
@@ -242,6 +243,7 @@
     "net.minecraft.client.resources.sounds.AbstractSoundInstanceMixin",
     "net.minecraft.client.resources.sounds.BiomeAmbientSoundsHandlerMixin",
     "net.minecraft.client.tutorial.MovementTutorialStepInstanceMixin",
+    "net.neoforged.neoforge.client.BlockEntityRenderBoundsDebugRendererMixin",
     "net.neoforged.neoforge.model.data.ModelDataManagerMixin"
   ],
   "server": [],

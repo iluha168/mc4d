@@ -10,4 +10,7 @@ public interface VoxelShape4 {
 	void forAllBoxes(Shapes4.DoubleLineConsumer consumer);
 
 	VoxelShape move(double dx, double dy, double dz, double dw);
+
+	/** The 3D slice of this shape at {@code w}. Custom method, not a vanilla fix. */
+	VoxelShape sliceW(double w);
 }

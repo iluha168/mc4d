@@ -206,6 +206,15 @@ class VoxelShapeMixin implements VoxelShape4 {
 		return 8; // Direction.values().length
 	}
 
+	@Override
+	public VoxelShape sliceW(double w) { // Custom method!
+		int point = this.findIndex(Direction4.Axis.W, w);
+		if (point < 0 || point >= ((DiscreteVoxelShape4) this.shape).wSize) {
+			return Shapes.empty();
+		}
+		return new SliceShape((VoxelShape) (Object) this, Direction4.Axis.W, point);
+	}
+
 	/**
 	 * @author iluha168
 	 * @reason Way too tightly coupled with 3D, cant mixin a loop?
