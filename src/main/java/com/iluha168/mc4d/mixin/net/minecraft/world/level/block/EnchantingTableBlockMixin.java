@@ -28,4 +28,14 @@ class EnchantingTableBlockMixin {
 	private static boolean BOOKSHELF_OFFSETS_filter(boolean original, @Local(argsOnly = true, name = "pos") BlockPos pos) {
 		return original || Math.abs(Vec4i.getW(pos)) == 2;
 	}
+
+	@Redirect(method = "isValidBookShelf", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/core/BlockPos;offset(III)Lnet/minecraft/core/BlockPos;"
+	))
+	private static BlockPos isValidBookShelf(BlockPos pos, int x, int y, int z, @Local(argsOnly = true, name = "offset") BlockPos offset) {
+		return ((BlockPos4) pos).offset(x, y, z, Vec4i.getW(offset) / 2);
+	}
+
+	// TODO everything
 }

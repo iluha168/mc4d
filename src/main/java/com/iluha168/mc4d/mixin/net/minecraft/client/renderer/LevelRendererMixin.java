@@ -23,6 +23,7 @@ import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.state.level.LevelRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
+import net.minecraft.server.level.BlockDestructionProgress;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
@@ -38,8 +39,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(LevelRenderer.class)
 abstract
 class LevelRendererMixin implements LevelRenderer4 {
-	// TODO the rest
-
 	@Shadow
 	private @Nullable ViewArea viewArea;
 
@@ -105,7 +104,21 @@ class LevelRendererMixin implements LevelRenderer4 {
 		entity4.setWOld(entity4.getW());
 	}
 
-	// TODO the rest
+	// TODO submitEntities when 4D renderer
+	// TODO extractVisibleBlockEntities when 4D renderer
+	// TODO submitBlockEntities when 4D renderer
+
+	@Redirect(method = "extractBlockDestroyAnimation", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/core/BlockPos;distToCenterSqr(DDD)D"
+	))
+	double extractBlockDestroyAnimation(BlockPos instance, double x, double y, double z, @Local(name = "cameraPos") Vec3 cameraPos) {
+		return instance.distToCenterSqr(cameraPos);
+	}
+
+	// TODO submitBlockDestroyAnimation when 4D renderer
+	// TODO renderBlockOutline when 4D renderer
+	// TODO renderHitOutline when 4D renderer
 
 	@Redirect(method = "setBlockDirty(Lnet/minecraft/core/BlockPos;Z)V", at = @At(
 		value = "INVOKE",
@@ -185,5 +198,10 @@ class LevelRendererMixin implements LevelRenderer4 {
 		((ViewArea4) this.viewArea).setDirty(sectionX, sectionY, sectionZ, sectionW, playerChanged);
 	}
 
-	// TODO the rest
+	@Definition(id = "getX", method = "Lnet/minecraft/core/BlockPos;getX()I")
+	@Expression("?.getX() != ?.getX()")
+	@ModifyExpressionValue(method = "destroyBlockProgress", at = @At("MIXINEXTRAS:EXPRESSION"))
+	boolean destroyBlockProgress(boolean original, @Local(name = "entry") BlockDestructionProgress entry, @Local(argsOnly = true, name = "pos") BlockPos pos) {
+		return original || Vec4i.getW(entry.getPos()) != Vec4i.getW(pos);
+	}
 }

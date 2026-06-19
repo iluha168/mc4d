@@ -6,12 +6,12 @@ import com.iluha168.mc4d.world.level.ChunkPos4;
 import com.iluha168.mc4d.world.phys.AABB4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
+import it.unimi.dsi.fastutil.longs.LongAVLTreeSet;
 import it.unimi.dsi.fastutil.longs.LongSortedSet;
 import net.minecraft.core.SectionPos;
 import net.minecraft.util.AbortableIterationConsumer;
@@ -47,31 +47,29 @@ class EntitySectionStorageMixin {
 		target = "Lnet/minecraft/core/SectionPos;asLong(III)J"
 	))
 	long forEachAccessibleNonEmptySection_asLong(int x, int y, int z) {
-		return SectionPos4.asLong(x, y, z, z);
+		return 0; // The returned value is not used
 	}
-
 	@WrapOperation(method = "forEachAccessibleNonEmptySection", at = @At(
 		value = "INVOKE",
 		target = "Lit/unimi/dsi/fastutil/longs/LongSortedSet;subSet(JJ)Lit/unimi/dsi/fastutil/longs/LongSortedSet;"
 	))
-	LongSortedSet forEachAccessibleNonEmptySection_subSet(LongSortedSet sectionIds, long from, long to, Operation<LongSortedSet> original) {
-		to -= 1;
-		return to > from
-			? original.call(sectionIds, from, to + 1L)
-			: original.call(sectionIds, to, from + 1L);
-	}
-
-	@Definition(id = "z", local = @Local(type = int.class, name = "z"))
-	@Expression("z <= ?")
-	@ModifyExpressionValue(method = "forEachAccessibleNonEmptySection", at = @At(value = "MIXINEXTRAS:EXPRESSION", ordinal = 0))
-	boolean forEachAccessibleNonEmptySection_check(
-		boolean original,
+	LongSortedSet forEachAccessibleNonEmptySection_subSet(
+		LongSortedSet sectionIds, long from, long to, Operation<LongSortedSet> original,
+		@Local(name = "x") int x,
 		@Share("wMin") LocalIntRef wMin,
-		@Share("wMax") LocalIntRef wMax,
-		@Local(name = "sectionKey") long sectionKey
+		@Share("wMax") LocalIntRef wMax
 	) {
-		final int w = SectionPos4.w(sectionKey);
-		return original && w >= wMin.get() && w <= wMax.get();
+		// Vanilla relies on X being the most significant field in SectionPos packing, so whatever Y and Z are, they are in a 1 dimensional packed range.
+		// But W is most significant now, so YZ spans a 2D block of non-continuous SectionPos longs.
+		// We split that range into a bunch of 1D ranges to match vanilla, ezpz:
+		LongSortedSet sections = new LongAVLTreeSet();
+		for (int w = wMin.get(); w <= wMax.get(); w++)
+			sections.addAll(original.call(
+				sectionIds,
+				SectionPos4.asLong(x, 0, 0, w),
+				SectionPos4.asLong(x, -1, -1, w) + 1L
+			));
+		return sections;
 	}
 
 	@Definition(id = "getChunkSections", method = "Lnet/minecraft/world/level/entity/EntitySectionStorage;getChunkSections(II)Lit/unimi/dsi/fastutil/longs/LongSortedSet;")
@@ -90,9 +88,7 @@ class EntitySectionStorageMixin {
 	private LongSortedSet getChunkSections(int x, int z, int w) {
 		long lowestAbsoluteSectionKey = SectionPos4.asLong(x, 0, z, w);
 		long highestAbsoluteSectionKey = SectionPos4.asLong(x, -1, z, w);
-		return lowestAbsoluteSectionKey > highestAbsoluteSectionKey
-			? this.sectionIds.subSet(highestAbsoluteSectionKey, lowestAbsoluteSectionKey + 1L)
-			: this.sectionIds.subSet(lowestAbsoluteSectionKey, highestAbsoluteSectionKey + 1L);
+		return this.sectionIds.subSet(lowestAbsoluteSectionKey, highestAbsoluteSectionKey + 1L);
 	}
 
 	@Redirect(method = "getChunkKeyFromSectionKey", at = @At(
