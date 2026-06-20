@@ -7,6 +7,7 @@ import com.iluha168.mc4d.network.protocol.game.*;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.entity.Entity4;
 import com.iluha168.mc4d.world.level.ChunkPos4;
+import com.iluha168.mc4d.world.level.Level4;
 import com.iluha168.mc4d.world.level.border.WorldBorder4;
 import com.iluha168.mc4d.world.level.chunk.ChunkSource4;
 import com.iluha168.mc4d.world.phys.Vec4;
@@ -20,8 +21,10 @@ import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.*;
 import net.minecraft.core.SectionPos;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.*;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.PositionMoveRotation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
@@ -32,10 +35,7 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 import net.minecraft.world.phys.Vec3;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -49,6 +49,10 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
 
 	@Shadow
 	private ClientLevel level;
+
+	@Shadow
+	@Final
+	private RandomSource random;
 
 	protected ClientPacketListenerMixin(Minecraft minecraft, Connection connection, CommonListenerCookie cookie) {
 		super(minecraft, connection, cookie);
@@ -159,6 +163,39 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
 	}
 
 	// TODO the rest
+
+	@Definition(id = "addParticle", method = "Lnet/minecraft/client/multiplayer/ClientLevel;addParticle(Lnet/minecraft/core/particles/ParticleOptions;ZZDDDDDD)V")
+	@Definition(id = "getZ", method = "Lnet/minecraft/network/protocol/game/ClientboundLevelParticlesPacket;getZ()D")
+	@Expression("?.addParticle(?, ?, ?, ?, ?, ?.getZ(), ?, ?, ?)")
+	@Redirect(method = "handleParticleEvent", at = @At("MIXINEXTRAS:EXPRESSION"))
+	void handleParticleEvent_count0(
+		ClientLevel level, ParticleOptions particle, boolean overrideLimiter, boolean alwaysShow, double x, double y, double z, double xd, double yd, double zd,
+		@Local(argsOnly = true, name = "packet") ClientboundLevelParticlesPacket packet
+	) {
+		ClientboundLevelParticlesPacket4 packet4 = (ClientboundLevelParticlesPacket4) packet;
+		((Level4) level).addParticle(
+			particle, overrideLimiter, alwaysShow,
+			x, y, z, packet4.getW(),
+			xd, yd, zd, packet.getMaxSpeed() * packet4.getWDist()
+		);
+	}
+
+	@Definition(id = "addParticle", method = "Lnet/minecraft/client/multiplayer/ClientLevel;addParticle(Lnet/minecraft/core/particles/ParticleOptions;ZZDDDDDD)V")
+	@Definition(id = "getZ", method = "Lnet/minecraft/network/protocol/game/ClientboundLevelParticlesPacket;getZ()D")
+	@Definition(id = "zVarience", local = @Local(type = double.class, name = "zVarience"))
+	@Expression("?.addParticle(?, ?, ?, ?, ?, ?.getZ() + zVarience, ?, ?, ?)")
+	@Redirect(method = "handleParticleEvent", at = @At("MIXINEXTRAS:EXPRESSION"))
+	void handleParticleEvent_multiple(
+		ClientLevel level, ParticleOptions particle, boolean overrideLimiter, boolean alwaysShow, double x, double y, double z, double xd, double yd, double zd,
+		@Local(argsOnly = true, name = "packet") ClientboundLevelParticlesPacket packet
+	) {
+		ClientboundLevelParticlesPacket4 packet4 = (ClientboundLevelParticlesPacket4) packet;
+		((Level4) level).addParticle(
+			particle, overrideLimiter, alwaysShow,
+			x, y, z, packet4.getW() + this.random.nextGaussian() * packet4.getWDist(),
+			xd, yd, zd, this.random.nextGaussian() * packet.getMaxSpeed()
+		);
+	}
 
 	@ModifyArg(method = "handleLightUpdatePacket", at = @At(
 		value = "INVOKE",

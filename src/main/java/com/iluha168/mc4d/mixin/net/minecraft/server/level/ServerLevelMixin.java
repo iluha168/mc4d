@@ -2,6 +2,7 @@ package com.iluha168.mc4d.mixin.net.minecraft.server.level;
 
 import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.mixin.net.minecraft.world.level.LevelMixin;
+import com.iluha168.mc4d.network.protocol.game.ClientboundLevelParticlesPacket4;
 import com.iluha168.mc4d.server.level.ServerLevel4;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.entity.Entity4;
@@ -20,7 +21,9 @@ import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.SectionPos;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -33,14 +36,13 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.levelgen.Heightmap;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.List;
 
 @Mixin(ServerLevel.class)
 class ServerLevelMixin extends LevelMixin implements ServerLevel4 {
@@ -56,6 +58,10 @@ class ServerLevelMixin extends LevelMixin implements ServerLevel4 {
 	@Shadow
 	@Final
 	private ServerChunkCache chunkSource;
+
+	@Shadow
+	@Final
+	private List<ServerPlayer> players;
 
 	@Inject(method = "<clinit>", at = @At("TAIL"))
 	private static void staticFixes(CallbackInfo ci) {
@@ -152,15 +158,108 @@ class ServerLevelMixin extends LevelMixin implements ServerLevel4 {
 	// TODO levelEvent
 	// TODO explode
 	// TODO runBlockEvents
-	// TODO sendParticles
-	// TODO sendParticles
-	// TODO sendParticles
+
+	@Overwrite
+	@Deprecated
+	public <T extends ParticleOptions> int sendParticles(
+		T particle, double x, double y, double z, int count, double xDist, double yDist, double zDist, double speed
+	) {
+		throw Err4.arguments3("ServerLevel4#sendParticles");
+	}
+	@Override
+	public <T extends ParticleOptions> int sendParticles(T particle, double x, double y, double z, double w, int count, double xDist, double yDist, double zDist, double wDist, double speed) {
+		return this.sendParticles(particle, false, false, x, y, z, w, count, xDist, yDist, zDist, wDist, speed);
+	}
+
+	@Overwrite
+	@Deprecated
+	public <T extends ParticleOptions> int sendParticles(
+		T particle,
+		boolean overrideLimiter,
+		boolean alwaysShow,
+		double x,
+		double y,
+		double z,
+		int count,
+		double xDist,
+		double yDist,
+		double zDist,
+		double speed
+	) {
+		throw Err4.arguments3("ServerLevel4#sendParticles");
+	}
+	@Override
+	public <T extends ParticleOptions> int sendParticles(
+		T particle,
+		boolean overrideLimiter,
+		boolean alwaysShow,
+		double x, double y, double z, double w,
+		int count,
+		double xDist, double yDist, double zDist, double wDist,
+		double speed
+	) {
+		ClientboundLevelParticlesPacket packet = ClientboundLevelParticlesPacket4.from(
+			particle, overrideLimiter, alwaysShow, x, y, z, w, (float)xDist, (float)yDist, (float)zDist, (float)wDist, (float)speed, count
+		);
+		int result = 0;
+
+		for (ServerPlayer player : this.players) {
+			if (this.sendParticles(player, overrideLimiter, x, y, z, w, packet)) {
+				result++;
+			}
+		}
+
+		return result;
+	}
+
+	@Overwrite
+	@Deprecated
+	public <T extends ParticleOptions> boolean sendParticles(
+		ServerPlayer player,
+		T particle,
+		boolean overrideLimiter,
+		boolean alwaysShow,
+		double x, double y, double z,
+		int count,
+		double xDist, double yDist, double zDist,
+		double speed
+	) {
+		throw Err4.arguments3("ServerLevel4#sendParticles");
+	}
+	@Override
+	public <T extends ParticleOptions> boolean sendParticles(
+		ServerPlayer player,
+		T particle,
+		boolean overrideLimiter,
+		boolean alwaysShow,
+		double x, double y, double z, double w,
+		int count,
+		double xDist, double yDist, double zDist, double wDist,
+		double speed
+	) {
+		Packet<?> packet = ClientboundLevelParticlesPacket4.from(
+			particle, overrideLimiter, alwaysShow, x, y, z, w, (float)xDist, (float)yDist, (float)zDist, (float)wDist, (float)speed, count
+		);
+		return this.sendParticles(player, overrideLimiter, x, y, z, w, packet);
+	}
 
 	@Overwrite
 	@Deprecated
 	private boolean sendParticles(ServerPlayer player, boolean overrideLimiter, double x, double y, double z, Packet<?> packet) {
-		// TODO 4D particle engine
-		return true;
+		throw Err4.arguments3(null);
+	}
+	@Unique
+	private boolean sendParticles(ServerPlayer player, boolean overrideLimiter, double x, double y, double z, double w, Packet<?> packet) {
+		if (player.level() != (Object) this) {
+			return false;
+		}
+		BlockPos pos = player.blockPosition();
+		if (pos.closerToCenterThan(new Vec4(x, y, z, w), overrideLimiter ? 512.0 : 32.0)) {
+			player.connection.send(packet);
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	@Overwrite

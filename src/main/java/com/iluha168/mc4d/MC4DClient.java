@@ -17,9 +17,10 @@ public class MC4DClient {
     public static final int COLOR_ANA  = ARGB.color(170, 80 , 255);
     public static final int COLOR_KATA = ARGB.color(80 , 255, 80 );
 
-    public static final Identifier NEIGHBOURING_3D_SLICE_RENDERER = Identifier.fromNamespaceAndPath(MC4D.MODID, "neighbouring_3d_slice_renderer");
+    public static final Identifier NEIGHBOURING_SLICE_BLOCK_RENDERER = Identifier.fromNamespaceAndPath(MC4D.MODID, "neighbouring_slice_block_renderer");
     /** Use this to see the target block outline cleanly. Useful for debugging voxel shapes. */
     public static final Identifier NO_BLOCK_MODEL_RENDERER = Identifier.fromNamespaceAndPath(MC4D.MODID, "no_block_model_renderer");
+    public static final Identifier NEIGHBOURING_SLICE_PARTICLE_RENDERER = Identifier.fromNamespaceAndPath(MC4D.MODID, "neighbouring_slice_particle_renderer");
 
     public static final KeyMapping keyAna = new KeyMapping("key.ana", -1, KeyMapping.Category.MOVEMENT);
     public static final KeyMapping keyKata = new KeyMapping("key.kata", -1, KeyMapping.Category.MOVEMENT);

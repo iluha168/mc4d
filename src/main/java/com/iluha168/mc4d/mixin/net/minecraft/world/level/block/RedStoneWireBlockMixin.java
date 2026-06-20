@@ -1,6 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.block;
 
 import com.iluha168.mc4d.core.Direction4;
+import com.iluha168.mc4d.world.level.LevelAccessor4;
 import com.iluha168.mc4d.world.level.block.state.properties.BlockStateProperties4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
@@ -12,7 +13,9 @@ import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RedStoneWireBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -23,6 +26,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -122,6 +126,21 @@ class RedStoneWireBlockMixin {
 		return original.call(state)
 			&& !state.getValue(BlockStateProperties4.ANA_REDSTONE).isConnected()
 			&& !state.getValue(BlockStateProperties4.KATA_REDSTONE).isConnected();
+	}
+
+	@Redirect(method = "spawnParticlesAlongLine", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/level/Level;addParticle(Lnet/minecraft/core/particles/ParticleOptions;DDDDDD)V"
+	))
+	private static void spawnParticlesAlongLine(
+		Level level, ParticleOptions particle, double x, double y, double z, double xd, double yd, double zd,
+		@Local(argsOnly = true, name = "side") Direction side,
+		@Local(argsOnly = true, name = "along") Direction along,
+		@Local(name = "sideOfBlock") float sideOfBlock,
+		@Local(name = "positionOnLine") float positionOnLine
+	) {
+		final double w = 0.5 + sideOfBlock * Direction4.as(side).getStepW() + positionOnLine * Direction4.as(along).getStepW();
+		((LevelAccessor4) level).addParticle(particle, x, y, z, w, xd, yd, zd, 0.0);
 	}
 
 	@Inject(method = "createBlockStateDefinition", at = @At("TAIL"))

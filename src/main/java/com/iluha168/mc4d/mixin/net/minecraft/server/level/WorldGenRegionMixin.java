@@ -11,6 +11,7 @@ import net.minecraft.CrashReportCategory;
 import net.minecraft.ReportedException;
 import net.minecraft.core.Holder;
 import net.minecraft.core.SectionPos;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.server.level.GenerationChunkHolder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.WorldGenRegion;
@@ -133,5 +134,11 @@ abstract class WorldGenRegionMixin implements LevelAccessor4 {
 		) + 1;
 	}
 
-	// TODO addParticle
+	@Overwrite
+	@Deprecated
+	public void addParticle(ParticleOptions particle, double x, double y, double z, double xd, double yd, double zd) {
+		throw Err4.arguments3("LevelAccessor4#addParticle");
+	}
+	@Override
+	public void addParticle(ParticleOptions particle, double x, double y, double z, double w, double xd, double yd, double zd, double wd) {}
 }

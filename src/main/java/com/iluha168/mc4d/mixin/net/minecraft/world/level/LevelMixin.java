@@ -17,6 +17,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.SectionPos;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -150,10 +151,42 @@ public abstract class LevelMixin implements Level4, LevelAccessor4 {
 	// TODO playSound
 	// TODO playLocalSound
 	// TODO playLocalSound
-	// TODO addParticle
-	// TODO addParticle
-	// TODO addAlwaysVisibleParticle
-	// TODO addAlwaysVisibleParticle
+
+	@Overwrite
+	@Deprecated
+	public void addParticle(ParticleOptions particle, double x, double y, double z, double xd, double yd, double zd) {
+		throw Err4.arguments3("LevelAccessor4#addParticle");
+	}
+	@Override
+	public void addParticle(ParticleOptions particle, double x, double y, double z, double w, double xd, double yd, double zd, double wd) {}
+
+	@Overwrite
+	@Deprecated
+	public void addParticle(
+		ParticleOptions particle, boolean overrideLimiter, boolean alwaysShow, double x, double y, double z, double xd, double yd, double zd
+	) {
+		throw Err4.arguments3("Level4#addParticle");
+	}
+	@Override
+	public void addParticle(ParticleOptions particle, boolean overrideLimiter, boolean alwaysShow, double x, double y, double z, double w, double xd, double yd, double zd, double wd) {}
+
+
+	@Overwrite
+	@Deprecated
+	public void addAlwaysVisibleParticle(ParticleOptions particle, double x, double y, double z, double xd, double yd, double zd) {
+		throw Err4.arguments3("Level4#addAlwaysVisibleParticle");
+	}
+	@Override
+	public void addAlwaysVisibleParticle(ParticleOptions particle, double x, double y, double z, double w, double xd, double yd, double zd, double wd) {}
+
+	@Overwrite
+	@Deprecated
+	public void addAlwaysVisibleParticle(ParticleOptions particle, boolean overrideLimiter, double x, double y, double z, double xd, double yd, double zd) {
+		throw Err4.arguments3("Level4#addAlwaysVisibleParticle");
+	}
+	@Override
+	public void addAlwaysVisibleParticle(ParticleOptions particle, boolean overrideLimiter, double x, double y, double z, double w, double xd, double yd, double zd, double wd) {}
+
 	// TODO explode
 	// TODO explode
 	// TODO explode

@@ -96,8 +96,6 @@ public abstract class ServerGamePacketListenerImplMixin implements ServerGamePac
 		this.lastGoodW = w;
 	}
 
-	// PacketUtils.ensureRunningOnSameThread(packet, this, this.player.level());
-	// if (containsInvalidValues(packet.getX(0.0), packet.getY(0.0), packet.getZ(0.0), packet.getYRot(0.0F), packet.getXRot(0.0F))) {
 	@ModifyArg(method = "handleMovePlayer", index = 1, at = @At(
 		value = "INVOKE",
 		target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;containsInvalidValues(DDDFF)Z"
@@ -109,33 +107,14 @@ public abstract class ServerGamePacketListenerImplMixin implements ServerGamePac
 		// Not accurate but works if we just want to check if either value is NaN
 		return x + ((ServerboundMovePlayerPacket4) packet).getW(0);
 	}
-	//     this.disconnect(Component.translatable("multiplayer.disconnect.invalid_player_movement"));
-	// } else {
-	//     ServerLevel level = this.player.level();
-	//     if (!this.player.wonGame) {
-	//         if (this.tickCount == 0) {
-	//             this.resetPosition();
-	//         }
-	//         if (this.hasClientLoaded()) {
-	//             float targetYRot = Mth.wrapDegrees(packet.getYRot(this.player.getYRot()));
-	//             float targetXRot = Mth.wrapDegrees(packet.getXRot(this.player.getXRot()));
-	//             if (this.updateAwaitingTeleport()) {
-	//                 this.player.absSnapRotationTo(targetYRot, targetXRot);
-	//             } else {
-	//                 double targetX = clampHorizontal(packet.getX(this.player.getX()));
-	//                 double targetY = clampVertical(packet.getY(this.player.getY()));
-	//                 double targetZ = clampHorizontal(packet.getZ(this.player.getZ()));
 	@Definition(id = "clampHorizontal", method = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;clampHorizontal(D)D")
 	@Definition(id = "packet", local = @Local(type = ServerboundMovePlayerPacket.class, name = "packet", argsOnly = true))
 	@Definition(id = "getZ", method = "Lnet/minecraft/network/protocol/game/ServerboundMovePlayerPacket;getZ(D)D")
 	@Expression("clampHorizontal(packet.getZ(?))")
 	@Inject(method = "handleMovePlayer", at = @At("MIXINEXTRAS:EXPRESSION"))
 	void handleMovePlayer_calculateTargetW(ServerboundMovePlayerPacket packet, CallbackInfo ci, @Share("targetW") LocalDoubleRef targetW) {
-	//                 double targetW = clampHorizontal(packet.getW(this.player.getW()));
 		targetW.set(clampHorizontal(((ServerboundMovePlayerPacket4) packet).getW(((Entity4) this.player).getW())));
 	}
-	//                 if (this.player.isPassenger()) {
-	//                     this.player.absSnapTo(this.player.getX(), this.player.getY(), this.player.getZ(), targetYRot, targetXRot);
 	@Definition(id = "absSnapTo", method = "Lnet/minecraft/server/level/ServerPlayer;absSnapTo(DDDFF)V")
 	@Definition(id = "getX", method = "Lnet/minecraft/server/level/ServerPlayer;getX()D")
 	@Expression("?.absSnapTo(?.getX(), ?, ?, ?, ?)")
@@ -144,34 +123,22 @@ public abstract class ServerGamePacketListenerImplMixin implements ServerGamePac
 		Entity4 player4 = (Entity4) player;
 		player4.absSnapTo(x, y, z, player4.getW(), yRot, xRot);
 	}
-	//                     this.player.level().getChunkSource().move(this.player);
-	//                 } else {
-	//                     double startX = this.player.getX();
-	//                     double startY = this.player.getY();
-	//                     double startZ = this.player.getZ();
 	@Definition(id = "startZ", local = @Local(type = double.class, name = "startZ"))
 	@Definition(id = "getZ", method = "Lnet/minecraft/server/level/ServerPlayer;getZ()D")
 	@Definition(id = "player", field = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;player:Lnet/minecraft/server/level/ServerPlayer;")
 	@Expression("startZ = this.player.getZ()")
 	@Inject(method = "handleMovePlayer", at = @At("MIXINEXTRAS:EXPRESSION"))
 	void handleMovePlayer_startW(ServerboundMovePlayerPacket packet, CallbackInfo ci, @Share("startW") LocalDoubleRef startW) {
-	//                     double startW = this.player.getW();
 		startW.set(((Entity4) this.player).getW());
 	}
-	//                     double xDist = targetX - this.firstGoodX;
-	//                     double yDist = targetY - this.firstGoodY;
-	//                     double zDist = targetZ - this.firstGoodZ;
 	@Definition(id = "zDist", local = @Local(type = double.class, name = "zDist"))
 	@Definition(id = "targetZ", local = @Local(type = double.class, name = "targetZ"))
 	@Definition(id = "firstGoodZ", field = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;firstGoodZ:D")
 	@Expression("zDist = targetZ - this.firstGoodZ")
 	@Inject(method = "handleMovePlayer", at = @At("MIXINEXTRAS:EXPRESSION"))
 	void handleMovePlayer_wDistFirstGood(ServerboundMovePlayerPacket packet, CallbackInfo ci, @Share("wDist") LocalDoubleRef wDist, @Share("targetW") LocalDoubleRef targetW) {
-	//                     double wDist = targetW - this.firstGoodW;
 		wDist.set(targetW.get() - this.firstGoodW);
 	}
-	//                     double expectedDist = this.player.getDeltaMovement().lengthSqr();
-	//                     double movedDist = xDist * xDist + yDist * yDist + zDist * zDist;
 	@Definition(id = "xDist", local = @Local(type = double.class, name = "xDist"))
 	@Definition(id = "yDist", local = @Local(type = double.class, name = "yDist"))
 	@Definition(id = "zDist", local = @Local(type = double.class, name = "zDist"))
@@ -180,9 +147,6 @@ public abstract class ServerGamePacketListenerImplMixin implements ServerGamePac
 	double handleMovePlayer_movedDist(double original, @Share("wDist") LocalDoubleRef wDist) {
 		return original + wDist.get() * wDist.get();
 	}
-	//                     if (this.player.isSleeping()) {
-	//                         if (movedDist > 1.0) {
-	//                             this.teleport(this.player.getX(), this.player.getY(), this.player.getZ(), targetYRot, targetXRot);
 	@Definition(id = "teleport", method = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;teleport(DDDFF)V")
 	@Definition(id = "player", field = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;player:Lnet/minecraft/server/level/ServerPlayer;")
 	@Definition(id = "getX", method = "Lnet/minecraft/server/level/ServerPlayer;getX()D")
@@ -191,24 +155,6 @@ public abstract class ServerGamePacketListenerImplMixin implements ServerGamePac
 	void handleMovePlayer_teleportWhileSleeping(ServerGamePacketListenerImpl instance, double x, double y, double z, float yRot, float xRot) {
 		((ServerGamePacketListenerImpl4) instance).teleport(new Vec4(x, y, z, ((Entity4) this.player).getW()), yRot, xRot);
 	}
-	//                         }
-	//                     } else {
-	//                         boolean isFallFlying = this.player.isFallFlying();
-	//                         if (level.tickRateManager().runsNormally()) {
-	//                             this.receivedMovePacketCount++;
-	//                             int deltaPackets = this.receivedMovePacketCount - this.knownMovePacketCount;
-	//                             if (deltaPackets > 5) {
-	//                                 LOGGER.debug(
-	//                                     "{} is sending move packets too frequently ({} packets since last tick)",
-	//                                     this.player.getPlainTextName(),
-	//                                     deltaPackets
-	//                                 );
-	//                                 deltaPackets = 1;
-	//                             }
-	//                             if (this.shouldCheckPlayerMovement(isFallFlying)) {
-	//                                 float metersPerTick = isFallFlying ? 300.0F : 100.0F;
-	//                                 if (movedDist - expectedDist > metersPerTick * deltaPackets) {
-	//                                     LOGGER.warn("{} moved too quickly! {},{},{}", this.player.getPlainTextName(), xDist, yDist, zDist);
 	@Definition(id = "LOGGER", field = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;LOGGER:Lorg/slf4j/Logger;")
 	@Definition(id = "warn", method = "Lorg/slf4j/Logger;warn(Ljava/lang/String;[Ljava/lang/Object;)V")
 	@Expression("LOGGER.warn(?, ?)")
@@ -216,31 +162,14 @@ public abstract class ServerGamePacketListenerImplMixin implements ServerGamePac
 	void handleMovePlayer_logTooQuick(Logger instance, String s, Object[] objects, @Share("wDist") LocalDoubleRef wDist) {
 		instance.warn(s + ",{}", ArrayUtils.addAll(objects, wDist.get()));
 	}
-	//                                     this.teleport(this.player.getX(), this.player.getY(), this.player.getZ(), this.player.getYRot(), this.player.getXRot());
-	                                                        // This is also covered by mixin above
-	//                                     return;
-	//                                 }
-	//                             }
-	//                         }
-	//                         AABB oldAABB = this.player.getBoundingBox();
-	//                         xDist = targetX - this.lastGoodX;
-	//                         yDist = targetY - this.lastGoodY;
-	//                         zDist = targetZ - this.lastGoodZ;
 	@Definition(id = "zDist", local = @Local(type = double.class, name = "zDist"))
 	@Definition(id = "targetZ", local = @Local(type = double.class, name = "targetZ"))
 	@Definition(id = "lastGoodZ", field = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;lastGoodZ:D")
 	@Expression("zDist = targetZ - this.lastGoodZ")
 	@Inject(method = "handleMovePlayer", at = @At("MIXINEXTRAS:EXPRESSION"))
 	void handleMovePlayer_wDistLastGood(ServerboundMovePlayerPacket packet, CallbackInfo ci, @Share("wDist") LocalDoubleRef wDist, @Share("targetW") LocalDoubleRef targetW) {
-		//                     wDist = targetW - this.lastGoodW;
 		wDist.set(targetW.get() - this.lastGoodW);
 	}
-	//                         boolean movedUpwards = yDist > 0.0;
-	//                         if (this.player.onGround() && !packet.isOnGround() && movedUpwards) {
-	//                             this.player.jumpFromGround();
-	//                         }
-	//                         boolean playerStandsOnSomething = this.player.verticalCollisionBelow;
-	//                         this.player.move(MoverType.PLAYER, new Vec3(xDist, yDist, zDist));
 	@Definition(id = "move", method = "Lnet/minecraft/server/level/ServerPlayer;move(Lnet/minecraft/world/entity/MoverType;Lnet/minecraft/world/phys/Vec3;)V")
 	@Definition(id = "PLAYER", field = "Lnet/minecraft/world/entity/MoverType;PLAYER:Lnet/minecraft/world/entity/MoverType;")
 	@Definition(id = "Vec3", type = Vec3.class)
@@ -250,13 +179,6 @@ public abstract class ServerGamePacketListenerImplMixin implements ServerGamePac
 	Vec3 handleMovePlayer_move(Vec3 vec3, @Share("wDist") LocalDoubleRef wDist) {
 		return Vec4.of(vec3, wDist.get());
 	}
-	//                         double oyDist = yDist;
-	//                         xDist = targetX - this.player.getX();
-	//                         yDist = targetY - this.player.getY();
-	//                         if (yDist > -0.5 || yDist < 0.5) {
-	//                             yDist = 0.0;
-	//                         }
-	//                         zDist = targetZ - this.player.getZ();
 	@Definition(id = "zDist", local = @Local(type = double.class, name = "zDist"))
 	@Definition(id = "targetZ", local = @Local(type = double.class, name = "targetZ"))
 	@Definition(id = "player", field = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;player:Lnet/minecraft/server/level/ServerPlayer;")
@@ -264,25 +186,8 @@ public abstract class ServerGamePacketListenerImplMixin implements ServerGamePac
 	@Expression("zDist = targetZ - this.player.getZ()")
 	@Inject(method = "handleMovePlayer", at = @At("MIXINEXTRAS:EXPRESSION"))
 	void handleMovePlayer_wDistPlayerW(ServerboundMovePlayerPacket packet, CallbackInfo ci, @Share("wDist") LocalDoubleRef wDist, @Share("targetW") LocalDoubleRef targetW) {
-		//                     wDist = targetW - this.player.getW();
 		wDist.set(targetW.get() - ((Entity4) this.player).getW());
 	}
-	//                         movedDist = xDist * xDist + yDist * yDist + zDist * zDist;
-																						// covered by mixin above
-	//                         boolean fail = false;
-	//                         if (!this.player.isChangingDimension()
-	//                             && movedDist > 0.0625
-	//                             && !this.player.isSleeping()
-	//                             && !this.player.isCreative()
-	//                             && !this.player.isSpectator()
-	//                             && !this.player.isInPostImpulseGraceTime()) {
-	//                             fail = true;
-	//                             LOGGER.warn("{} moved wrongly!", this.player.getPlainTextName());
-	//                         }
-	//                         if (this.player.noPhysics
-	//                             || this.player.isSleeping()
-	//                             || (!fail || !level.noCollision(this.player, oldAABB))
-	//                                 && !this.isEntityCollidingWithAnythingNew(level, this.player, oldAABB, targetX, targetY, targetZ)) {
 	@Redirect(method = "handleMovePlayer", at = @At(
 		value = "INVOKE",
 		target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;isEntityCollidingWithAnythingNew(Lnet/minecraft/world/level/LevelReader;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/AABB;DDD)Z",
@@ -294,7 +199,6 @@ public abstract class ServerGamePacketListenerImplMixin implements ServerGamePac
 	) {
 		return ((ServerGamePacketListenerImpl4) instance).isEntityCollidingWithAnythingNew(level, entity, oldAABB, new Vec4(newX, newY, newZ, targetW.get()));
 	}
-	//                             this.player.absSnapTo(targetX, targetY, targetZ, targetYRot, targetXRot);
 	@Redirect(method = "handleMovePlayer", at = @At(
 		value = "INVOKE",
 		target = "Lnet/minecraft/server/level/ServerPlayer;absSnapTo(DDDFF)V",
@@ -303,18 +207,6 @@ public abstract class ServerGamePacketListenerImplMixin implements ServerGamePac
 	void handleMovePlayer_snapTo(ServerPlayer player, double x, double y, double z, float yRot, float xRot, @Share("targetW") LocalDoubleRef targetW) {
 		((Entity4) player).absSnapTo(x, y, z, targetW.get(), yRot, xRot);
 	}
-	//                             boolean isAutoSpinAttack = this.player.isAutoSpinAttack();
-	//                             this.clientIsFloating = oyDist >= -0.03125
-	//                                 && !playerStandsOnSomething
-	//                                 && !this.player.isSpectator()
-	//                                 && !this.server.allowFlight()
-	//                                 && !this.player.mayFly()
-	//                                 && !this.player.hasEffect(MobEffects.LEVITATION)
-	//                                 && !isFallFlying
-	//                                 && !isAutoSpinAttack
-	//                                 && this.noBlocksAround(this.player);
-	//                             this.player.level().getChunkSource().move(this.player);
-	//                             Vec3 clientDeltaMovement = new Vec3(this.player.getX() - startX, this.player.getY() - startY, this.player.getZ() - startZ);
 	@Definition(id = "Vec3", type = Vec3.class)
 	@Definition(id = "player", field = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;player:Lnet/minecraft/server/level/ServerPlayer;")
 	@Definition(id = "getZ", method = "Lnet/minecraft/server/level/ServerPlayer;getZ()D")
@@ -324,8 +216,6 @@ public abstract class ServerGamePacketListenerImplMixin implements ServerGamePac
 	Vec3 handleMovePlayer_clientDeltaMovement(Vec3 original, @Share("startW") LocalDoubleRef startW) {
 		return Vec4.of(original, ((Entity4) this.player).getW() - startW.get());
 	}
-	//                             this.player.setOnGroundWithMovement(packet.isOnGround(), packet.horizontalCollision(), clientDeltaMovement);
-	//                             this.player.doCheckFallDamage(clientDeltaMovement.x, clientDeltaMovement.y, clientDeltaMovement.z, packet.isOnGround());
 	@Definition(id = "doCheckFallDamage", method = "Lnet/minecraft/server/level/ServerPlayer;doCheckFallDamage(DDDZ)V")
 	@Definition(id = "clientDeltaMovement", local = @Local(type = Vec3.class, name = "clientDeltaMovement"))
 	@Definition(id = "x", field = "Lnet/minecraft/world/phys/Vec3;x:D")
@@ -338,23 +228,7 @@ public abstract class ServerGamePacketListenerImplMixin implements ServerGamePac
 		double w = ((Vec4) clientDeltaMovement).w;
 		((Entity4) instance).doCheckFallDamage(x, y, z, w, onGround);
 	}
-	//                             this.handlePlayerKnownMovement(clientDeltaMovement);
-	//                             if (movedUpwards) {
-	//                                 this.player.resetFallDistance();
-	//                             }
-	//                             if (packet.isOnGround()
-	//                                 || this.player.hasLandedInLiquid()
-	//                                 || this.player.onClimbable()
-	//                                 || this.player.isSpectator()
-	//                                 || isFallFlying
-	//                                 || isAutoSpinAttack) {
-	//                                 this.player.tryResetCurrentImpulseContext();
-	//                             }
 	// TODO                        this.player.checkMovementStatistics(this.player.getX() - startX, this.player.getY() - startY, this.player.getZ() - startZ);
-
-	//                             this.lastGoodX = this.player.getX();
-	//                             this.lastGoodY = this.player.getY();
-	//                             this.lastGoodZ = this.player.getZ();
 	@Definition(id = "lastGoodZ", field = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;lastGoodZ:D")
 	@Definition(id = "player", field = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;player:Lnet/minecraft/server/level/ServerPlayer;")
 	@Definition(id = "getZ", method = "Lnet/minecraft/server/level/ServerPlayer;getZ()D")
@@ -363,8 +237,6 @@ public abstract class ServerGamePacketListenerImplMixin implements ServerGamePac
 	void handleMovePlayer_lastGoodW(ServerboundMovePlayerPacket packet, CallbackInfo ci) {
 		this.lastGoodW = ((Entity4) this.player).getW();
 	}
-	//                         } else {
-	//                             this.teleport(startX, startY, startZ, targetYRot, targetXRot);
 	@Definition(id = "teleport", method = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;teleport(DDDFF)V")
 	@Definition(id = "startX", local = @Local(type = double.class, name = "startX"))
 	@Expression("this.teleport(startX, ?, ?, ?, ?)")
@@ -375,10 +247,6 @@ public abstract class ServerGamePacketListenerImplMixin implements ServerGamePac
 	) {
 		((ServerGamePacketListenerImpl4) instance).teleport(new Vec4(x, y, z, startW.get()), yRot, xRot);
 	}
-	//                             this.player
-	//                                 .doCheckFallDamage(
-	//                                     this.player.getX() - startX, this.player.getY() - startY, this.player.getZ() - startZ, packet.isOnGround()
-	//                                 );
 	@Definition(id = "doCheckFallDamage", method = "Lnet/minecraft/server/level/ServerPlayer;doCheckFallDamage(DDDZ)V")
 	@Definition(id = "player", field = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;player:Lnet/minecraft/server/level/ServerPlayer;")
 	@Definition(id = "getZ", method = "Lnet/minecraft/server/level/ServerPlayer;getZ()D")
@@ -393,14 +261,6 @@ public abstract class ServerGamePacketListenerImplMixin implements ServerGamePac
 		double w = player4.getW() - startW.get();
 		player4.doCheckFallDamage(x, y, z, w, onGround);
 	}
-	//                             this.player.removeLatestMovementRecording();
-	//                         }
-	//                     }
-	//                 }
-	//             }
-	//         }
-	//     }
-	// }
 
 	@Overwrite
 	private boolean isEntityCollidingWithAnythingNew(LevelReader level, Entity entity, AABB oldAABB, double newX, double newY, double newZ) {
@@ -448,5 +308,11 @@ public abstract class ServerGamePacketListenerImplMixin implements ServerGamePac
 	))
 	Vec3 handleClientTickEnd(Vec3 lastKnownClientMovement) {
 		return Vec4.ZERO;
+	}
+
+	@Expression("? < 1.0000001")
+	@ModifyExpressionValue(method = "handleUseItemOn", at = @At(value = "MIXINEXTRAS:EXPRESSION", ordinal = 0))
+	boolean handleUseItemOn(boolean original, @Local(name = "distance") Vec3 distance) {
+		return original && Math.abs(((Vec4) distance).w) < 1.0000001;
 	}
 }

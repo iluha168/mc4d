@@ -49,6 +49,7 @@ class LevelRendererMixin implements LevelRenderer4 {
 
 	@Unique private int lastCameraSectionW;
 	@Unique private double lastCameraW;
+	@Unique private boolean lastNeighbouringSliceRendererEnabled;
 
 	@Inject(method = "setLevel", at = @At("HEAD"))
 	void setLevel(@Nullable ClientLevel level, CallbackInfo ci) {
@@ -75,7 +76,8 @@ class LevelRendererMixin implements LevelRenderer4 {
 	void cullTerrain_repositionCamera(Camera camera, Frustum frustum, boolean spectator, CallbackInfo ci, @Local(name = "cameraPos") Vec3 cameraPos) {
 		// Here we make client recalculate meshes for EVERY chunk when switching slices. See SectionCompilerMixin.
 		final double cameraPosW = ((Vec4) cameraPos).w;
-		if (Math.floor(cameraPosW * 16.0) != Math.floor(this.lastCameraW * 16.0)) {
+		final boolean enabled = Minecraft.getInstance().debugEntries.isCurrentlyEnabled(MC4DClient.NEIGHBOURING_SLICE_BLOCK_RENDERER);
+		if (enabled && Math.floor(cameraPosW * 32.0) != Math.floor(this.lastCameraW * 32.0)) {
 			// Update the camera's section more frequently cuz it is cheap.
 			this.setSectionDirty(
 				SectionPos.blockToSectionCoord(cameraPos.x),
@@ -86,14 +88,12 @@ class LevelRendererMixin implements LevelRenderer4 {
 			);
 		}
 		// Ideally we should update all sections when camera moves, but that is way too taxing on performance.
-		if (Math.floor(cameraPosW * 4.0) != Math.floor(this.lastCameraW * 4.0)) {
+		if (enabled != this.lastNeighbouringSliceRendererEnabled || (enabled && Math.floor(cameraPosW * 4.0) != Math.floor(this.lastCameraW * 4.0))) {
 			//noinspection DataFlowIssue
 			((ViewArea4) this.viewArea).setAllSectionWDirty(SectionPos.blockToSectionCoord(cameraPosW), true);
 		}
-		this.lastCameraW = Minecraft.getInstance().debugEntries.isCurrentlyEnabled(MC4DClient.NEIGHBOURING_3D_SLICE_RENDERER)
-			? cameraPosW
-			: Double.NaN; // Rendering not enabled, setting a value that will always be different from camera pos, but same every tick
-				// This way it dirties chunks when toggled on and off.
+		this.lastCameraW = cameraPosW;
+		this.lastNeighbouringSliceRendererEnabled = enabled;
 	}
 
 	@Definition(id = "zOld", field = "Lnet/minecraft/world/entity/Entity;zOld:D")

@@ -50,7 +50,7 @@ class SectionCompilerMixin implements SectionCompiler4 {
 		target = "Lnet/minecraft/core/SectionPos;origin()Lnet/minecraft/core/BlockPos;"
 	))
 	private BlockPos compile_origin(BlockPos origin) {
-		this.enableNeighbouringSliceRenderer = Minecraft.getInstance().debugEntries.isCurrentlyEnabled(MC4DClient.NEIGHBOURING_3D_SLICE_RENDERER);
+		this.enableNeighbouringSliceRenderer = Minecraft.getInstance().debugEntries.isCurrentlyEnabled(MC4DClient.NEIGHBOURING_SLICE_BLOCK_RENDERER);
 		return ((BlockPos4) origin).offset(0, 0, 0, SectionPos.sectionRelative((int) Math.floor(this.cameraW)));
 	}
 	@Redirect(method = "compile(Lnet/minecraft/core/SectionPos;Lnet/minecraft/client/renderer/chunk/RenderSectionRegion;Lcom/mojang/blaze3d/vertex/VertexSorting;Lnet/minecraft/client/renderer/SectionBufferBuilderPack;Ljava/util/List;)Lnet/minecraft/client/renderer/chunk/SectionCompiler$Results;", at = @At(
