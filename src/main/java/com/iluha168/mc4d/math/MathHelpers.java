@@ -53,4 +53,11 @@ public interface MathHelpers {
 			Mth.lerp3(alpha1, alpha2, alpha3, x0001, x1001, x0101, x1101, x0011, x1011, x0111, x1111)
 		);
 	}
+
+	static double length(double x, double y, double z, double w) {
+		return Math.sqrt(lengthSquared(x, y, z, w));
+	}
+	static double lengthSquared(double x, double y, double z, double w) {
+		return x * x + y * y + z * z + w * w;
+	}
 }

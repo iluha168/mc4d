@@ -4,6 +4,7 @@ import com.iluha168.mc4d.core.BlockPos4;
 import com.iluha168.mc4d.core.Direction4;
 import com.iluha168.mc4d.core.Position4;
 import com.iluha168.mc4d.core.Vec4i;
+import com.iluha168.mc4d.math.MathHelpers;
 import com.iluha168.mc4d.mixin.net.minecraft.world.entity.player.PlayerMixin;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.entity.player.Input4;
@@ -52,7 +53,8 @@ abstract class LocalPlayerMixin extends PlayerMixin {
 	@Shadow
 	protected abstract boolean suffocatesAt(BlockPos pos);
 
-	// TODO sendPosition
+	@Unique
+	private double wLast;
 
 	@Shadow
 	public ClientInput input;
@@ -65,6 +67,20 @@ abstract class LocalPlayerMixin extends PlayerMixin {
 
 	@Shadow
 	private int autoJumpTime;
+
+	@Redirect(method = "sendPosition", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/util/Mth;lengthSquared(DDD)D"
+	))
+	double sendPosition(double x, double y, double z) {
+		return MathHelpers.lengthSquared(x, y, z, this.getW() - this.wLast);
+	}
+	@Definition(id = "zLast", field = "Lnet/minecraft/client/player/LocalPlayer;zLast:D")
+	@Expression("this.zLast = ?")
+	@Inject(method = "sendPosition", at = @At("MIXINEXTRAS:EXPRESSION"))
+	void sendPosition(CallbackInfo ci) {
+		this.wLast = this.getW();
+	}
 
 	@Overwrite
 	@Deprecated
@@ -354,7 +370,7 @@ abstract class LocalPlayerMixin extends PlayerMixin {
 		return original + this.wwa * ((Vec4) movement).w;
 	}
 
-	// TODO updateIsUnderwater
+	// TODO updateIsUnderwater when 4D sound engine
 	// TODO getRopeHoldPosition?
 
 	@Redirect(method = "pick", at = @At(

@@ -5,7 +5,9 @@ import com.iluha168.mc4d.world.phys.HorizontalVec;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.client.player.ClientInput;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Input;
 import net.minecraft.world.phys.Vec2;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,11 +19,21 @@ class ClientInputMixin {
 	@Shadow
 	public Input keyPresses;
 
+	@Shadow
+	protected Vec2 moveVector;
+
 	@Definition(id = "ZERO", field = "Lnet/minecraft/world/phys/Vec2;ZERO:Lnet/minecraft/world/phys/Vec2;")
 	@Expression("ZERO")
 	@ModifyExpressionValue(method = "<init>", at = @At("MIXINEXTRAS:EXPRESSION"))
 	Vec2 init(Vec2 original) {
 		return HorizontalVec.ZERO;
+	}
+
+	@ModifyReturnValue(method = "hasForwardImpulse", at = @At("RETURN"))
+	boolean hasForwardImpulse(boolean original) {
+		// This does diverge from "W axis must behave exactly like X and Z" philosophy,
+		// but until entities have 5 head rotations, this is the only way to enable W sprinting.
+		return original || Mth.abs(((HorizontalVec) this.moveVector).z) > Mth.EPSILON;
 	}
 
 	@ModifyExpressionValue(method = "makeJump", at = @At(

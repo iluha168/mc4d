@@ -1,6 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.entity;
 
 import com.iluha168.mc4d.core.Vec4i;
+import com.iluha168.mc4d.math.MathHelpers;
 import com.iluha168.mc4d.server.level.ServerLevel4;
 import com.iluha168.mc4d.world.entity.LivingEntity4;
 import com.iluha168.mc4d.world.phys.Vec4;
@@ -151,7 +152,15 @@ public abstract class LivingEntityMixin extends EntityMixin implements LivingEnt
 	// TODO floatInWaterWhileRidden
 	// TODO updateFallFlyingMovement
 	// TODO travelRidden
-	// TODO calculateEntityAnimation
+
+	@Redirect(method = "calculateEntityAnimation", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/util/Mth;length(DDD)D"
+	))
+	double calculateEntityAnimation(double x, double y, double z) {
+		return MathHelpers.length(x, y, z, this.getW() - this.wo);
+	}
+
 	// TODO handleRelativeFrictionAndCalculateMovement
 	// TODO getFluidFallingAdjustedMovement
 	// TODO handleOnClimbable

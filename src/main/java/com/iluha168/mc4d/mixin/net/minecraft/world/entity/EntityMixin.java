@@ -6,6 +6,7 @@ import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.entity.Entity4;
 import com.iluha168.mc4d.world.level.ChunkPos4;
+import com.iluha168.mc4d.world.level.LevelAccessor4;
 import com.iluha168.mc4d.world.level.LevelReader4;
 import com.iluha168.mc4d.world.phys.AABB4;
 import com.iluha168.mc4d.world.phys.Vec4;
@@ -20,13 +21,12 @@ import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.MoverType;
-import net.minecraft.world.entity.PositionMoveRotation;
-import net.minecraft.world.entity.Relative;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -38,10 +38,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.waypoints.WaypointTransmitter;
 import org.jspecify.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
@@ -171,6 +168,13 @@ public abstract class EntityMixin implements Entity4 {
 
 	@Shadow
 	public abstract double getY();
+
+	@Shadow
+	@Final
+	protected RandomSource random;
+
+	@Shadow
+	private EntityDimensions dimensions;
 
 	@Override
 	public void setWO(double wo) {
@@ -375,7 +379,24 @@ public abstract class EntityMixin implements Entity4 {
 	}
 
 	// TODO doWaterSplashEffect
-	// TODO spawnSprintParticle
+
+	@Redirect(method = "spawnSprintParticle", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/level/Level;addParticle(Lnet/minecraft/core/particles/ParticleOptions;DDDDDD)V"
+	))
+	void spawnSprintParticle(
+		Level level, ParticleOptions particle, double x, double y, double z, double xd, double yd, double zd,
+		@Local(name = "entityPosition") BlockPos entityPosition,
+		@Local(name = "pos") BlockPos pos,
+		@Local(name = "movement") Vec3 movement
+	) {
+		double w = this.getW() + (this.random.nextDouble() - 0.5) * this.dimensions.width();
+		final int posW = Vec4i.getW(pos);
+		if (Vec4i.getW(entityPosition) != posW) {
+			w = Mth.clamp(w, posW, posW + 1.0);
+		}
+		((LevelAccessor4) level).addParticle(particle, x, y, z, w, xd, yd, zd, ((Vec4) movement).w * -4.0);
+	}
 
 	@Redirect(method = "getInputVector", at = @At(
 		value = "NEW",
