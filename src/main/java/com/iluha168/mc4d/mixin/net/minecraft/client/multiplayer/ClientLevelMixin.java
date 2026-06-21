@@ -7,12 +7,14 @@ import com.iluha168.mc4d.client.particle.ParticleEngine4;
 import com.iluha168.mc4d.client.particle.TerrainParticle4;
 import com.iluha168.mc4d.client.renderer.LevelRenderer4;
 import com.iluha168.mc4d.core.BlockPos4;
+import com.iluha168.mc4d.core.Cursor4D;
 import com.iluha168.mc4d.core.Direction4;
 import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.mixin.net.minecraft.world.level.LevelMixin;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.entity.Entity4;
 import com.iluha168.mc4d.world.level.ChunkPos4;
+import com.iluha168.mc4d.world.level.ColorResolver4;
 import com.iluha168.mc4d.world.phys.AABB4;
 import com.iluha168.mc4d.world.phys.Vec4;
 import com.iluha168.mc4d.world.phys.shapes.VoxelShape4;
@@ -28,6 +30,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.TerrainParticle;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Cursor3D;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -45,6 +48,7 @@ import net.minecraft.world.attribute.AmbientParticle;
 import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.ColorResolver;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
@@ -58,6 +62,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(ClientLevel.class)
@@ -304,7 +309,41 @@ class ClientLevelMixin extends LevelMixin implements ClientLevel4 {
 		return this.registryAccess().lookupOrThrow(Registries.BIOME).getOrThrow(Biomes.PLAINS);
 	}
 
-	// TODO calculateBlockTint
+	@Redirect(method = "calculateBlockTint", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/level/ColorResolver;getColor(Lnet/minecraft/world/level/biome/Biome;DD)I",
+		ordinal = 0
+	))
+	int calculateBlockTint_dist0(ColorResolver resolver, Biome biome, double x, double z, @Local(argsOnly = true, name = "pos") BlockPos pos) {
+		return ((ColorResolver4) resolver).getColor(biome, x, z, Vec4i.getW(pos));
+	}
+	@ModifyVariable(method = "calculateBlockTint", at = @At("STORE"), name = "count")
+	int calculateBlockTint_count(int count, @Local(name = "dist") int dist) {
+		return count * (dist * 2 + 1);
+	}
+	@Redirect(method = "calculateBlockTint", at = @At(
+		value = "NEW",
+		target = "(IIIIII)Lnet/minecraft/core/Cursor3D;"
+	))
+	Cursor3D calculateBlockTint_cursor(int minX, int minY, int minZ, int maxX, int maxY, int maxZ, @Local(argsOnly = true, name = "pos") BlockPos pos, @Local(name = "dist") int dist) {
+		final int posW = Vec4i.getW(pos);
+		return new Cursor4D(minX, minY, minZ, posW - dist, maxX, maxY, maxZ, posW + dist);
+	}
+	@Redirect(method = "calculateBlockTint", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/core/BlockPos$MutableBlockPos;set(III)Lnet/minecraft/core/BlockPos$MutableBlockPos;"
+	))
+	BlockPos.MutableBlockPos calculateBlockTint_set(BlockPos.MutableBlockPos nextPos, int x, int y, int z, @Local(name = "cursor") Cursor3D cursor) {
+		return ((BlockPos4.MutableBlockPos) nextPos).set(x, y, z, ((Cursor4D) cursor).nextW());
+	}
+	@Redirect(method = "calculateBlockTint", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/level/ColorResolver;getColor(Lnet/minecraft/world/level/biome/Biome;DD)I",
+		ordinal = 1
+	))
+	int calculateBlockTint_colorBlended(ColorResolver resolver, Biome biome, double x, double z, @Local(name = "nextPos") BlockPos.MutableBlockPos nextPos) {
+		return ((ColorResolver4) resolver).getColor(biome, x, z, Vec4i.getW(nextPos));
+	}
 
 	@Redirect(method = "addDestroyBlockEffect", at = @At(
 		value = "INVOKE",

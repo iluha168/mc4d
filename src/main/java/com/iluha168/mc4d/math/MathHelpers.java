@@ -1,5 +1,7 @@
 package com.iluha168.mc4d.math;
 
+import net.minecraft.util.Mth;
+
 public interface MathHelpers {
 	static int det3(
 		int m00, int m01, int m02,
@@ -37,5 +39,18 @@ public interface MathHelpers {
 
 	static double absMax(double a, double b, double c) {
 		return Math.max(Math.abs(a), Math.max(Math.abs(b), Math.abs(c)));
+	}
+
+	/** {@link Mth#lerp3} */
+	static double lerp4(
+		double alpha1, double alpha2, double alpha3, double alpha4,
+		double x0000, double x1000, double x0100, double x1100, double x0010, double x1010, double x0110, double x1110,
+		double x0001, double x1001, double x0101, double x1101, double x0011, double x1011, double x0111, double x1111
+	) {
+		return Mth.lerp(
+			alpha4,
+			Mth.lerp3(alpha1, alpha2, alpha3, x0000, x1000, x0100, x1100, x0010, x1010, x0110, x1110),
+			Mth.lerp3(alpha1, alpha2, alpha3, x0001, x1001, x0101, x1101, x0011, x1011, x0111, x1111)
+		);
 	}
 }

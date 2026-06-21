@@ -32,7 +32,7 @@ class SectionPosMixin implements SectionPos4 {
 	@WrapMethod(method = "of(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/core/SectionPos;")
 	private static SectionPos of_blockPos(BlockPos pos, Operation<SectionPos> original) {
 		SectionPos sectionPos = original.call(pos);
-		Vec4i.setW(sectionPos, Vec4i.getW(pos));
+		Vec4i.setW(sectionPos, SectionPos.blockToSectionCoord(Vec4i.getW(pos)));
 		return sectionPos;
 	}
 

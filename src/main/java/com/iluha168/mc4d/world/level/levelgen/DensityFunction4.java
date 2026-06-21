@@ -13,7 +13,7 @@ public interface DensityFunction4 {
 	// TODO NoiseChunk
 	interface FunctionContext {
 		static DensityFunction4.FunctionContext as(DensityFunction.SinglePointContext context) {
-			return (DensityFunction4.FunctionContext) (Object) context;
+			return (DensityFunction4.FunctionContext) (DensityFunction.FunctionContext) context;
 		}
 
 		int blockW();

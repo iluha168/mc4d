@@ -88,7 +88,10 @@ class LevelRendererMixin implements LevelRenderer4 {
 			);
 		}
 		// Ideally we should update all sections when camera moves, but that is way too taxing on performance.
-		if (enabled != this.lastNeighbouringSliceRendererEnabled || (enabled && Math.floor(cameraPosW * 4.0) != Math.floor(this.lastCameraW * 4.0))) {
+		if (enabled != this.lastNeighbouringSliceRendererEnabled || (enabled
+			? Math.floor(cameraPosW * 4.0) != Math.floor(this.lastCameraW * 4.0)
+			: Math.floor(cameraPosW) != Math.floor(this.lastCameraW)
+		)) {
 			//noinspection DataFlowIssue
 			((ViewArea4) this.viewArea).setAllSectionWDirty(SectionPos.blockToSectionCoord(cameraPosW), true);
 		}
