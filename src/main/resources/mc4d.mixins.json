@@ -132,6 +132,8 @@
     "net.minecraft.world.level.block.LeverBlockMixin",
     "net.minecraft.world.level.block.NetherPortalBlockMixin",
     "net.minecraft.world.level.block.PipeBlockMixin",
+    "net.minecraft.world.level.block.RedstoneTorchBlockMixin",
+    "net.minecraft.world.level.block.RedstoneWallTorchBlockMixin",
     "net.minecraft.world.level.block.RedStoneWireBlockMixin",
     "net.minecraft.world.level.block.RespawnAnchorBlockMixin",
     "net.minecraft.world.level.block.SegmentableBlockMixin",
