@@ -12,23 +12,37 @@ public interface DensityFunction4 {
 	 */
 	// TODO NoiseChunk
 	interface FunctionContext {
-		static DensityFunction4.FunctionContext as(DensityFunction.SinglePointContext context) {
-			return (DensityFunction4.FunctionContext) (DensityFunction.FunctionContext) context;
+		static DensityFunction4.FunctionContext as(DensityFunction.FunctionContext context) {
+			return (DensityFunction4.FunctionContext) context;
 		}
 
 		int blockW();
-		void setBlockW(int w);
 	}
 
-	// TODO NoiseHolder
+	/**
+	 * Implemented by {@link DensityFunction.NoiseHolder}.
+	 */
+	interface NoiseHolder {
+		static DensityFunction4.NoiseHolder as(DensityFunction.NoiseHolder noiseHolder) {
+			return (DensityFunction4.NoiseHolder) (Object) noiseHolder;
+		}
+
+		double getValue(double x, double y, double z, double w);
+	}
 
 	/**
 	 * Implemented by {@link DensityFunction.SinglePointContext}.
 	 */
 	interface SinglePointContext {
+		void setBlockW(int w);
+
+		static DensityFunction4.SinglePointContext as(DensityFunction.SinglePointContext context) {
+			return (DensityFunction4.SinglePointContext) (Object) context;
+		}
+
 		static DensityFunction.SinglePointContext of(int blockX, int blockY, int blockZ, int blockW) {
 			DensityFunction.SinglePointContext context = new DensityFunction.SinglePointContext(blockX, blockY, blockZ);
-			DensityFunction4.FunctionContext.as(context).setBlockW(blockW);
+			DensityFunction4.SinglePointContext.as(context).setBlockW(blockW);
 			return context;
 		}
 	}

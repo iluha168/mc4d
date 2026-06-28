@@ -20,7 +20,7 @@ public interface Vec4i {
 	int getY();
 	int getZ();
 	int getW();
-	Vec4i setW(int w);
+	Vec3i setW(int w);
 
 	/** Helper to not cast all the time. */
 	static int getW(Vec3i vec) {

@@ -113,10 +113,10 @@ public abstract class Vec3iMixin implements Vec4i {
 	}
 
 	@Override
-	public Vec4i setW(int w) {
+	public Vec3i setW(int w) {
 		this.w = w;
 		this.wNotSet = false;
-		return this;
+		return (Vec3i) (Object) this;
 	}
 
 	@Overwrite

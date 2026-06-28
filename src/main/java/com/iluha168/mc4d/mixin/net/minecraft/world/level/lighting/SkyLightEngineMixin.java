@@ -309,7 +309,7 @@ class SkyLightEngineMixin {
 	void propagateLightSources_kataAnaSources(
 		ChunkPos pos, CallbackInfo ci,
 		@Share("kataSources") LocalRef<ChunkSkyLightSources> kataSources,
-		@Share("kataSources") LocalRef<ChunkSkyLightSources> anaSources
+		@Share("anaSources") LocalRef<ChunkSkyLightSources> anaSources
 	) {
 		final int w = ChunkPos4.as(pos).w();
 		kataSources.set(Objects.requireNonNullElse(this.getChunkSources(pos.x(), pos.z(), w - 1), this.emptyChunkSources));
@@ -357,7 +357,7 @@ class SkyLightEngineMixin {
 	int propagateLightSources(
 		int neighborXZLowestSourceY,
 		@Share("kataSources") LocalRef<ChunkSkyLightSources4> kataSources,
-		@Share("kataSources") LocalRef<ChunkSkyLightSources4> anaSources,
+		@Share("anaSources") LocalRef<ChunkSkyLightSources4> anaSources,
 		@Local(name = "x") int x,
 		@Local(name = "z") int z,
 		@Share("w") LocalIntRef w,

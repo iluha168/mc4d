@@ -1,6 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.block;
 
 import com.iluha168.mc4d.core.Direction4;
+import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.world.level.LevelAccessor4;
 import com.iluha168.mc4d.world.level.block.state.properties.BlockStateProperties4;
 import com.llamalad7.mixinextras.expression.Definition;
@@ -134,13 +135,14 @@ class RedStoneWireBlockMixin {
 	))
 	private static void spawnParticlesAlongLine(
 		Level level, ParticleOptions particle, double x, double y, double z, double xd, double yd, double zd,
+		@Local(argsOnly = true, name = "pos") BlockPos pos,
 		@Local(argsOnly = true, name = "side") Direction side,
 		@Local(argsOnly = true, name = "along") Direction along,
 		@Local(name = "sideOfBlock") float sideOfBlock,
 		@Local(name = "positionOnLine") float positionOnLine
 	) {
 		final double w = 0.5 + sideOfBlock * Direction4.as(side).getStepW() + positionOnLine * Direction4.as(along).getStepW();
-		((LevelAccessor4) level).addParticle(particle, x, y, z, w, xd, yd, zd, 0.0);
+		((LevelAccessor4) level).addParticle(particle, x, y, z, Vec4i.getW(pos) + w, xd, yd, zd, 0.0);
 	}
 
 	@Inject(method = "createBlockStateDefinition", at = @At("TAIL"))

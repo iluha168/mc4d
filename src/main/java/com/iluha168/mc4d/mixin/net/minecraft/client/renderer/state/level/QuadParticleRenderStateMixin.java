@@ -72,7 +72,7 @@ abstract class QuadParticleRenderStateMixin implements QuadParticleRenderState4 
 				scale = 0.0F;
 			} else {
 				color = ARGB.alphaBlend(color, ARGB.color(
-					2 / (1 + (float) Math.exp(-Math.abs(w / scale))) - 1, // Makes particles that are closer less tinted using a sigmoid
+					2 / (1 + (float) Math.exp(-Math.abs(0.2 * w / scale))) - 1, // Makes particles that are closer less tinted using a sigmoid
 					ARGB.transparent(w > 0 ? MC4DClient.COLOR_ANA : MC4DClient.COLOR_KATA)
 				));
 			}

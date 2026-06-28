@@ -47,4 +47,8 @@ public final class Err4 {
 	public static @NonNull RuntimeException math(String description) {
 		return err("This operation cannot be extended to 4D. " + description);
 	}
+
+	public static @NonNull RuntimeException unreachable(String description) {
+		return err("This code path should be unreachable. " + description);
+	}
 }
