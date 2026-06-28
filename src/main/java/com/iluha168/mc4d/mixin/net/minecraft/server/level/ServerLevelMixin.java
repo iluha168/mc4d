@@ -3,7 +3,9 @@ package com.iluha168.mc4d.mixin.net.minecraft.server.level;
 import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.mixin.net.minecraft.world.level.LevelMixin;
 import com.iluha168.mc4d.network.protocol.game.ClientboundLevelParticlesPacket4;
+import com.iluha168.mc4d.network.protocol.game.ClientboundSoundPacket4;
 import com.iluha168.mc4d.server.level.ServerLevel4;
+import com.iluha168.mc4d.server.players.PlayerList4;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.entity.Entity4;
 import com.iluha168.mc4d.world.level.ChunkPos4;
@@ -24,11 +26,20 @@ import net.minecraft.core.SectionPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.PlayerList;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.animal.equine.SkeletonHorse;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.BlockEventData;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -36,6 +47,7 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.levelgen.Heightmap;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -62,6 +74,10 @@ class ServerLevelMixin extends LevelMixin implements ServerLevel4 {
 	@Shadow
 	@Final
 	private List<ServerPlayer> players;
+
+	@Shadow
+	@Final
+	private MinecraftServer server;
 
 	@Inject(method = "<clinit>", at = @At("TAIL"))
 	private static void staticFixes(CallbackInfo ci) {
@@ -153,11 +169,54 @@ class ServerLevelMixin extends LevelMixin implements ServerLevel4 {
 		return original + wd * wd;
 	}
 
-	// TODO playSeededSound
-	// TODO playSeededSound
-	// TODO levelEvent
+	@Overwrite
+	@Deprecated
+	public void playSeededSound(@Nullable Entity except, double x, double y, double z, Holder<SoundEvent> sound, SoundSource source, float volume, float pitch, long seed) {
+		throw Err4.arguments3("Level4#playSeededSound");
+	}
+	@Override
+	public void playSeededSound(
+		@Nullable Entity except, double x, double y, double z, double w, Holder<SoundEvent> sound, SoundSource source, float volume, float pitch, long seed
+	) {
+		// TODO net.neoforged.neoforge.event.EventHooks.onPlaySoundAtPosition
+		((PlayerList4) this.server.getPlayerList())
+			.broadcast(
+				except instanceof Player player ? player : null,
+				x, y, z, w,
+				sound.value().getRange(volume),
+				this.dimension(),
+				ClientboundSoundPacket4.from(sound, source, x, y, z, w, volume, pitch, seed)
+			);
+	}
+
+	@Redirect(method = "playSeededSound(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;FFJ)V", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/server/players/PlayerList;broadcast(Lnet/minecraft/world/entity/player/Player;DDDDLnet/minecraft/resources/ResourceKey;Lnet/minecraft/network/protocol/Packet;)V"
+	))
+	void playSeededSound(
+		PlayerList instance, @Nullable Player except, double x, double y, double z, double range, ResourceKey<Level> dimension, Packet<?> packet,
+		@Local(argsOnly = true, name = "sourceEntity") Entity sourceEntity
+	) {
+		((PlayerList4) instance).broadcast(except, x, y, z, ((Entity4) sourceEntity).getW(), range, dimension, packet);
+	}
+
+	@Redirect(method = "levelEvent", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/server/players/PlayerList;broadcast(Lnet/minecraft/world/entity/player/Player;DDDDLnet/minecraft/resources/ResourceKey;Lnet/minecraft/network/protocol/Packet;)V"
+	))
+	void levelEvent(PlayerList instance, @Nullable Player except, double x, double y, double z, double range, ResourceKey<Level> dimension, Packet<?> packet, @Local(argsOnly = true, name = "pos") BlockPos pos) {
+		((PlayerList4) instance).broadcast(except, x, y, z, Vec4i.getW(pos), range, dimension, packet);
+	}
+
 	// TODO explode
-	// TODO runBlockEvents
+
+	@Redirect(method = "runBlockEvents", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/server/players/PlayerList;broadcast(Lnet/minecraft/world/entity/player/Player;DDDDLnet/minecraft/resources/ResourceKey;Lnet/minecraft/network/protocol/Packet;)V"
+	))
+	void runBlockEvents(PlayerList instance, @Nullable Player except, double x, double y, double z, double range, ResourceKey<Level> dimension, Packet<?> packet, @Local(name = "eventData") BlockEventData eventData) {
+		((PlayerList4) instance).broadcast(except, x, y, z, Vec4i.getW(eventData.pos()), range, dimension, packet);
+	}
 
 	@Overwrite
 	@Deprecated

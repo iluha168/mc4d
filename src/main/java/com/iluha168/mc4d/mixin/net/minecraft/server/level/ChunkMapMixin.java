@@ -2,11 +2,13 @@ package com.iluha168.mc4d.mixin.net.minecraft.server.level;
 
 import com.iluha168.mc4d.math.MathHelpers;
 import com.iluha168.mc4d.network.protocol.game.ClientboundSetChunkCacheCenterPacket4;
+import com.iluha168.mc4d.server.level.ChunkMap4;
 import com.iluha168.mc4d.server.level.ChunkTrackingView4;
 import com.iluha168.mc4d.server.level.ThreadedLevelLightEngine4;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.util.StaticCache3D;
 import com.iluha168.mc4d.world.level.ChunkPos4;
+import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
@@ -20,10 +22,10 @@ import net.minecraft.server.level.ChunkTrackingView;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ThreadedLevelLightEngine;
 import net.minecraft.util.StaticCache2D;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ChunkPos;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Unique;
+import net.minecraft.world.phys.Vec3;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -33,15 +35,15 @@ import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
 @Mixin(ChunkMap.class)
-class ChunkMapMixin {
+class ChunkMapMixin implements ChunkMap4 {
 	// TODO other methods
 
 	@Overwrite
 	@Deprecated
 	public boolean isChunkTracked(ServerPlayer player, int chunkX, int chunkZ) {
-		throw Err4.arguments2("ChunkMap#isChunkTracked(ServerPlayer, int, int, int)");
+		throw Err4.arguments2("ChunkMap4#isChunkTracked");
 	}
-	@Unique
+	@Override
 	public boolean isChunkTracked(ServerPlayer player, int chunkX, int chunkZ, int chunkW) {
 		return ChunkTrackingView4.as(player.getChunkTrackingView()).contains(chunkX, chunkZ, chunkW)
 			&& !player.connection.chunkSender.isPending(ChunkPos4.pack(chunkX, chunkZ, chunkW));
@@ -171,4 +173,26 @@ class ChunkMapMixin {
 	}
 
 	// TODO other methods
+
+	@Mixin(targets = "net.minecraft.server.level.ChunkMap$TrackedEntity")
+	static class TrackedEntityMixin {
+		@Shadow
+		@Final
+		private Entity entity;
+
+		@Definition(id = "z", field = "Lnet/minecraft/world/phys/Vec3;z:D")
+		@Expression("?.z * ?.z")
+		@ModifyExpressionValue(method = "updatePlayer", at = @At("MIXINEXTRAS:EXPRESSION"))
+		double updatePlayer_distanceSquared(double original, @Local(name = "deltaToPlayer") Vec3 deltaToPlayer) {
+			final double w = ((Vec4) deltaToPlayer).w;
+			return original + w * w;
+		}
+		@Redirect(method = "updatePlayer", at = @At(
+			value = "INVOKE",
+			target = "Lnet/minecraft/server/level/ChunkMap;isChunkTracked(Lnet/minecraft/server/level/ServerPlayer;II)Z"
+		))
+		boolean updatePlayer_isChunkTracked(ChunkMap instance, ServerPlayer player, int x, int z) {
+			return ((ChunkMap4) instance).isChunkTracked(player, x, z, ChunkPos4.as(this.entity.chunkPosition()).w());
+		}
+	}
 }

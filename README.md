@@ -22,6 +22,7 @@ The goal of this mod is to make that dimension act identical to the existing 3.
 - The changes affect Overworld, Nether, etc., **all _Levels_**.
 - All entries in the **F3 debug HUD** show 4 dimensions instead of 3.
 - A **4D particle engine**. It is rare when a particle intersects your camera's 3D world slice, use **debug renderers in F3+F6** to see 1 slice further.
+- A **4D sound engine**. Sounds outside your 3D slice do not have a definite "left" or "right", they are played as always-centered stereo audio with a variable angle (spatial spread) instead.
 
 > [!CAUTION]
 > 3D saves are not compatible with 4D saves, in both directions. Create a new world after installing the mod.
@@ -37,10 +38,10 @@ TL;DR: **None.** Compatibility with Minecraft itself is in the works.
 
 For mod developers:
 
-If a mod uses vanilla dimension abstractions like `Vec3`, `AABB`, etc., and does not operate on each individual dimension, it should work fine.
-For example, creating them from individual components - `new Vec(X, Y, Z)`, `new AABB(minX, minY, minZ, maxX, maxY, maxZ)` - bad, using `vec.with(Axis.Z, 2)`, `aabb.getSize()` - safe.
+If a mod uses vanilla dimension abstractions like `BlockPos`, `ChunkPos`, etc., and does not operate on each individual dimension, it should work fine.
+For example, creating them from individual components - `new Vec3(X, Y, Z)`, `new SectionPos(X, Y, Z)` - bad, using `vec.with(Axis.Y, 2)`, `aabb.getSize()` - safe.
 
-Iterating over all axes, all directions, all blocks in a radius, etc., and using their methods - also ok.
+Iterating over all axes, all directions, etc., and using their methods - also ok.
 However, pulling out a specific dimension value is a bad idea - the code could end up treating all W as W=0.
 
 If a vanilla method has 3 arguments for spatial dimensions, e.g. `method(..., double x, double y, double z, ...)`, assume that it will always throw.

@@ -8,6 +8,7 @@ import com.iluha168.mc4d.math.MathHelpers;
 import com.iluha168.mc4d.mixin.net.minecraft.world.entity.player.PlayerMixin;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.entity.player.Input4;
+import com.iluha168.mc4d.world.level.Level4;
 import com.iluha168.mc4d.world.phys.AABB4;
 import com.iluha168.mc4d.world.phys.HorizontalVec;
 import com.iluha168.mc4d.world.phys.Vec4;
@@ -141,8 +142,8 @@ abstract class LocalPlayerMixin extends PlayerMixin {
 		value = "INVOKE",
 		target = "Lnet/minecraft/world/level/Level;playLocalSound(DDDLnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FFZ)V"
 	))
-	void playLocalSound(Level instance, double x, double y, double z, SoundEvent sound, SoundSource source, float volume, float pitch, boolean distanceDelay) {
-		// TODO obviously remove this in favor of 4D sound engine
+	void playLocalSound(Level level, double x, double y, double z, SoundEvent sound, SoundSource source, float volume, float pitch, boolean distanceDelay) {
+		((Level4) level).playLocalSound(x, y, z, this.getW(), sound, source, volume, pitch, distanceDelay);
 	}
 
 	@Definition(id = "zza", field = "Lnet/minecraft/client/player/LocalPlayer;zza:F")
@@ -370,7 +371,14 @@ abstract class LocalPlayerMixin extends PlayerMixin {
 		return original + this.wwa * ((Vec4) movement).w;
 	}
 
-	// TODO updateIsUnderwater when 4D sound engine
+	@Redirect(method = "updateIsUnderwater", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/level/Level;playLocalSound(DDDLnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FFZ)V"
+	))
+	void updateIsUnderwater(Level level, double x, double y, double z, SoundEvent sound, SoundSource source, float volume, float pitch, boolean distanceDelay) {
+		((Level4) level).playLocalSound(x, y, z, this.getW(), sound, source, volume, pitch, distanceDelay);
+	}
+
 	// TODO getRopeHoldPosition?
 
 	@Redirect(method = "pick", at = @At(

@@ -15,10 +15,16 @@ import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -60,6 +66,15 @@ public abstract class LevelMixin implements Level4, LevelAccessor4 {
 
 	@Shadow
 	public FluidState getFluidState(BlockPos pos) {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
+
+	@Shadow
+	@Final
+	private RandomSource soundSeedGenerator;
+
+	@Shadow
+	public ResourceKey<Level> dimension()  {
 		throw new UnsupportedOperationException("Implemented via mixin");
 	}
 
@@ -144,13 +159,68 @@ public abstract class LevelMixin implements Level4, LevelAccessor4 {
 	LevelChunk getBlockState(Level This, int chunkX, int chunkZ, @Local(argsOnly = true, name = "pos") BlockPos pos) {
 		return this.getChunk(chunkX, chunkZ, SectionPos.blockToSectionCoord(Vec4i.getW(pos)));
 	}
-	// TODO playSeededSound
-	// TODO playSeededSound
-	// TODO playSound
-	// TODO playSound
-	// TODO playSound
-	// TODO playLocalSound
-	// TODO playLocalSound
+
+	@Redirect(method = "playSound(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/core/BlockPos;Lnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FF)V", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/level/Level;playSound(Lnet/minecraft/world/entity/Entity;DDDLnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FF)V"
+	))
+	void playSound_blockPos(Level instance, Entity except, double x, double y, double z, SoundEvent sound, SoundSource source, float volume, float pitch, @Local(argsOnly = true, name = "pos") BlockPos pos) {
+		this.playSound(except, x, y, z, Vec4i.getW(pos) + 0.5, sound, source, volume, pitch);
+	}
+
+	@Overwrite
+	@Deprecated
+	public void playSeededSound(@Nullable Entity except, double x, double y, double z, SoundEvent sound, SoundSource source, float volume, float pitch, long seed) {
+		throw Err4.arguments3("Level4#playSeededSound");
+	}
+	@Override
+	public void playSeededSound(@Nullable Entity except, double x, double y, double z, double w, SoundEvent sound, SoundSource source, float volume, float pitch, long seed) {
+		this.playSeededSound(except, x, y, z, w, BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), source, volume, pitch, seed);
+	}
+
+	@Overwrite
+	@Deprecated
+	public void playSound(@Nullable Entity except, double x, double y, double z, SoundEvent sound, SoundSource source) {
+		throw Err4.arguments3("Level4#playSound");
+	}
+	@Override
+	public void playSound(@Nullable Entity except, double x, double y, double z, double w, SoundEvent sound, SoundSource source) {
+		this.playSound(except, x, y, z, w, sound, source, 1.0F, 1.0F);
+	}
+
+	@Overwrite
+	@Deprecated
+	public void playSound(@Nullable Entity except, double x, double y, double z, SoundEvent sound, SoundSource source, float volume, float pitch) {
+		throw Err4.arguments3("Level4#playSound");
+	}
+	@Override
+	public void playSound(@Nullable Entity except, double x, double y, double z, double w, SoundEvent sound, SoundSource source, float volume, float pitch) {
+		this.playSeededSound(except, x, y, z, w, sound, source, volume, pitch, this.soundSeedGenerator.nextLong());
+	}
+
+	@Overwrite
+	@Deprecated
+	public void playSound(@Nullable Entity except, double x, double y, double z, Holder<SoundEvent> sound, SoundSource source, float volume, float pitch) {
+		throw Err4.arguments3("Level4#playSound");
+	}
+	@Override
+	public void playSound(@Nullable Entity except, double x, double y, double z, double w, Holder<SoundEvent> sound, SoundSource source, float volume, float pitch) {
+		this.playSeededSound(except, x, y, z, w, sound, source, volume, pitch, this.soundSeedGenerator.nextLong());
+	}
+
+	@Redirect(method = "playLocalSound(Lnet/minecraft/core/BlockPos;Lnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FFZ)V", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/level/Level;playLocalSound(DDDLnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FFZ)V"
+	))
+	void playLocalSound_blockPos(Level instance, double x, double y, double z, SoundEvent sound, SoundSource source, float volume, float pitch, boolean distanceDelay, @Local(argsOnly = true, name = "pos") BlockPos pos) {
+		this.playLocalSound(x, y, z, Vec4i.getW(pos) + 0.5, sound, source, volume, pitch, distanceDelay);
+	}
+
+	@Overwrite
+	@Deprecated
+	public void playLocalSound(double x, double y, double z, SoundEvent sound, SoundSource source, float volume, float pitch, boolean distanceDelay) {
+		throw Err4.arguments3("Level4#playLocalSound");
+	}
 
 	@Overwrite
 	@Deprecated

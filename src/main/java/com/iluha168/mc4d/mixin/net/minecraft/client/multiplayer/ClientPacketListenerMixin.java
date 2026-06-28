@@ -20,11 +20,15 @@ import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.*;
+import net.minecraft.core.Holder;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.*;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.PositionMoveRotation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
@@ -160,6 +164,19 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
 	))
 	void handleInitializeBorder(WorldBorder instance, double x, double z, @Local(argsOnly = true, name = "packet") ClientboundInitializeBorderPacket packet) {
 		((WorldBorder4) instance).setCenter(x, z, ((ClientboundInitializeBorderPacket4) packet).getNewCenterW());
+	}
+
+	// TODO the rest
+
+	@Redirect(method = "handleSoundEvent", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/client/multiplayer/ClientLevel;playSeededSound(Lnet/minecraft/world/entity/Entity;DDDLnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;FFJ)V"
+	))
+	void handleSoundEvent(
+		ClientLevel level, Entity except, double x, double y, double z, Holder<SoundEvent> sound, SoundSource source, float volume, float pitch, long seed,
+		@Local(argsOnly = true, name = "packet") ClientboundSoundPacket packet
+	) {
+		((Level4) level).playSeededSound(except, x, y, z, ((ClientboundSoundPacket4) packet).getW(), sound, source, volume, pitch, seed);
 	}
 
 	// TODO the rest

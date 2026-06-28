@@ -6,6 +6,7 @@ import com.iluha168.mc4d.client.particle.Particle4;
 import com.iluha168.mc4d.client.particle.ParticleEngine4;
 import com.iluha168.mc4d.client.particle.TerrainParticle4;
 import com.iluha168.mc4d.client.renderer.LevelRenderer4;
+import com.iluha168.mc4d.client.resources.sounds.SimpleSoundInstance4;
 import com.iluha168.mc4d.core.BlockPos4;
 import com.iluha168.mc4d.core.Cursor4D;
 import com.iluha168.mc4d.core.Direction4;
@@ -29,6 +30,7 @@ import net.minecraft.client.color.block.BlockTintCache;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.TerrainParticle;
 import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Cursor3D;
 import net.minecraft.core.Direction;
@@ -46,6 +48,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.attribute.AmbientParticle;
 import net.minecraft.world.attribute.EnvironmentAttributes;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.ColorResolver;
@@ -190,16 +193,48 @@ class ClientLevelMixin extends LevelMixin implements ClientLevel4 {
 	// TODO trySpawnDripParticles
 	// TODO spawnParticle
 	// TODO spawnFluidParticle
-	// TODO playSeededSound
-	// TODO playLocalSound
 
-	/**
-	 * @author iluha168
-	 * @reason TODO remove this in favor of 4D sound engine
-	 */
 	@Overwrite
-	private void playSound(double x, double y, double z, SoundEvent sound, SoundSource source, float volume, float pitch, boolean distanceDelay, long seed) {
+	@Deprecated
+	public void playSeededSound(@Nullable Entity except, double x, double y, double z, Holder<SoundEvent> sound, SoundSource source, float volume, float pitch, long seed) {
+		throw Err4.arguments3("Level4#playSeededSound");
+	}
+	@Override
+	public void playSeededSound(
+		@Nullable Entity except, double x, double y, double z, double w, Holder<SoundEvent> sound, SoundSource source, float volume, float pitch, long seed
+	) {
+		// TODO net.neoforged.neoforge.event.EventHooks.onPlaySoundAtPosition
+		if (except == this.minecraft.player) {
+			this.playSound(x, y, z, w, sound.value(), source, volume, pitch, false, seed);
+		}
+	}
 
+	@SuppressWarnings({"RedundantMethodOverride", "deprecation"})
+	@Overwrite
+	@Deprecated
+	public void playLocalSound(double x, double y, double z, SoundEvent sound, SoundSource source, float volume, float pitch, boolean distanceDelay) {
+		throw Err4.arguments3("Level4#playLocalSound");
+	}
+	@Override
+	public void playLocalSound(double x, double y, double z, double w, SoundEvent sound, SoundSource source, float volume, float pitch, boolean distanceDelay) {
+		this.playSound(x, y, z, w, sound, source, volume, pitch, distanceDelay, this.random.nextLong());
+	}
+
+	@Overwrite
+	@Deprecated
+	private void playSound(double x, double y, double z, SoundEvent sound, SoundSource source, float volume, float pitch, boolean distanceDelay, long seed) {
+		throw Err4.arguments3(null);
+	}
+	@Unique
+	private void playSound(double x, double y, double z, double w, SoundEvent sound, SoundSource source, float volume, float pitch, boolean distanceDelay, long seed) {
+		double distanceToSqr = ((Vec4) this.minecraft.gameRenderer.getMainCamera().position()).distanceToSqr(x, y, z, w);
+		SimpleSoundInstance instance = SimpleSoundInstance4.from(sound, source, volume, pitch, RandomSource.create(seed), x, y, z, w);
+		if (distanceDelay && distanceToSqr > 100.0) {
+			double delayInSeconds = Math.sqrt(distanceToSqr) / 40.0;
+			this.minecraft.getSoundManager().playDelayed(instance, (int)(delayInSeconds * 20.0));
+		} else {
+			this.minecraft.getSoundManager().play(instance);
+		}
 	}
 
 	// TODO createFireworks
