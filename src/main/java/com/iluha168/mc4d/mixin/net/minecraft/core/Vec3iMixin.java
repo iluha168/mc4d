@@ -82,8 +82,9 @@ public abstract class Vec3iMixin implements Vec4i {
 		this.wNotSet = true;
 	}
 
-	@Expression("? == ?")
-	@ModifyExpressionValue(method = "equals", at = @At(value = "MIXINEXTRAS:EXPRESSION", ordinal = 0))
+	@Definition(id = "getZ", method = "Lnet/minecraft/core/Vec3i;getZ()I")
+	@Expression("?.getZ() == ?.getZ()")
+	@ModifyExpressionValue(method = "equals", at = @At("MIXINEXTRAS:EXPRESSION"))
 	boolean equals(boolean original, @Local(argsOnly = true, name = "o") Object o) {
 		return original && this.getW() == ((Vec4i) o).getW();
 	}
