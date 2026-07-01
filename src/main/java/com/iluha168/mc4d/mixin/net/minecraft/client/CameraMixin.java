@@ -1,5 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client;
 
+import com.iluha168.mc4d.client.renderer.culling.Frustum4;
 import com.iluha168.mc4d.core.BlockPos4;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.entity.Entity4;
@@ -9,6 +10,7 @@ import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.Camera;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -39,7 +41,13 @@ class CameraMixin {
 		return Vec4.ZERO;
 	}
 
-	// TODO prepareCullFrustum
+	@Redirect(method = "prepareCullFrustum", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/client/renderer/culling/Frustum;prepare(DDD)V"
+	))
+	void prepareCullFrustum(Frustum frustum, double camX, double camY, double camZ, @Local(argsOnly = true, name = "cameraPos") Vec3 cameraPos) {
+		((Frustum4) frustum).prepare(camX, camY, camZ, ((Vec4) cameraPos).w);
+	}
 
 	@Redirect(method = "alignWithEntity", at = @At(
 		value = "INVOKE",

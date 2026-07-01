@@ -23,5 +23,6 @@ class DebugScreenEntriesMixin {
 		register(MC4DClient.NEIGHBOURING_SLICE_BLOCK_RENDERER, new DebugEntryNoop());
 		register(MC4DClient.NO_BLOCK_MODEL_RENDERER, new DebugEntryNoop());
 		register(MC4DClient.NEIGHBOURING_SLICE_PARTICLE_RENDERER, new DebugEntryNoop());
+		register(MC4DClient.NEIGHBOURING_SLICE_ENTITY_RENDERER, new DebugEntryNoop());
 	}
 }

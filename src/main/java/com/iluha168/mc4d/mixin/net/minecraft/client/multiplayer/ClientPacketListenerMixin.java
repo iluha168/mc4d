@@ -49,8 +49,6 @@ import java.util.Iterator;
 
 @Mixin(ClientPacketListener.class)
 public abstract class ClientPacketListenerMixin extends ClientCommonPacketListenerImpl {
-	// TODO the rest
-
 	@Shadow
 	private ClientLevel level;
 
@@ -61,6 +59,16 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
 	protected ClientPacketListenerMixin(Minecraft minecraft, Connection connection, CommonListenerCookie cookie) {
 		super(minecraft, connection, cookie);
 		throw new UnsupportedOperationException("Implemented via mixin");
+	}
+
+	// TODO the rest
+
+	@Redirect(method = "handleMoveEntity", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/network/protocol/game/VecDeltaCodec;decode(JJJ)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 handleMoveEntity(VecDeltaCodec positionCodec, long xa, long ya, long za, @Local(argsOnly = true, name = "packet") ClientboundMoveEntityPacket packet) {
+		return ((VecDeltaCodec4) positionCodec).decode(xa, ya, za, ((ClientboundMoveEntityPacket4) packet).getWa());
 	}
 
 	@Redirect(method = "handleMovePlayer", at = @At(
@@ -156,7 +164,20 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
 		);
 	}
 
-	// TODO the rest
+	@Redirect(method = "handleTakeItemEntity", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/client/multiplayer/ClientLevel;playLocalSound(DDDLnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FFZ)V"
+	))
+	void handleTakeItemEntity(
+		ClientLevel instance, double x, double y, double z, SoundEvent sound, SoundSource source, float volume, float pitch, boolean distanceDelay,
+		@Local(name = "from") Entity from
+	) {
+		((Level4) instance).playLocalSound(x, y, z, ((Entity4) from).getW(), sound, source, volume, pitch, distanceDelay);
+	}
+
+	// TODO handleEntityEvent
+	// TODO handleExplosion
+	// TODO handleGameEvent
 
 	@Redirect(method = "handleInitializeBorder", at = @At(
 		value = "INVOKE",

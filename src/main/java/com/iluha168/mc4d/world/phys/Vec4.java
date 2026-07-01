@@ -3,7 +3,6 @@ package com.iluha168.mc4d.world.phys;
 import com.iluha168.mc4d.core.Direction4;
 import com.iluha168.mc4d.core.Position4;
 import com.iluha168.mc4d.core.Vec4i;
-import com.iluha168.mc4d.network.LpVec4;
 import com.iluha168.mc4d.util.Err4;
 import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
@@ -51,8 +50,6 @@ public class Vec4 extends Vec3 implements Position4 {
 			output.writeDouble(value.w());
 		}
 	};
-
-	public static final StreamCodec<ByteBuf, Vec4> LP_STREAM_CODEC = StreamCodec.of(LpVec4::write, LpVec4::read);
 
 	public static final Vec4 ZERO = new Vec4(0.0, 0.0, 0.0, 0.0);
 	public static final Vec4 X_AXIS = new Vec4(1.0, 0.0, 0.0, 0.0);

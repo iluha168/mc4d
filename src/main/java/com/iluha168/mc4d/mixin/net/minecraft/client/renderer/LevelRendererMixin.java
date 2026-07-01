@@ -4,6 +4,8 @@ import com.iluha168.mc4d.MC4DClient;
 import com.iluha168.mc4d.client.renderer.LevelRenderer4;
 import com.iluha168.mc4d.client.renderer.ShapeRenderer4;
 import com.iluha168.mc4d.client.renderer.ViewArea4;
+import com.iluha168.mc4d.client.renderer.entity.EntityRenderDispatcher4;
+import com.iluha168.mc4d.client.renderer.entity.state.EntityRenderState4;
 import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.entity.Entity4;
@@ -13,6 +15,7 @@ import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
+import com.llamalad7.mixinextras.sugar.ref.LocalDoubleRef;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -21,8 +24,12 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.ViewArea;
 import net.minecraft.client.renderer.culling.Frustum;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.state.level.LevelRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
@@ -99,12 +106,31 @@ class LevelRendererMixin implements LevelRenderer4 {
 		this.lastNeighbouringSliceRendererEnabled = enabled;
 	}
 
+	@Definition(id = "camZ", local = @Local(type = double.class, name = "camZ"))
+	@Expression("camZ = @(?)")
+	@Inject(method = "extractVisibleEntities", at = @At("MIXINEXTRAS:EXPRESSION"))
+	void extractVisibleEntities(
+		Camera camera, Frustum frustum, DeltaTracker deltaTracker, LevelRenderState output, CallbackInfo ci,
+		@Share("camW") LocalDoubleRef camW, @Local(name = "cameraPos") Vec3 cameraPos
+	) {
+		camW.set(((Vec4) cameraPos).w);
+	}
+	@Redirect(method = "extractVisibleEntities", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;shouldRender(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/client/renderer/culling/Frustum;DDD)Z"
+	))
+	<E extends Entity> boolean extractVisibleEntities_shouldRender(
+		EntityRenderDispatcher instance, E entity, Frustum culler, double camX, double camY, double camZ,
+		@Share("camW") LocalDoubleRef camW
+	) {
+		return ((EntityRenderDispatcher4) instance).shouldRender(entity, culler, camX, camY, camZ, camW.get());
+	}
 	@Definition(id = "zOld", field = "Lnet/minecraft/world/entity/Entity;zOld:D")
 	@Definition(id = "entity", local = @Local(type = Entity.class, name = "entity"))
 	@Definition(id = "getZ", method = "Lnet/minecraft/world/entity/Entity;getZ()D")
 	@Expression("entity.zOld = entity.getZ()")
 	@Inject(method = "extractVisibleEntities", at = @At("MIXINEXTRAS:EXPRESSION"))
-	void setWOld(
+	void extractVisibleEntities_setWOld(
 		Camera camera, Frustum frustum, DeltaTracker deltaTracker, LevelRenderState output, CallbackInfo ci,
 		@Local(name = "entity") Entity entity
 	) {
@@ -112,7 +138,21 @@ class LevelRendererMixin implements LevelRenderer4 {
 		entity4.setWOld(entity4.getW());
 	}
 
-	// TODO submitEntities when 4D renderer
+	@Redirect(method = "submitEntities", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;submit(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lnet/minecraft/client/renderer/state/level/CameraRenderState;DDDLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;)V"
+	))
+	<S extends EntityRenderState> void submitEntities(
+		EntityRenderDispatcher instance, S renderState, CameraRenderState camera, double x, double y, double z, PoseStack poseStack, SubmitNodeCollector submitNodeCollector,
+		@Local(name = "cameraPos") Vec3 cameraPos
+	) {
+		((EntityRenderDispatcher4) instance).submit(
+			renderState, camera,
+			x, y, z, ((EntityRenderState4) renderState).w() - ((Vec4) cameraPos).w,
+			poseStack, submitNodeCollector
+		);
+	}
+
 	// TODO extractVisibleBlockEntities when 4D renderer
 	// TODO submitBlockEntities when 4D renderer
 

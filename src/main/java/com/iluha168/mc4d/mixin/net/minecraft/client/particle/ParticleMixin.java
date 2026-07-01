@@ -27,8 +27,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.List;
 
 @Mixin(Particle.class)
-abstract
-class ParticleMixin implements Particle4 {
+abstract class ParticleMixin implements Particle4 {
 	@Shadow
 	protected float bbWidth;
 

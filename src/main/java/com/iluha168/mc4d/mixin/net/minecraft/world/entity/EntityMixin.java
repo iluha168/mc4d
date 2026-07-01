@@ -1,11 +1,15 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.entity;
 
 import com.iluha168.mc4d.core.BlockPos4;
+import com.iluha168.mc4d.core.Direction4;
 import com.iluha168.mc4d.core.Position4;
 import com.iluha168.mc4d.core.Vec4i;
+import com.iluha168.mc4d.network.protocol.game.ClientboundAddEntityPacket4;
+import com.iluha168.mc4d.server.level.ServerLevel4;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.entity.Entity4;
 import com.iluha168.mc4d.world.level.ChunkPos4;
+import com.iluha168.mc4d.world.level.Level4;
 import com.iluha168.mc4d.world.level.LevelAccessor4;
 import com.iluha168.mc4d.world.level.LevelReader4;
 import com.iluha168.mc4d.world.phys.AABB4;
@@ -18,12 +22,18 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
+import com.llamalad7.mixinextras.sugar.ref.LocalDoubleRef;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.network.protocol.game.VecDeltaCodec;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.*;
@@ -72,22 +82,32 @@ public abstract class EntityMixin implements Entity4 {
 
 	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 	@Shadow
-	public abstract boolean isRemoved();
+	public boolean isRemoved() {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
 
 	@Shadow
-	public abstract boolean isAddedToLevel();
+	public boolean isAddedToLevel() {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
 
 	@Shadow
-	public abstract void setBoundingBox(AABB bb);
+	public void setBoundingBox(AABB bb) {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
 
 	@Shadow
-	protected abstract AABB makeBoundingBox();
+	protected AABB makeBoundingBox() {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
 
 	@Shadow
 	private @Nullable Entity vehicle;
 
 	@Shadow
-	protected abstract void reapplyPosition();
+	protected void reapplyPosition() {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
 
 	@Shadow
 	public double xo;
@@ -105,69 +125,111 @@ public abstract class EntityMixin implements Entity4 {
 	public double wOld;
 
 	@Shadow
-	public abstract void absSnapRotationTo(float yRot, float xRot);
+	public void absSnapRotationTo(float yRot, float xRot) {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
 
 	@Shadow
-	public abstract void setDeltaMovement(Vec3 deltaMovement);
+	public void setDeltaMovement(Vec3 deltaMovement) {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
 
 	@Shadow
-	public abstract boolean touchingUnloadedChunk();
+	public boolean touchingUnloadedChunk() {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
 
 	@Shadow
-	protected abstract void checkSupportingBlock(boolean onGround, @Nullable Vec3 movement);
+	protected void checkSupportingBlock(boolean onGround, @Nullable Vec3 movement) {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
 
 	@Shadow
-	public abstract BlockPos getOnPosLegacy();
+	public BlockPos getOnPosLegacy() {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
 
 	@Shadow
-	protected abstract void checkFallDamage(double ya, boolean onGround, BlockState onState, BlockPos pos);
+	protected void checkFallDamage(double ya, boolean onGround, BlockState onState, BlockPos pos) {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
 
 	@Shadow
 	public boolean horizontalCollision;
 
 	@Shadow
-	public abstract @Nullable Entity teleport(TeleportTransition transition);
+	public @Nullable Entity teleport(TeleportTransition transition) {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
 
 	@Shadow
-	public abstract float getYRot();
+	public float getYRot() {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
 
 	@Shadow
-	public abstract float getXRot();
+	public float getXRot() {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
 
 	@Shadow
-	public abstract void setYRot(float yRot);
+	public void setYRot(float yRot) {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
 
 	@Shadow
-	public abstract void setXRot(float xRot);
+	public void setXRot(float xRot) {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
 
 	@Shadow
-	public abstract void setOldPosAndRot();
+	public void setOldPosAndRot() {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
 
-	@Shadow public abstract Vec3 position();
-
-	@Shadow
-	public abstract Vec3 getForward();
-
-	@Shadow
-	public abstract double getX();
+	@Shadow public Vec3 position() {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
 
 	@Shadow
-	public abstract AABB getBoundingBox();
+	public Vec3 getForward() {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
 
 	@Shadow
-	public abstract double getZ();
+	public double getX() {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
 
 	@Shadow
-	public abstract Level level();
+	public AABB getBoundingBox() {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
 
 	@Shadow
-	public abstract float getBbWidth();
+	public double getZ() {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
 
 	@Shadow
-	public abstract float getBbHeight();
+	public Level level() {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
 
 	@Shadow
-	public abstract double getY();
+	public float getBbWidth() {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
+
+	@Shadow
+	public float getBbHeight() {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
+
+	@Shadow
+	public double getY() {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
 
 	@Shadow
 	@Final
@@ -175,6 +237,28 @@ public abstract class EntityMixin implements Entity4 {
 
 	@Shadow
 	private EntityDimensions dimensions;
+
+	@Shadow
+	public Vec3 getDeltaMovement() {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
+
+	@Shadow
+	@Final
+	private VecDeltaCodec packetPositionCodec;
+
+	@Shadow
+	public boolean needsSync;
+
+	@Shadow
+	private boolean isFree(AABB box) {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
+
+	@Shadow
+	public boolean shouldRenderAtSqrDistance(double distance) {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
 
 	@Override
 	public void setWO(double wo) {
@@ -187,6 +271,10 @@ public abstract class EntityMixin implements Entity4 {
 	@Override
 	public void setWOld(double wOld) {
 		this.wOld = wOld;
+	}
+	@Override
+	public double wOld() {
+		return this.wOld;
 	}
 
 	@Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;setPos(DDD)V"))
@@ -202,8 +290,24 @@ public abstract class EntityMixin implements Entity4 {
 		return Vec4.ZERO;
 	}
 
-	// TODO syncPacketPositionCodec
-	// TODO closerThan
+	@Overwrite
+	@Deprecated
+	public void syncPacketPositionCodec(double x, double y, double z) {
+		throw Err4.arguments3("Entity4#syncPacketPositionCodec");
+	}
+	@Override
+	public void syncPacketPositionCodec(double x, double y, double z, double w) {
+		this.packetPositionCodec.setBase(new Vec4(x, y, z, w));
+	}
+
+	@Redirect(method = "closerThan(Lnet/minecraft/world/entity/Entity;DD)Z", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/util/Mth;lengthSquared(DD)D"
+	))
+	double closerThan(double x, double y, @Local(argsOnly = true, name = "other") Entity other) {
+		final double dw = ((Entity4) other).getW() - this.getW();
+		return Mth.lengthSquared(x, y, dw);
+	}
 
 	@Overwrite
 	@Deprecated
@@ -225,8 +329,24 @@ public abstract class EntityMixin implements Entity4 {
 	}
 
 	// TODO? turn
-	// TODO lavaHurt
-	// TODO isFree
+
+	@Redirect(method = "lavaHurt", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/server/level/ServerLevel;playSound(Lnet/minecraft/world/entity/Entity;DDDLnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FF)V"
+	))
+	void lavaHurt(ServerLevel instance, Entity except, double x, double y, double z, SoundEvent sound, SoundSource source, float volume, float pitch) {
+		((Level4) instance).playSound(except, x, y, z, this.getW(), sound, source, volume, pitch);
+	}
+
+	@Overwrite
+	@Deprecated
+	public boolean isFree(double xa, double ya, double za) {
+		throw Err4.arguments3("Entity4#isFree");
+	}
+	@Override
+	public boolean isFree(double xa, double ya, double za, double wa) {
+		return this.isFree(((AABB4) this.getBoundingBox()).move(xa, ya, za, wa));
+	}
 
 	@Redirect(method = "checkSupportingBlock", at = @At(
 		value = "NEW",
@@ -297,7 +417,13 @@ public abstract class EntityMixin implements Entity4 {
 		return ((Vec4) instance).multiply(xScale, yScale, zScale, zScale);
 	}
 
-	// TODO playEntityOnFireExtinguishedSound
+	@Redirect(method = "playEntityOnFireExtinguishedSound", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/level/Level;playSound(Lnet/minecraft/world/entity/Entity;DDDLnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FF)V"
+	))
+	void playEntityOnFireExtinguishedSound(Level instance, Entity except, double x, double y, double z, SoundEvent sound, SoundSource source, float volume, float pitch) {
+		((Level4) instance).playSound(except, x, y, z, this.getW(), sound, source, volume, pitch);
+	}
 
 	@Redirect(method = "getOnPos(F)Lnet/minecraft/core/BlockPos;", at = @At(
 		value = "NEW",
@@ -352,8 +478,22 @@ public abstract class EntityMixin implements Entity4 {
 		return Vec4.ZERO;
 	}
 
-	// TODO waterSwimSound
-	// TODO playSound
+	@ModifyArg(method = "waterSwimSound", at = @At(
+		value = "INVOKE",
+		target = "Ljava/lang/Math;sqrt(D)D"
+	))
+	double waterSwimSound(double lengthSquared, @Local(name = "deltaMovement") Vec3 deltaMovement) {
+		final double w = ((Vec4) deltaMovement).w;
+		return lengthSquared + w * w * 0.2F;
+	}
+
+	@Redirect(method = "playSound(Lnet/minecraft/sounds/SoundEvent;FF)V", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/level/Level;playSound(Lnet/minecraft/world/entity/Entity;DDDLnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FF)V"
+	))
+	void playSound(Level instance, Entity except, double x, double y, double z, SoundEvent sound, SoundSource source, float volume, float pitch) {
+		((Level4) instance).playSound(except, x, y, z, this.getW(), sound, source, volume, pitch);
+	}
 
 	@Overwrite
 	@Deprecated
@@ -378,7 +518,22 @@ public abstract class EntityMixin implements Entity4 {
 		return BlockPos4.containing(x, y, z, Vec4i.getW(pos));
 	}
 
-	// TODO doWaterSplashEffect
+	@ModifyArg(method = "doWaterSplashEffect", at = @At(
+		value = "INVOKE",
+		target = "Ljava/lang/Math;sqrt(D)D"
+	))
+	double doWaterSplashEffect_speed(double a, @Local(name = "movement") Vec3 movement) {
+		final double w = ((Vec4) movement).w;
+		return a + w * w * 0.2F;
+	}
+	@Redirect(method = "doWaterSplashEffect", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/level/Level;addParticle(Lnet/minecraft/core/particles/ParticleOptions;DDDDDD)V"
+	))
+	void doWaterSplashEffect(Level instance, ParticleOptions particle, double x, double y, double z, double xd, double yd, double zd, @Local(name = "movement") Vec3 movement) {
+		final double wo = (this.random.nextDouble() * 2.0 - 1.0) * this.dimensions.width();
+		((LevelAccessor4) instance).addParticle(particle, x, y, z, this.getW() + wo, xd, yd, zd, ((Vec4) movement).w);
+	}
 
 	@Redirect(method = "spawnSprintParticle", at = @At(
 		value = "INVOKE",
@@ -502,8 +657,28 @@ public abstract class EntityMixin implements Entity4 {
 		return new Vec4(x, y, z, this.wOld);
 	}
 
-	// TODO distanceTo
-	// TODO distanceToSqr
+	@ModifyArg(method = "distanceTo", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/util/Mth;sqrt(F)F"
+	))
+	float distanceTo(float lengthSquared, @Local(argsOnly = true, name = "entity") Entity entity) {
+		final float wd = (float) (this.getW() - ((Entity4) entity).getW());
+		return lengthSquared + wd * wd;
+	}
+
+	@Overwrite
+	@Deprecated
+	public double distanceToSqr(double x2, double y2, double z2) {
+		throw Err4.arguments3("Entity4#distanceToSqr");
+	}
+	@Override
+	public double distanceToSqr(double x2, double y2, double z2, double w2) {
+		final double xd = this.getX() - x2;
+		final double yd = this.getY() - y2;
+		final double zd = this.getZ() - z2;
+		final double wd = this.getW() - w2;
+		return xd * xd + yd * yd + zd * zd + wd * wd;
+	}
 
 	@WrapMethod(method = "distanceToSqr(Lnet/minecraft/world/phys/Vec3;)D")
 	double distanceToSqr(Vec3 pos, Operation<Double> original) {
@@ -511,9 +686,59 @@ public abstract class EntityMixin implements Entity4 {
 		return original.call(pos) + wd * wd;
 	}
 
-	// TODO push
-	// TODO push
-	// TODO push
+	@Definition(id = "dd", local = @Local(type = double.class, name = "dd"))
+	@Expression("dd = @(?)")
+	@ModifyExpressionValue(method = "push(Lnet/minecraft/world/entity/Entity;)V", at = @At(value = "MIXINEXTRAS:EXPRESSION", ordinal = 0))
+	double push_dd(double dd, @Share("wa") LocalDoubleRef wa, @Local(argsOnly = true, name = "entity") Entity entity) {
+		wa.set(((Entity4) entity).getW() - this.getW());
+		return Math.max(dd, Math.abs(wa.get()));
+	}
+	@Definition(id = "isVehicle", method = "Lnet/minecraft/world/entity/Entity;isVehicle()Z")
+	@Expression("this.isVehicle()")
+	@Inject(method = "push(Lnet/minecraft/world/entity/Entity;)V", at = @At("MIXINEXTRAS:EXPRESSION"))
+	void push_wa(
+		Entity entity, CallbackInfo ci,
+		@Share("wa") LocalDoubleRef wa,
+		@Local(name = "dd") double dd,
+		@Local(name = "pow") double pow
+	) {
+		wa.set(wa.get() / dd * pow * 0.05F);
+	}
+	@Definition(id = "push", method = "Lnet/minecraft/world/entity/Entity;push(DDD)V")
+	@Expression("this.push(?, ?, ?)")
+	@Redirect(method = "push(Lnet/minecraft/world/entity/Entity;)V", at = @At("MIXINEXTRAS:EXPRESSION"))
+	void push_me(Entity instance, double xa, double ya, double za, @Share("wa") LocalDoubleRef wa) {
+		((Entity4) instance).push(xa, ya, za, -wa.get());
+	}
+	@Definition(id = "entity", local = @Local(type = Entity.class, name = "entity", argsOnly = true))
+	@Definition(id = "push", method = "Lnet/minecraft/world/entity/Entity;push(DDD)V")
+	@Expression("entity.push(?, ?, ?)")
+	@Redirect(method = "push(Lnet/minecraft/world/entity/Entity;)V", at = @At("MIXINEXTRAS:EXPRESSION"))
+	void push_other(Entity instance, double xa, double ya, double za, @Share("wa") LocalDoubleRef wa) {
+		((Entity4) instance).push(xa, ya, za, wa.get());
+	}
+
+	@Redirect(method = "push(Lnet/minecraft/world/phys/Vec3;)V", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;push(DDD)V"
+	))
+	void push(Entity instance, double xa, double ya, double za, @Local(argsOnly = true, name = "impulse") Vec3 impulse) {
+		((Entity4) instance).push(xa, ya, za, ((Vec4) impulse).w);
+	}
+
+	@Overwrite
+	@Deprecated
+	public void push(double xa, double ya, double za) {
+		throw Err4.arguments3("Entity4#push");
+	}
+	@Override
+	public void push(double xa, double ya, double za, double wa) {
+		if (Double.isFinite(xa) && Double.isFinite(ya) && Double.isFinite(za) && Double.isFinite(wa)) {
+			this.setDeltaMovement(((Vec4) this.getDeltaMovement()).add(xa, ya, za, wa));
+			this.needsSync = true;
+		}
+	}
+
 	// TODO? calculateViewVector
 
 	@Redirect(method = "getEyePosition()Lnet/minecraft/world/phys/Vec3;", at = @At(
@@ -555,7 +780,20 @@ public abstract class EntityMixin implements Entity4 {
 		return ((Vec4) from).add(x, y, z, w);
 	}
 
-	// TODO shouldRender
+	@Overwrite
+	@Deprecated
+	public boolean shouldRender(double camX, double camY, double camZ) {
+		throw Err4.arguments3("Entity4#shouldRender");
+	}
+	@Override
+	public boolean shouldRender(double camX, double camY, double camZ, double camW) {
+		final double xd = this.getX() - camX;
+		final double yd = this.getY() - camY;
+		final double zd = this.getZ() - camZ;
+		final double wd = this.getW() - camW;
+		final double distance = xd * xd + yd * yd + zd * zd + wd * wd;
+		return this.shouldRenderAtSqrDistance(distance);
+	}
 
 	@Definition(id = "store", method = "Lnet/minecraft/world/level/storage/ValueOutput;store(Ljava/lang/String;Lcom/mojang/serialization/Codec;Ljava/lang/Object;)V")
 	@Definition(id = "CODEC", field = "Lnet/minecraft/world/phys/Vec3;CODEC:Lcom/mojang/serialization/Codec;")
@@ -626,12 +864,86 @@ public abstract class EntityMixin implements Entity4 {
 	// TODO rideTick
 	// TODO positionRider
 	// TODO getHandHoldingItemAngle
-	// TODO handleOnAboveBubbleColumn
-	// TODO sendBubbleColumnParticles
-	// TODO handleOnInsideBubbleColumn
-	// TODO moveTowardsClosestSpace
+
+	@Redirect(method = "handleOnAboveBubbleColumn", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;setDeltaMovement(DDD)V"
+	))
+	private static void handleOnAboveBubbleColumn(Entity instance, double xd, double yd, double zd, @Local(name = "movement") Vec3 movement) {
+		instance.setDeltaMovement(new Vec4(xd, yd, zd, ((Vec4) movement).w));
+	}
+
+	@Redirect(method = "sendBubbleColumnParticles", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/server/level/ServerLevel;sendParticles(Lnet/minecraft/core/particles/ParticleOptions;DDDIDDDD)I"
+	))
+	private static int sendBubbleColumnParticles(
+		ServerLevel instance, ParticleOptions particle, double x, double y, double z, int count, double xDist, double yDist, double zDist, double speed,
+		@Local(argsOnly = true, name = "pos") BlockPos pos,
+		@Local(name = "random") RandomSource random
+	) {
+		final double w = Vec4i.getW(pos) + random.nextDouble();
+		return ((ServerLevel4) instance).sendParticles(particle, x, y, z, w, count, xDist, yDist, zDist, zDist, speed);
+	}
+
+	@Redirect(method = "handleOnInsideBubbleColumn", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;setDeltaMovement(DDD)V"
+	))
+	private static void handleOnInsideBubbleColumn(Entity instance, double xd, double yd, double zd, @Local(name = "movement") Vec3 movement) {
+		instance.setDeltaMovement(new Vec4(xd, yd, zd, ((Vec4) movement).w));
+	}
+
+	@Overwrite
+	@Deprecated
+	protected void moveTowardsClosestSpace(double x, double y, double z) {
+		throw Err4.arguments3("Entity4#moveTowardsClosestSpace");
+	}
+	@Override
+	public void moveTowardsClosestSpace(double x, double y, double z, double w) {
+		BlockPos pos = BlockPos4.containing(x, y, z, w);
+		Vec4 delta = new Vec4(x - pos.getX(), y - pos.getY(), z - pos.getZ(), w - Vec4i.getW(pos));
+		BlockPos.MutableBlockPos neighborPos = new BlockPos.MutableBlockPos();
+		Direction closestDirection = Direction.UP;
+		double closest = Double.MAX_VALUE;
+
+		for (Direction direction : new Direction[]{Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST, Direction4.KATA, Direction4.ANA, Direction.UP}) {
+			neighborPos.setWithOffset(pos, direction);
+			//noinspection resource
+			if (!this.level().getBlockState(neighborPos).isCollisionShapeFullBlock(this.level(), neighborPos)) {
+				double d = delta.get(direction.getAxis());
+				double orientedDelta = direction.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 1.0 - d : d;
+				if (orientedDelta < closest) {
+					closest = orientedDelta;
+					closestDirection = direction;
+				}
+			}
+		}
+
+		float speed = this.random.nextFloat() * 0.2F + 0.1F;
+		float step = closestDirection.getAxisDirection().getStep();
+		Vec4 scaledMovement = (Vec4) this.getDeltaMovement().scale(0.75);
+		if (closestDirection.getAxis() == Direction.Axis.X) {
+			this.setDeltaMovement(new Vec4(step * speed, scaledMovement.y, scaledMovement.z, scaledMovement.w));
+		} else if (closestDirection.getAxis() == Direction.Axis.Y) {
+			this.setDeltaMovement(new Vec4(scaledMovement.x, step * speed, scaledMovement.z, scaledMovement.w));
+		} else if (closestDirection.getAxis() == Direction.Axis.Z) {
+			this.setDeltaMovement(new Vec4(scaledMovement.x, scaledMovement.y, step * speed, scaledMovement.w));
+		} else if (closestDirection.getAxis() == Direction4.Axis.W) {
+			this.setDeltaMovement(new Vec4(scaledMovement.x, scaledMovement.y, scaledMovement.z, step * speed));
+		}
+	}
+
 	// TODO toString
-	// TODO copyPosition
+
+	@Redirect(method = "copyPosition", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;snapTo(DDDFF)V"
+	))
+	void copyPosition(Entity instance, double x, double y, double z, float yRot, float xRot, @Local(argsOnly = true, name = "target") Entity target) {
+		((Entity4) instance).snapTo(x, y, z, ((Entity4) target).getW(), yRot, xRot);
+	}
+
 	// TODO calculatePassengerTransition
 
 	@Redirect(method = "teleportSetPosition(Lnet/minecraft/world/entity/PositionMoveRotation;Lnet/minecraft/world/entity/PositionMoveRotation;Ljava/util/Set;)V", at = @At(
@@ -660,8 +972,23 @@ public abstract class EntityMixin implements Entity4 {
 	// TODO fudgePositionAfterSizeChange
 	// TODO? rotate
 	// TODO? mirror
-	// TODO getCollisionHorizontalEscapeVector
-	// TODO getDismountLocationForPassenger
+
+	@Redirect(method = "getCollisionHorizontalEscapeVector", at = @At(
+		value = "NEW",
+		target = "(DDD)Lnet/minecraft/world/phys/Vec3;"
+	))
+	private static Vec3 getCollisionHorizontalEscapeVector(double x, double y, double z) {
+		return new Vec4(x, y, z, 0.0); // Ugh
+	}
+
+	@Redirect(method = "getDismountLocationForPassenger", at = @At(
+		value = "NEW",
+		target = "(DDD)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 getDismountLocationForPassenger(double x, double y, double z) {
+		return new Vec4(x, y, z, this.getW());
+	}
+
 	// TODO? lookAt
 
 	@Redirect(method = "touchingUnloadedChunk", at = @At(
@@ -674,7 +1001,7 @@ public abstract class EntityMixin implements Entity4 {
 	}
 
 	@Inject(method = "setDeltaMovement(Lnet/minecraft/world/phys/Vec3;)V", at = @At("HEAD"))
-	void setDeltaMovement(Vec3 deltaMovement, CallbackInfo ci) {
+	void setDeltaMovement_force4D(Vec3 deltaMovement, CallbackInfo ci) {
 		if (!(deltaMovement instanceof Vec4)) {
 			throw Err4.container3();
 		}
@@ -745,7 +1072,21 @@ public abstract class EntityMixin implements Entity4 {
 		}
 	}
 
-	// TODO recreateFromPacket
+	@Redirect(method = "recreateFromPacket", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;syncPacketPositionCodec(DDD)V"
+	))
+	void recreateFromPacket(Entity instance, double x, double y, double z, @Local(argsOnly = true, name = "packet") ClientboundAddEntityPacket packet) {
+		((Entity4) instance).syncPacketPositionCodec(x, y, z, ((ClientboundAddEntityPacket4) packet).getW());
+	}
+	@Redirect(method = "recreateFromPacket", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;snapTo(DDDFF)V"
+	))
+	void recreateFromPacket(Entity instance, double x, double y, double z, float yRot, float xRot, @Local(argsOnly = true, name = "packet") ClientboundAddEntityPacket packet) {
+		((Entity4) instance).snapTo(x, y, z, ((ClientboundAddEntityPacket4) packet).getW(), yRot, xRot);
+	}
+
 	// TODO lerpPositionAndRotationStep
 	// TODO MoveFunction
 
