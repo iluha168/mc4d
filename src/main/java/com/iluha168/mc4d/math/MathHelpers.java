@@ -1,6 +1,7 @@
 package com.iluha168.mc4d.math;
 
 import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 
 public interface MathHelpers {
 	static int det3(
@@ -59,5 +60,19 @@ public interface MathHelpers {
 	}
 	static double lengthSquared(double x, double y, double z, double w) {
 		return x * x + y * y + z * z + w * w;
+	}
+
+	/**
+	 * Returns the {@code index}-th of {@code total} points spread as evenly as possible over the surface of a unit sphere.
+	 *
+	 * @param index the point's index, expected in {@code [0, total)}
+	 * @param total how many points are being distributed over the sphere; must be positive
+	 * @return a point on the unit sphere, as a unit-length {@link Vec3}
+	 */
+	static Vec3 fibonacciSphere(int index, double total) {
+		final double phi = Math.acos(1.0 - 2.0 * ((index + 0.5) / total));
+		final double theta = Math.PI * (1.0 + Math.sqrt(5.0)) * index;
+		final double sinPhi = Math.sin(phi);
+		return new Vec3(sinPhi * Math.cos(theta), sinPhi * Math.sin(theta), Math.cos(phi));
 	}
 }

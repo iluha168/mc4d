@@ -2,6 +2,8 @@ package com.iluha168.mc4d.mixin.net.minecraft.world.level.chunk;
 
 import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.util.Err4;
+import com.iluha168.mc4d.world.level.ChunkPos4;
+import com.iluha168.mc4d.world.level.chunk.ChunkSource4;
 import com.iluha168.mc4d.world.level.chunk.LevelChunkSection4;
 import com.iluha168.mc4d.world.level.levelgen.Heightmap4;
 import com.iluha168.mc4d.world.level.lighting.ChunkSkyLightSources4;
@@ -18,6 +20,7 @@ import net.minecraft.core.SectionPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ChunkSource;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.levelgen.Heightmap;
@@ -32,7 +35,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LevelChunk.class)
-class LevelChunkMixin {
+class LevelChunkMixin extends ChunkAccessMixin {
 	@Definition(id = "z", local = @Local(type = int.class, name = "z"))
 	@Expression("z = @(?)")
 	@Inject(method = "getBlockState", at = @At("MIXINEXTRAS:EXPRESSION"))
@@ -103,7 +106,13 @@ class LevelChunkMixin {
 	boolean setBlockState_updateHeightmaps(Heightmap heightmap, int localX, int localY, int localZ, BlockState state, @Share("localW") LocalIntRef localW) {
 		return ((Heightmap4) heightmap).update(localX, localY, localZ, localW.get(), state);
 	}
-	// TODO setBlockState_onSectionEmptinessChanged
+	@Redirect(method = "setBlockState", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/level/chunk/ChunkSource;onSectionEmptinessChanged(IIIZ)V"
+	))
+	void setBlockState_onSectionEmptinessChanged(ChunkSource instance, int sectionX, int sectionY, int sectionZ, boolean empty) {
+		((ChunkSource4) instance).onSectionEmptinessChanged(sectionX, sectionY, sectionZ, ChunkPos4.as(this.chunkPos).w(), empty);
+	}
 	@Redirect(method = "setBlockState", at = @At(
 		value = "INVOKE",
 		target = "Lnet/minecraft/world/level/lighting/ChunkSkyLightSources;update(Lnet/minecraft/world/level/BlockGetter;III)Z"

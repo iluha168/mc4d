@@ -128,6 +128,7 @@ public class Vec4 extends Vec3 implements Position4 {
 	public @NonNull Vec4 subtract(double x, double y, double z) {
 		if (x == 0 && z == 0) {
 			// Call site intends to modify only the Y axis
+			// Do not rely on this hack while writing mixins - redirect the calls anyway, this is planned for removal
 			return this.subtract(x, y, z, z);
 		}
 		throw Err4.arguments3("Vec4#subtract");
@@ -152,6 +153,7 @@ public class Vec4 extends Vec3 implements Position4 {
 	public @NonNull Vec4 add(double x, double y, double z) {
 		if (x == 0 && z == 0) {
 			// Call site intends to modify only the Y axis
+			// Do not rely on this hack while writing mixins - redirect the calls anyway, this is planned for removal
 			return this.add(x, y, z, z);
 		}
 		throw Err4.arguments3("Vec4#add");
@@ -367,6 +369,7 @@ public class Vec4 extends Vec3 implements Position4 {
 	}
 
 	@Override
+	@Deprecated // Just access w directly
 	public final double w() {
 		return this.w;
 	}

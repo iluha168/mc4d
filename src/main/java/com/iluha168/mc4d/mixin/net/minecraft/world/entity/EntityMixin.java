@@ -8,6 +8,8 @@ import com.iluha168.mc4d.network.protocol.game.ClientboundAddEntityPacket4;
 import com.iluha168.mc4d.server.level.ServerLevel4;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.entity.Entity4;
+import com.iluha168.mc4d.world.entity.Relative4;
+import com.iluha168.mc4d.world.entity.item.ItemEntity4;
 import com.iluha168.mc4d.world.level.ChunkPos4;
 import com.iluha168.mc4d.world.level.Level4;
 import com.iluha168.mc4d.world.level.LevelAccessor4;
@@ -19,6 +21,8 @@ import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.lib.apache.commons.ArrayUtils;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
@@ -37,6 +41,8 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -55,6 +61,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.Locale;
 import java.util.Set;
 
 @Mixin(Entity.class)
@@ -257,6 +264,21 @@ public abstract class EntityMixin implements Entity4 {
 
 	@Shadow
 	public boolean shouldRenderAtSqrDistance(double distance) {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
+
+	@Shadow
+	private void teleportPassengers() {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
+
+	@Shadow
+	protected void setRot(float yRot, float xRot) {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
+
+	@Shadow
+	public BlockPos blockPosition() {
 		throw new UnsupportedOperationException("Implemented via mixin");
 	}
 
@@ -850,8 +872,20 @@ public abstract class EntityMixin implements Entity4 {
 		this.setDeltaMovement(new Vec4(xd, yd, zd, Math.abs(wd) > 10.0 ? 0.0 : wd));
 	}
 
-	// TODO spawnAtLocation
-	// TODO spawnAtLocation
+	@Redirect(method = "spawnAtLocation(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/entity/item/ItemEntity;", at = @At(
+		value = "NEW",
+		target = "(Lnet/minecraft/world/level/Level;DDDLnet/minecraft/world/item/ItemStack;)Lnet/minecraft/world/entity/item/ItemEntity;"
+	))
+	ItemEntity spawnAtLocation(Level level, double x, double y, double z, ItemStack itemStack, @Local(argsOnly = true, name = "offset") Vec3 offset) {
+		return ItemEntity4.from(level, x, y, z, this.getW() + ((Vec4) offset).w, itemStack);
+	}
+	@Redirect(method = "spawnAtLocation(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/item/ItemStack;F)Lnet/minecraft/world/entity/item/ItemEntity;", at = @At(
+		value = "NEW",
+		target = "(DDD)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 spawnAtLocation(double x, double y, double z) {
+		return new Vec4(x, y, z, z);
+	}
 
 	@Redirect(method = "isInWall", at = @At(
 		value = "INVOKE",
@@ -861,9 +895,17 @@ public abstract class EntityMixin implements Entity4 {
 		return AABB4.ofSize((Vec4) center, sizeX, sizeY, sizeZ, sizeX);
 	}
 
-	// TODO rideTick
+	@Redirect(method = "rideTick", at = @At(
+		value = "FIELD",
+		target = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;",
+		opcode = Opcodes.GETSTATIC
+	))
+	Vec3 rideTick() {
+		return Vec4.ZERO;
+	}
+
 	// TODO positionRider
-	// TODO getHandHoldingItemAngle
+	// TODO? getHandHoldingItemAngle
 
 	@Redirect(method = "handleOnAboveBubbleColumn", at = @At(
 		value = "INVOKE",
@@ -934,7 +976,19 @@ public abstract class EntityMixin implements Entity4 {
 		}
 	}
 
-	// TODO toString
+	@WrapOperation(method = "toString", at = @At(
+		value = "INVOKE",
+		target = "Ljava/lang/String;format(Ljava/util/Locale;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;"
+	))
+	String toString(Locale l, String format, Object[] args, Operation<String> original) {
+		return original.call(
+			l,
+			format.replace("z=%.2f", "z=%.2f, w=%.2f"),
+			format.contains("removed=")
+				? ArrayUtils.add(args, args.length - 1, this.getW())
+				: ArrayUtils.add(args, this.getW())
+		);
+	}
 
 	@Redirect(method = "copyPosition", at = @At(
 		value = "INVOKE",
@@ -944,7 +998,17 @@ public abstract class EntityMixin implements Entity4 {
 		((Entity4) instance).snapTo(x, y, z, ((Entity4) target).getW(), yRot, xRot);
 	}
 
-	// TODO calculatePassengerTransition
+	@Redirect(method = "calculatePassengerTransition", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/phys/Vec3;add(DDD)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 calculatePassengerTransition(
+		Vec3 instance, double x, double y, double z,
+		@Local(argsOnly = true, name = "transition") TeleportTransition transition,
+		@Local(name = "passengerOffset") Vec3 passengerOffset
+	) {
+		return ((Vec4) instance).add(x, y, z, transition.relatives().contains(Relative4.W) ? 0.0 : ((Vec4) passengerOffset).w);
+	}
 
 	@Redirect(method = "teleportSetPosition(Lnet/minecraft/world/entity/PositionMoveRotation;Lnet/minecraft/world/entity/PositionMoveRotation;Ljava/util/Set;)V", at = @At(
 		value = "INVOKE",
@@ -966,12 +1030,51 @@ public abstract class EntityMixin implements Entity4 {
 		return this.teleport(new TeleportTransition(level, new Vec4(x, y, z, w), Vec4.ZERO, newYRot, newXRot, relatives, TeleportTransition.DO_NOTHING)) != null;
 	}
 
-	// TODO dismountTo
-	// TODO teleportTo
-	// TODO teleportRelative
-	// TODO fudgePositionAfterSizeChange
-	// TODO? rotate
-	// TODO? mirror
+	@Overwrite
+	@Deprecated
+	public void dismountTo(double x, double y, double z) {
+		throw Err4.arguments3("Entity4#dismountTo");
+	}
+	@Override
+	public void dismountTo(double x, double y, double z, double w) {
+		this.teleportTo(x, y, z, w);
+	}
+
+	@Overwrite
+	@Deprecated
+	public void teleportTo(double x, double y, double z) {
+		throw Err4.arguments3("Entity4#teleportTo");
+	}
+	@Override
+	public void teleportTo(double x, double y, double z, double w) {
+		//noinspection resource
+		if (this.level() instanceof ServerLevel) {
+			this.snapTo(x, y, z, w, this.getYRot(), this.getXRot());
+			this.teleportPassengers();
+		}
+	}
+
+	@Overwrite
+	@Deprecated
+	public void teleportRelative(double dx, double dy, double dz) {
+		throw Err4.arguments3("Entity4#teleportRelative");
+	}
+	@Override
+	public void teleportRelative(double dx, double dy, double dz, double dw) {
+		this.teleportTo(this.getX() + dx, this.getY() + dy, this.getZ() + dz, this.getW() + dw);
+	}
+
+	@Redirect(method = "fudgePositionAfterSizeChange", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/phys/Vec3;add(DDD)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 fudgePositionAfterSizeChange(Vec3 instance, double x, double y, double z) {
+		assert x == z;
+		return ((Vec4) instance).add(x, y, z, z);
+	}
+
+	// TODO rotate
+	// TODO mirror
 
 	@Redirect(method = "getCollisionHorizontalEscapeVector", at = @At(
 		value = "NEW",
@@ -1016,13 +1119,18 @@ public abstract class EntityMixin implements Entity4 {
 	public int getBlockW() {
 		return Vec4i.getW(this.blockPosition);
 	}
-
 	@Override
 	public double getW() {
 		return ((Vec4) this.position).w;
 	}
-
-	// TODO getRandomW
+	@Override
+	public double getW(double progress) {
+		return ((Vec4) this.position).w + this.getBbWidth() * progress;
+	}
+	@Override
+	public double getRandomW(double spread) {
+		return this.getW((2.0 * this.random.nextDouble() - 1.0) * spread);
+	}
 
 	@Overwrite
 	@Deprecated
@@ -1087,7 +1195,23 @@ public abstract class EntityMixin implements Entity4 {
 		((Entity4) instance).snapTo(x, y, z, ((ClientboundAddEntityPacket4) packet).getW(), yRot, xRot);
 	}
 
-	// TODO lerpPositionAndRotationStep
-	// TODO MoveFunction
+	@Overwrite
+	@Deprecated
+	protected void lerpPositionAndRotationStep(int stepsToTarget, double targetX, double targetY, double targetZ, double targetYRot, double targetXRot) {
+		throw Err4.arguments3("Entity4#lerpPositionAndRotationStep");
+	}
+	@Override
+	public void lerpPositionAndRotationStep(int stepsToTarget, double targetX, double targetY, double targetZ, double targetW, double targetYRot, double targetXRot) {
+		final double alpha = 1.0 / stepsToTarget;
+		final double x = Mth.lerp(alpha, this.getX(), targetX);
+		final double y = Mth.lerp(alpha, this.getY(), targetY);
+		final double z = Mth.lerp(alpha, this.getZ(), targetZ);
+		final double w = Mth.lerp(alpha, this.getW(), targetW);
+		float yRot = (float)Mth.rotLerp(alpha, this.getYRot(), targetYRot);
+		float xRot = (float)Mth.lerp(alpha, this.getXRot(), targetXRot);
+		this.setPos(new Vec4(x, y, z, w));
+		this.setRot(yRot, xRot);
+	}
 
+	// TODO MoveFunction
 }

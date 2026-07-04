@@ -31,8 +31,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EntityRenderer.class)
-abstract
-class EntityRendererMixin<T extends Entity, S extends EntityRenderState> implements EntityRenderer4<T, S> {
+abstract class EntityRendererMixin<T extends Entity, S extends EntityRenderState> implements EntityRenderer4<T, S> {
 	// TODO everything else
 
 	@Shadow

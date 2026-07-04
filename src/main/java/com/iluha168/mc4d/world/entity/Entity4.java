@@ -36,10 +36,16 @@ public interface Entity4 {
 	void moveTowardsClosestSpace(double x, double y, double z, double w);
 
 	boolean teleportTo(ServerLevel level, double x, double y, double z, double w, Set<Relative> relatives, float newYRot, float newXRot, boolean resetCamera);
+	void dismountTo(double x, double y, double z, double w);
+	void teleportTo(double x, double y, double z, double w);
+	void teleportRelative(double dx, double dy, double dz, double dw);
 
 	int getBlockW();
 	double getW();
+	double getW(double progress);
+	double getRandomW(double spread);
 
 	void setPosRaw(double x, double y, double z, double w);
 
+	void lerpPositionAndRotationStep(int stepsToTarget, double targetX, double targetY, double targetZ, double targetW, double targetYRot, double targetXRot);
 }

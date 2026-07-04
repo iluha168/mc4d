@@ -54,14 +54,22 @@ public abstract class ChunkAccessMixin implements ChunkAccess4 {
 	private static Logger LOGGER;
 
 	@Shadow
-	public abstract int getMinY();
+	public int getMinY() {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
 
 	@Shadow
-	public abstract int getHeight();
+	public int getHeight() {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
 
 	@Shadow
 	@Final
 	public LevelChunkSection[] sections;
+
+	@Shadow
+	@Final
+	protected ChunkPos chunkPos;
 
 	@Overwrite
 	@Deprecated
