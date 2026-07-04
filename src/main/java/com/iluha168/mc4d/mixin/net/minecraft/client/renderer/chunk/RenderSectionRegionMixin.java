@@ -1,20 +1,26 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.renderer.chunk;
 
+import com.iluha168.mc4d.client.renderer.chunk.CompiledSectionMesh4;
 import com.iluha168.mc4d.client.renderer.chunk.RenderSectionRegion4;
 import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.level.ChunkPos4;
 import com.llamalad7.mixinextras.sugar.Local;
+import it.unimi.dsi.fastutil.floats.FloatArrayList;
+import it.unimi.dsi.fastutil.floats.FloatOpenHashSet;
 import net.minecraft.client.renderer.chunk.RenderSectionRegion;
 import net.minecraft.client.renderer.chunk.SectionCopy;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.world.level.ChunkPos;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.Arrays;
 
 @Mixin(RenderSectionRegion.class)
 class RenderSectionRegionMixin implements RenderSectionRegion4 {
@@ -25,6 +31,9 @@ class RenderSectionRegionMixin implements RenderSectionRegion4 {
 
 	@Unique private int minSectionW;
 	@Unique private boolean minSectionWNotSet;
+	@Unique private double cameraW;
+	@Unique private boolean cameraWNotSet;
+	@Unique private @Nullable FloatOpenHashSet wBoundaries;
 
 	@Override
 	public int minSectionW() {
@@ -38,12 +47,42 @@ class RenderSectionRegionMixin implements RenderSectionRegion4 {
 		this.minSectionWNotSet = false;
 	}
 
+	@Override
+	public double cameraW() {
+		if (this.cameraWNotSet)
+			throw Err4.field4missing("cameraW");
+		return this.cameraW;
+	}
+	@Override
+	public void setCameraW(double cameraW) {
+		this.cameraW = cameraW;
+		this.cameraWNotSet = false;
+	}
+
+	@Override
+	public void addWBoundaries(float[] wBoundaries) {
+		if (wBoundaries.length == 0)
+			return;
+		if (this.wBoundaries == null)
+			this.wBoundaries = new FloatOpenHashSet();
+		this.wBoundaries.addAll(FloatArrayList.wrap(wBoundaries));
+	}
+	@Override
+	public float[] collectedWBoundaries() {
+		if (this.wBoundaries == null)
+			return CompiledSectionMesh4.NO_W_BOUNDARIES;
+		final float[] collected = this.wBoundaries.toFloatArray();
+		Arrays.sort(collected);
+		return collected;
+	}
+
 	@Inject(
 		method = "<init>(Lnet/minecraft/client/multiplayer/ClientLevel;III[Lnet/minecraft/client/renderer/chunk/SectionCopy;Lit/unimi/dsi/fastutil/longs/Long2ObjectFunction;)V",
 		at = @At("TAIL")
 	)
 	void init(CallbackInfo ci) {
 		this.minSectionWNotSet = true;
+		this.cameraWNotSet = true;
 	}
 
 	@Redirect(method = "getBlockState", at = @At(

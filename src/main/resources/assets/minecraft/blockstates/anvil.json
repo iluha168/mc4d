@@ -1,0 +1,59 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": {
+        "w=6;10": "minecraft:block/anvil",
+        "w=4;12": "mc4d:block/anvil/anvil_dw_2",
+        "w=3;13": "mc4d:block/anvil/anvil_dw_3",
+        "w=2;14": "mc4d:block/anvil/anvil_dw_4",
+        "w=0;16": "mc4d:block/anvil/anvil_empty"
+      },
+      "y": 270
+    },
+    "facing=north": {
+      "model": {
+        "w=6;10": "minecraft:block/anvil",
+        "w=4;12": "mc4d:block/anvil/anvil_dw_2",
+        "w=3;13": "mc4d:block/anvil/anvil_dw_3",
+        "w=2;14": "mc4d:block/anvil/anvil_dw_4",
+        "w=0;16": "mc4d:block/anvil/anvil_empty"
+      },
+      "y": 180
+    },
+    "facing=south": {
+      "model": {
+        "w=6;10": "minecraft:block/anvil",
+        "w=4;12": "mc4d:block/anvil/anvil_dw_2",
+        "w=3;13": "mc4d:block/anvil/anvil_dw_3",
+        "w=2;14": "mc4d:block/anvil/anvil_dw_4",
+        "w=0;16": "mc4d:block/anvil/anvil_empty"
+      }
+    },
+    "facing=west": {
+      "model": {
+        "w=6;10": "minecraft:block/anvil",
+        "w=4;12": "mc4d:block/anvil/anvil_dw_2",
+        "w=3;13": "mc4d:block/anvil/anvil_dw_3",
+        "w=2;14": "mc4d:block/anvil/anvil_dw_4",
+        "w=0;16": "mc4d:block/anvil/anvil_empty"
+      },
+      "y": 90
+    },
+    "facing=ana": {
+      "model": {
+        "w=4;12": "mc4d:block/anvil/anvil_along_w",
+        "w=3;13": "mc4d:block/anvil/anvil_along_w_dw_4",
+        "w=2;14": "mc4d:block/anvil/anvil_along_w_dw_5",
+        "w=0;16": "mc4d:block/anvil/anvil_along_w_dw_6"
+      }
+    },
+    "facing=kata": {
+      "model": {
+        "w=4;12": "mc4d:block/anvil/anvil_along_w",
+        "w=3;13": "mc4d:block/anvil/anvil_along_w_dw_4",
+        "w=2;14": "mc4d:block/anvil/anvil_along_w_dw_5",
+        "w=0;16": "mc4d:block/anvil/anvil_along_w_dw_6"
+      }
+    }
+  }
+}

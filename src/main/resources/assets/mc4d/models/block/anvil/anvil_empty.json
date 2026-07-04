@@ -1,0 +1,45 @@
+{
+  "parent": "block/block",
+  "textures": {
+    "particle": "minecraft:block/anvil",
+    "body": "minecraft:block/anvil",
+    "top": "minecraft:block/anvil_top"
+  },
+  "display": {
+    "fixed": {
+      "rotation": [
+        0,
+        90,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    "on_shelf": {
+      "rotation": [
+        0,
+        90,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  "elements": []
+}

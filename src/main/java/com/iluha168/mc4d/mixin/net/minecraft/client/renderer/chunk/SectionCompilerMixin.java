@@ -1,11 +1,15 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.renderer.chunk;
 
 import com.iluha168.mc4d.MC4DClient;
+import com.iluha168.mc4d.client.renderer.chunk.CompiledSectionMesh4;
+import com.iluha168.mc4d.client.renderer.chunk.RenderSectionRegion4;
 import com.iluha168.mc4d.client.renderer.chunk.SectionCompiler4;
 import com.iluha168.mc4d.core.BlockPos4;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
 import net.minecraft.client.Minecraft;
@@ -22,8 +26,10 @@ import org.joml.Vector3fc;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(SectionCompiler.class)
 class SectionCompilerMixin implements SectionCompiler4 {
@@ -45,6 +51,10 @@ class SectionCompilerMixin implements SectionCompiler4 {
 		);
 	}
 
+	@Inject(method = "compile(Lnet/minecraft/core/SectionPos;Lnet/minecraft/client/renderer/chunk/RenderSectionRegion;Lcom/mojang/blaze3d/vertex/VertexSorting;Lnet/minecraft/client/renderer/SectionBufferBuilderPack;Ljava/util/List;)Lnet/minecraft/client/renderer/chunk/SectionCompiler$Results;", at = @At("HEAD"))
+	private void compile_cameraW(CallbackInfoReturnable<SectionCompiler.Results> cir, @Local(argsOnly = true, name = "region") RenderSectionRegion region) {
+		((RenderSectionRegion4) region).setCameraW(this.cameraW); // Just passing it through
+	}
 	@ModifyExpressionValue(method = "compile(Lnet/minecraft/core/SectionPos;Lnet/minecraft/client/renderer/chunk/RenderSectionRegion;Lcom/mojang/blaze3d/vertex/VertexSorting;Lnet/minecraft/client/renderer/SectionBufferBuilderPack;Ljava/util/List;)Lnet/minecraft/client/renderer/chunk/SectionCompiler$Results;", at = @At(
 		value = "INVOKE",
 		target = "Lnet/minecraft/core/SectionPos;origin()Lnet/minecraft/core/BlockPos;"
@@ -89,6 +99,12 @@ class SectionCompilerMixin implements SectionCompiler4 {
 			output.put(x, y, z, scale(quad, this.ghostBlockShrinkFactor), instance);
 		};
 	}
+	@ModifyReturnValue(method = "compile(Lnet/minecraft/core/SectionPos;Lnet/minecraft/client/renderer/chunk/RenderSectionRegion;Lcom/mojang/blaze3d/vertex/VertexSorting;Lnet/minecraft/client/renderer/SectionBufferBuilderPack;Ljava/util/List;)Lnet/minecraft/client/renderer/chunk/SectionCompiler$Results;", at = @At("RETURN"))
+	private SectionCompiler.Results compile_wBoundaries(SectionCompiler.Results results, @Local(argsOnly = true, name = "region") RenderSectionRegion region) {
+		// remember at which camera W mesh's W-ranged models change. See CompiledSectionMesh4.
+		SectionCompiler4.Results.as(results).setWBoundaries(((RenderSectionRegion4) region).collectedWBoundaries());
+		return results;
+	}
 
 	// --------------------------------------- NOT VANILLA+ ---------------------------------------
 	/** Scales quad using (0.5; 0.5; 0.5) as the origin. */
@@ -111,5 +127,19 @@ class SectionCompilerMixin implements SectionCompiler4 {
 			0.5F + (pos.y() - 0.5F) * scale,
 			0.5F + (pos.z() - 0.5F) * scale
 		);
+	}
+
+	@Mixin(SectionCompiler.Results.class)
+	static class ResultsMixin implements SectionCompiler4.Results {
+		@Unique private float[] wBoundaries = CompiledSectionMesh4.NO_W_BOUNDARIES;
+
+		@Override
+		public float[] wBoundaries() {
+			return this.wBoundaries;
+		}
+		@Override
+		public void setWBoundaries(float[] wBoundaries) {
+			this.wBoundaries = wBoundaries;
+		}
 	}
 }

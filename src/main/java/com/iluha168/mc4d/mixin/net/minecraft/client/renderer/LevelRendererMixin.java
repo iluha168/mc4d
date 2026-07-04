@@ -4,8 +4,11 @@ import com.iluha168.mc4d.MC4DClient;
 import com.iluha168.mc4d.client.renderer.LevelRenderer4;
 import com.iluha168.mc4d.client.renderer.ShapeRenderer4;
 import com.iluha168.mc4d.client.renderer.ViewArea4;
+import com.iluha168.mc4d.client.renderer.block.dispatch.Variant4;
+import com.iluha168.mc4d.client.renderer.chunk.CompiledSectionMesh4;
 import com.iluha168.mc4d.client.renderer.entity.EntityRenderDispatcher4;
 import com.iluha168.mc4d.client.renderer.entity.state.EntityRenderState4;
+import com.iluha168.mc4d.core.SectionPos4;
 import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.entity.Entity4;
@@ -26,6 +29,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.ViewArea;
+import net.minecraft.client.renderer.chunk.SectionRenderDispatcher;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
@@ -44,6 +48,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 @Mixin(LevelRenderer.class)
 abstract
 class LevelRendererMixin implements LevelRenderer4 {
@@ -57,10 +64,13 @@ class LevelRendererMixin implements LevelRenderer4 {
 	@Unique private int lastCameraSectionW;
 	@Unique private double lastCameraW;
 	@Unique private boolean lastNeighbouringSliceRendererEnabled;
+	/** Compiled sections whose mesh contains W-sliced models. See {@link CompiledSectionMesh4}. */
+	@Unique private final Set<SectionRenderDispatcher.RenderSection> wSlicedSections = ConcurrentHashMap.newKeySet();
 
 	@Inject(method = "setLevel", at = @At("HEAD"))
 	void setLevel(@Nullable ClientLevel level, CallbackInfo ci) {
 		this.lastCameraSectionW = Integer.MIN_VALUE;
+		this.wSlicedSections.clear();
 	}
 
 	@Definition(id = "lastCameraSectionX", field = "Lnet/minecraft/client/renderer/LevelRenderer;lastCameraSectionX:I")
@@ -94,16 +104,38 @@ class LevelRendererMixin implements LevelRenderer4 {
 				false
 			);
 		}
+		final double cameraBlockW = Math.floor(cameraPosW);
+		final double lastCameraBlockW = Math.floor(this.lastCameraW);
 		// Ideally we should update all sections when camera moves, but that is way too taxing on performance.
 		if (enabled != this.lastNeighbouringSliceRendererEnabled || (enabled
 			? Math.floor(cameraPosW * 4.0) != Math.floor(this.lastCameraW * 4.0)
-			: Math.floor(cameraPosW) != Math.floor(this.lastCameraW)
+			: cameraBlockW != lastCameraBlockW // IMPORTANT UPDATE when crossing block W boundary, EVEN OUTSIDE DEBUG MODE.
 		)) {
 			//noinspection DataFlowIssue
 			((ViewArea4) this.viewArea).setAllSectionWDirty(SectionPos.blockToSectionCoord(cameraPosW), true);
 		}
+
+		// Re-mesh the sections whose W-ranged models change their selected 3D model between the last and the current camera W.
+		if (cameraPosW != this.lastCameraW && cameraBlockW == lastCameraBlockW) {
+			final float minLocalW = (float) ((Math.min(cameraPosW, this.lastCameraW) - cameraBlockW) * Variant4.W_SCALE);
+			final float maxLocalW = (float) ((Math.max(cameraPosW, this.lastCameraW) - cameraBlockW) * Variant4.W_SCALE);
+			final int cameraSectionW = SectionPos.posToSectionCoord(cameraPosW);
+			this.wSlicedSections.removeIf(section -> {
+				if (!(section.getSectionMesh() instanceof CompiledSectionMesh4 mesh) || mesh.wBoundaries().length == 0)
+					return true; // The mesh was replaced by one without W-ranged models.
+				if (SectionPos4.w(section.getSectionNode()) == cameraSectionW && CompiledSectionMesh4.anyWBoundaryIn(mesh.wBoundaries(), minLocalW, maxLocalW))
+					section.setDirty(false);
+				return false;
+			});
+		}
 		this.lastCameraW = cameraPosW;
 		this.lastNeighbouringSliceRendererEnabled = enabled;
+	}
+
+	@Inject(method = "addRecentlyCompiledSection", at = @At("TAIL"))
+	void addRecentlyCompiledSection(SectionRenderDispatcher.RenderSection section, CallbackInfo ci) {
+		if (section.getSectionMesh() instanceof CompiledSectionMesh4 mesh && mesh.wBoundaries().length > 0)
+			this.wSlicedSections.add(section);
 	}
 
 	@Definition(id = "camZ", local = @Local(type = double.class, name = "camZ"))
