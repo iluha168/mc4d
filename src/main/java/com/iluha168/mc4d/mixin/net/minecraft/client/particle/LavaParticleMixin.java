@@ -1,12 +1,14 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.particle;
 
-import com.iluha168.mc4d.client.particle.BaseAshSmokeParticle4;
+import com.iluha168.mc4d.client.particle.Particle4;
 import com.iluha168.mc4d.client.particle.ParticleProvider4;
 import com.iluha168.mc4d.util.Err4;
+import com.iluha168.mc4d.world.level.LevelAccessor4;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.particle.LavaParticle;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.SmokeParticle;
 import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.RandomSource;
 import org.jspecify.annotations.Nullable;
@@ -14,14 +16,30 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(SmokeParticle.class)
-class SmokeParticleMixin {
-	@Mixin(SmokeParticle.Provider.class)
+@Mixin(LavaParticle.class)
+abstract class LavaParticleMixin extends SingleQuadParticleMixin {
+	@Override
+	public void init_finish(double w, double wa) {
+		super.init_finish(w, 0.0);
+		this.wd *= 0.8F;
+	}
+
+	@Redirect(method = "tick", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/client/multiplayer/ClientLevel;addParticle(Lnet/minecraft/core/particles/ParticleOptions;DDDDDD)V"
+	))
+	void tick(ClientLevel instance, ParticleOptions particle, double x, double y, double z, double xd, double yd, double zd) {
+		((LevelAccessor4) instance).addParticle(particle, x, y, z, this.w(), xd, yd, zd, this.wd);
+	}
+
+	@Mixin(LavaParticle.Provider.class)
 	static class ProviderMixin implements ParticleProvider4<SimpleParticleType> {
 		@Shadow
 		@Final
-		private SpriteSet sprites;
+		private SpriteSet sprite;
 
 		@Overwrite
 		@Deprecated
@@ -32,9 +50,8 @@ class SmokeParticleMixin {
 		}
 		@Override
 		public @Nullable Particle createParticle(SimpleParticleType options, ClientLevel level, double x, double y, double z, double w, double xAux, double yAux, double zAux, double wAux, RandomSource random) {
-			SmokeParticle particle = new SmokeParticle(level, x, y, z, xAux, yAux, zAux, 1.0F, this.sprites);
-			//noinspection DataFlowIssue
-			((BaseAshSmokeParticle4) particle).init_finish(w, 0.1F, wAux);
+			LavaParticle particle = new LavaParticle(level, x, y, z, this.sprite.get(random));
+			((Particle4) particle).init_finish(w, 0.0);
 			return particle;
 		}
 	}

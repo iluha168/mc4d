@@ -17,11 +17,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArgs;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
@@ -31,12 +27,13 @@ public enum DirectionMixin implements Direction4 {
 	KATA(6, 7, 4, "kata", Direction.AxisDirection.NEGATIVE, Direction4.Axis.W, Vec4i.from(0, 0, 0, -1)),
 	ANA (7, 6, 5, "ana" , Direction.AxisDirection.POSITIVE, Direction4.Axis.W, Vec4i.from(0, 0, 0, 1));
 
-	@Inject(method = "<clinit>", at = @At("TAIL"))
-	private static void normal(CallbackInfo ci) {
-		for (Direction direction : Direction.values()) {
-			if (direction.getAxis() == Direction4.Axis.W) continue;
-			Vec4i.setW(direction.getUnitVec3i(), 0);
-		}
+	@ModifyArg(method = "<init>", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/phys/Vec3;atLowerCornerOf(Lnet/minecraft/core/Vec3i;)Lnet/minecraft/world/phys/Vec3;"
+	))
+	private Vec3i init(Vec3i normal, @Local(argsOnly = true, name = "axis") Direction.Axis axis) {
+		if (axis != Direction4.Axis.W) Vec4i.setW(normal, 0);
+		return normal;
 	}
 
 	@Shadow

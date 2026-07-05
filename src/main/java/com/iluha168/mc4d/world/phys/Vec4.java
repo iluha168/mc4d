@@ -68,6 +68,10 @@ public class Vec4 extends Vec3 implements Position4 {
 		this.w = w;
 	}
 
+	public Vec4(Vec3i vec) {
+		this(vec.getX(), vec.getY(), vec.getZ(), Vec4i.getW(vec));
+	}
+
 	/**
 	 * Backwards compatibility helper. Adds 4th coordinate to a 3D/4D vector, if it does not have one.
 	 */

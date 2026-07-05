@@ -12,10 +12,13 @@ import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.lib.apache.commons.ArrayUtils;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
+import net.minecraft.core.SectionPos;
+import net.minecraft.core.Vec3i;
 import net.minecraft.network.protocol.game.ClientboundSetChunkCacheCenterPacket;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ChunkTrackingView;
@@ -36,8 +39,6 @@ import java.util.concurrent.CompletableFuture;
 
 @Mixin(ChunkMap.class)
 class ChunkMapMixin implements ChunkMap4 {
-	// TODO other methods
-
 	@Overwrite
 	@Deprecated
 	public boolean isChunkTracked(ServerPlayer player, int chunkX, int chunkZ) {
@@ -75,7 +76,6 @@ class ChunkMapMixin implements ChunkMap4 {
 	int getChunkRangeFuture_chunkCount(int x) {
 		return MathHelpers.cube(x);
 	}
-
 	@Definition(id = "x", local = @Local(type = int.class, name = "x"))
 	@Definition(id = "range", local = @Local(type = int.class, name = "range", argsOnly = true))
 	@Expression("x = @(-range)")
@@ -84,7 +84,6 @@ class ChunkMapMixin implements ChunkMap4 {
 		w.set(negRange);
 		return negRange;
 	}
-
 	// This does apply properly, IDE is lying
 	@Definition(id = "x", local = @Local(type = int.class, name = "x"))
 	@Expression("x = x + @(1)")
@@ -95,7 +94,6 @@ class ChunkMapMixin implements ChunkMap4 {
 		w.set(-range);
 		return 1;
 	}
-
 	@Definition(id = "distance", local = @Local(type = int.class, name = "distance"))
 	@Definition(id = "max", method = "Ljava/lang/Math;max(II)I")
 	@Expression("distance = @(max(?, ?))")
@@ -103,7 +101,6 @@ class ChunkMapMixin implements ChunkMap4 {
 	int getChunkRangeFuture_distance(int distXZ, @Share("w") LocalIntRef w) {
 		return Math.max(distXZ, Math.abs(w.get()));
 	}
-
 	@Redirect(method = "getChunkRangeFuture", at = @At(
 		value = "INVOKE",
 		target = "Lnet/minecraft/world/level/ChunkPos;pack(II)J"
@@ -136,7 +133,26 @@ class ChunkMapMixin implements ChunkMap4 {
 		return ChunkPos4.pack(x, z, ChunkPos4.as(pos).w());
 	}
 
-	// TODO other methods
+	// TODO dumpChunks
+
+	@Redirect(method = "anyPlayerCloseEnoughTo", at = @At(
+		value = "NEW",
+		target = "(Lnet/minecraft/core/Vec3i;)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 anyPlayerCloseEnoughTo(Vec3i vec) {
+		return new Vec4(vec);
+	}
+
+	@ModifyReturnValue(method = "euclideanDistanceSquared", at = @At("RETURN"))
+	private static double euclideanDistanceSquared(
+		double original,
+		@Local(argsOnly = true, name = "chunkPos") ChunkPos chunkPos,
+		@Local(argsOnly = true, name = "pos") Vec3 pos
+	) {
+		final double wPos = SectionPos.sectionToBlockCoord(ChunkPos4.as(chunkPos).w(), 8);
+		final double wd = wPos - ((Vec4) pos).w;
+		return original + wd * wd;
+	}
 
 	@ModifyExpressionValue(method = "applyChunkTrackingView", at = @At(
 		value = "NEW",
@@ -146,8 +162,6 @@ class ChunkMapMixin implements ChunkMap4 {
 		((ClientboundSetChunkCacheCenterPacket4) original).setW(ChunkPos4.as(to.center()).w());
 		return original;
 	}
-
-	// TODO other methods
 
 	@Redirect(method = "getPlayers", at = @At(
 		value = "INVOKE",
@@ -171,8 +185,6 @@ class ChunkMapMixin implements ChunkMap4 {
 	CompletableFuture<?> waitForLightBeforeSending(ThreadedLevelLightEngine lightEngine, int chunkX, int chunkZ, @Local(argsOnly = true, name = "chunkPos") ChunkPos chunkPos) {
 		return ((ThreadedLevelLightEngine4) lightEngine).waitForPendingTasks(chunkX, chunkZ, ChunkPos4.as(chunkPos).w());
 	}
-
-	// TODO other methods
 
 	@Mixin(targets = "net.minecraft.server.level.ChunkMap$TrackedEntity")
 	static class TrackedEntityMixin {
