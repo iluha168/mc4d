@@ -63,6 +63,8 @@
     "net.minecraft.network.protocol.game.VecDeltaCodecMixin",
     "net.minecraft.server.MinecraftServerMixin",
     "net.minecraft.server.MinecraftServerMixin$ChunkLoadStatusViewMixin",
+    "net.minecraft.server.commands.FillCommandMixin",
+    "net.minecraft.server.commands.FillCommandMixin$ModeMixin",
     "net.minecraft.server.commands.ForceLoadCommandMixin",
     "net.minecraft.server.commands.PlaySoundCommandMixin",
     "net.minecraft.server.commands.SummonCommandMixin",
