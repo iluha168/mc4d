@@ -209,7 +209,13 @@ public abstract class LivingEntityMixin extends EntityMixin implements LivingEnt
 		return new Vec4(x, y, z, 0);
 	}
 
-	// TODO jumpInLiquid
+	@Redirect(method = "jumpInLiquid", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/phys/Vec3;add(DDD)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 jumpInLiquid(Vec3 instance, double x, double y, double z) {
+		return ((Vec4) instance).add(x, y, z, z);
+	}
 
 	@Redirect(method = "travelInAir", at = @At(
 		value = "INVOKE",
@@ -232,7 +238,20 @@ public abstract class LivingEntityMixin extends EntityMixin implements LivingEnt
 		instance.setDeltaMovement(new Vec4(dx, dy, dz, ((Vec4) movement).w * friction));
 	}
 
-	// TODO travelInWater
+	@Redirect(method = "travelInWater", at = @At(
+		value = "NEW",
+		target = "(DDD)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 travelInWater(double x, double y, double z, @Local(name = "ladderMovement") Vec3 ladderMovement) {
+		return new Vec4(x, y, z, ((Vec4) ladderMovement).w);
+	}
+	@Redirect(method = "travelInWater", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/phys/Vec3;multiply(DDD)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 travelInWater(Vec3 instance, double xScale, double yScale, double zScale) {
+		return ((Vec4) instance).multiply(xScale, yScale, zScale, zScale);
+	}
 
 	@Redirect(method = "travelInLava", at = @At(
 		value = "INVOKE",
@@ -249,8 +268,29 @@ public abstract class LivingEntityMixin extends EntityMixin implements LivingEnt
 		return ((Vec4) instance).add(x, y, z, z);
 	}
 
-	// TODO jumpOutOfFluid
-	// TODO floatInWaterWhileRidden
+	@Redirect(method = "jumpOutOfFluid", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/LivingEntity;isFree(DDD)Z"
+	))
+	boolean jumpOutOfFluid_isFree(LivingEntity instance, double x, double y, double z, @Local(name = "movement") Vec3 movement) {
+		return ((Entity4) instance).isFree(x, y, z, ((Vec4) movement).w);
+	}
+	@Redirect(method = "jumpOutOfFluid", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/LivingEntity;setDeltaMovement(DDD)V"
+	))
+	void jumpOutOfFluid_setDeltaMovement(LivingEntity instance, double x, double y, double z, @Local(name = "movement") Vec3 movement) {
+		instance.setDeltaMovement(new Vec4(x, y, z, ((Vec4) movement).w));
+	}
+
+	@Redirect(method = "floatInWaterWhileRidden", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/phys/Vec3;add(DDD)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 floatInWaterWhileRidden(Vec3 instance, double x, double y, double z) {
+		return ((Vec4) instance).add(x, y, z, z);
+	}
+
 	// TODO updateFallFlyingMovement
 
 	@ModifyExpressionValue(method = "travelRidden", at = @At(

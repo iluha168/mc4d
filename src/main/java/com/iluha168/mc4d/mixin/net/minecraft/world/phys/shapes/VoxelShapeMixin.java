@@ -1,5 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.phys.shapes;
 
+import com.iluha168.mc4d.core.AxisCycle4;
 import com.iluha168.mc4d.core.Direction4;
 import com.iluha168.mc4d.core.Position4;
 import com.iluha168.mc4d.core.Vec4i;
@@ -16,9 +17,11 @@ import net.minecraft.core.AxisCycle;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
+import net.minecraft.util.Mth;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.*;
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -180,8 +183,39 @@ class VoxelShapeMixin implements VoxelShape4 {
 		) -> list.add(new AABB4(x1, y1, z1, w1, x2, y2, z2, w2)));
 	}
 
-	// TODO min
-	// TODO max
+	@Overwrite
+	@Deprecated
+	public double min(Direction.Axis aAxis, double b, double c) {
+		throw Err4.arguments3("VoxelShape4#min");
+	}
+	@Override
+	public double min(Direction.Axis aAxis, double b, double c, double d) {
+		final Direction.Axis bAxis = AxisCycle.FORWARD.cycle(aAxis);
+		final Direction.Axis cAxis = AxisCycle4.TRANSPOSE.cycle(aAxis);
+		final Direction.Axis dAxis = AxisCycle.BACKWARD.cycle(aAxis);
+		final int bi = this.findIndex(bAxis, b);
+		final int ci = this.findIndex(cAxis, c);
+		final int di = this.findIndex(dAxis, d);
+		final int i = ((DiscreteVoxelShape4) this.shape).firstFull(aAxis, bi, ci, di);
+		return i >= this.shape.getSize(aAxis) ? Double.POSITIVE_INFINITY : this.get(aAxis, i);
+	}
+
+	@Overwrite
+	@Deprecated
+	public double max(Direction.Axis aAxis, double b, double c) {
+		throw Err4.arguments3("VoxelShape4#max");
+	}
+	@Override
+	public double max(Direction.Axis aAxis, double b, double c, double d) {
+		final Direction.Axis bAxis = AxisCycle.FORWARD.cycle(aAxis);
+		final Direction.Axis cAxis = AxisCycle4.TRANSPOSE.cycle(aAxis);
+		final Direction.Axis dAxis = AxisCycle.BACKWARD.cycle(aAxis);
+		final int bi = this.findIndex(bAxis, b);
+		final int ci = this.findIndex(cAxis, c);
+		final int di = this.findIndex(dAxis, d);
+		final int i = ((DiscreteVoxelShape4) this.shape).lastFull(aAxis, bi, ci, di);
+		return i <= 0 ? Double.NEGATIVE_INFINITY : this.get(aAxis, i);
+	}
 
 	@Redirect(method = "clip", at = @At(
 		value = "INVOKE",
@@ -199,7 +233,27 @@ class VoxelShapeMixin implements VoxelShape4 {
 		return ((DiscreteVoxelShape4) shape).isFullWide(x, y, z, w);
 	}
 
-	// TODO closestPointTo
+	@Redirect(method = "closestPointTo", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/phys/shapes/VoxelShape;forAllBoxes(Lnet/minecraft/world/phys/shapes/Shapes$DoubleLineConsumer;)V"
+	))
+	void closestPointTo(
+		VoxelShape instance, Shapes.DoubleLineConsumer consumer,
+		@Local(argsOnly = true, name = "point") Vec3 point,
+		@Local(name = "closest") MutableObject<Vec3> closest
+	) {
+		Vec4 point4 = (Vec4) point;
+		((VoxelShape4) instance).forAllBoxes((x1, y1, z1, w1, x2, y2, z2, w2) -> {
+			final double x = Mth.clamp(point4.x, x1, x2);
+			final double y = Mth.clamp(point4.y, y1, y2);
+			final double z = Mth.clamp(point4.z, z1, z2);
+			final double w = Mth.clamp(point4.w, w1, w2);
+			Vec3 currentClosest = closest.get();
+			if (currentClosest == null || point4.distanceToSqr(x, y, z, w) < point.distanceToSqr(currentClosest)) {
+				closest.setValue(new Vec4(x, y, z, w));
+			}
+		});
+	}
 
 	@ModifyConstant(method = "getFaceShape", constant = @Constant(intValue = 6))
 	int getFaceShape(int constant) {

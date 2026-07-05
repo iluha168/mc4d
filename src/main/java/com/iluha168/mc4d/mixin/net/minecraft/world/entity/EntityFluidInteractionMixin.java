@@ -5,6 +5,7 @@ import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.entity.Entity4;
 import com.iluha168.mc4d.world.level.LevelReader4;
 import com.iluha168.mc4d.world.phys.AABB4;
+import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
@@ -21,6 +22,8 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Unique;
@@ -80,7 +83,6 @@ class EntityFluidInteractionMixin {
 	BlockPos.MutableBlockPos update_set(BlockPos.MutableBlockPos mutablePos, int x, int y, int z, @Share("w") LocalIntRef w) {
 		return ((BlockPos4.MutableBlockPos) mutablePos).set(x, y, z, w.get());
 	}
-
 	@Definition(id = "z", local = @Local(type = int.class, name = "z"))
 	@Definition(id = "eyeBlockZ", local = @Local(type = int.class, name = "eyeBlockZ"))
 	@Expression("z == eyeBlockZ")
@@ -128,5 +130,32 @@ class EntityFluidInteractionMixin {
 		return hasFluid;
 	}
 
-	// TODO Tracker
+	@Mixin(targets = "net.minecraft.world.entity.EntityFluidInteraction$Tracker")
+	static class TrackerMixin {
+		@Redirect(method = "<init>", at = @At(
+			value = "FIELD",
+			target = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;",
+			opcode = Opcodes.GETSTATIC
+		))
+		Vec3 init() {
+			return Vec4.ZERO;
+		}
+
+		@Redirect(method = "reset", at = @At(
+			value = "FIELD",
+			target = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;",
+			opcode = Opcodes.GETSTATIC
+		))
+		Vec3 reset() {
+			return Vec4.ZERO;
+		}
+
+		@Definition(id = "abs", method = "Ljava/lang/Math;abs(D)D")
+		@Definition(id = "z", field = "Lnet/minecraft/world/phys/Vec3;z:D")
+		@Expression("abs(?.z) < 0.003")
+		@ModifyExpressionValue(method = "applyCurrentTo", at = @At("MIXINEXTRAS:EXPRESSION"))
+		boolean applyCurrentTo(boolean original, @Local(name = "oldMovement") Vec3 oldMovement) {
+			return original && Math.abs(((Vec4) oldMovement).w) < 0.003;
+		}
+	}
 }
