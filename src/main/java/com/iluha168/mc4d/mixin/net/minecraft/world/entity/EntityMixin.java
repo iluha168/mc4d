@@ -19,6 +19,7 @@ import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -761,7 +762,10 @@ public abstract class EntityMixin implements Entity4 {
 		}
 	}
 
-	// TODO? calculateViewVector
+	@ModifyReturnValue(method = "calculateViewVector", at = @At("RETURN"))
+	Vec3 calculateViewVector(Vec3 original) {
+		return Vec4.of(original, 0);
+	}
 
 	@Redirect(method = "getEyePosition()Lnet/minecraft/world/phys/Vec3;", at = @At(
 		value = "NEW",

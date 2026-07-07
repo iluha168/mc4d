@@ -10,9 +10,9 @@ The goal of this mod is to make that dimension act identical to the existing 3.
 > **Not** to be confused with **time** from [General Relativity](https://en.wikipedia.org/wiki/General_relativity).
 > "Spatial" means a dimension of space. I hate that I have to say this.
 
-## Features
+## 4D Features
 - The **4th axis**, labeled "**W**". It is the 3rd **horizontal** axis.
-- 2 new directions: "**ana**" for W+ and "**kata**" for W-. Remember the south-east rule? It is _ana_-south-east now.
+- 2 new directions: "**ana**" for W+ and "**kata**" for W-. Remember the south-east rule? It is _anth_-south-east now.
 - All entities, blocks and chunk sections have **4D positions**.
 - **Horizontal** sizes are capped at `±100000` in **all 3 directions**, compared to vanilla's `±30000000` in 2 directions.
   - This means vanilla world has area of `36e14` square meters, but in this mod the area is `8e15` cubic meters.
@@ -23,11 +23,24 @@ The goal of this mod is to make that dimension act identical to the existing 3.
 - All entries in the **F3 debug HUD** show 4 dimensions instead of 3.
 - A **4D particle engine**. It is rare when a particle intersects your camera's 3D world slice, use **debug renderers in F3+F6** to see 1 slice further.
 - A **4D sound engine**. Sounds outside your 3D slice do not have a definite "left" or "right", they are played as always-centered stereo audio with a variable angle (spatial spread) instead.
+- **4D block models**. Kind of. Chooses different 3D models based on camera's current location inside the slice.
 
 > [!CAUTION]
 > 3D saves are not compatible with 4D saves, in both directions. Create a new world after installing the mod.
 
-### F3+F6
+## Camera offset keybind
+
+Allows you to offset the camera horizontally, by up to 1 block. This way you can **build in neighboring 3D slices** of the world without leaving your own.
+
+Movement controls become offset controls while the keybind is held. In terms of movement, **you can only shift and jump while peeking**.
+
+**Hitting against a block outside your slice counts as an interfaction with the kenth/anth face of that block.**
+Unless you press shift.
+
+For example, in vanilla, pressing "Use" against a north face, while holding a block item, places that block to the south of the target.
+Similarly, using a block against an anth face places it to the kenth.
+
+## F3+F6
 Your client renders a 2D image of a 3D slice of the 4D world.
 
 To see 1 block further along the axis perpendicular to that 3D slice, scroll down in the _Debug Options_ menu for `mc4d:neighbouring_slice` entries.

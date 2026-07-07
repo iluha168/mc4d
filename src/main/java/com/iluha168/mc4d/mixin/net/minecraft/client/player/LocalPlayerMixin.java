@@ -1,5 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.player;
 
+import com.iluha168.mc4d.client.Camera4;
 import com.iluha168.mc4d.core.BlockPos4;
 import com.iluha168.mc4d.core.Direction4;
 import com.iluha168.mc4d.core.Position4;
@@ -7,6 +8,7 @@ import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.math.MathHelpers;
 import com.iluha168.mc4d.mixin.net.minecraft.world.entity.player.PlayerMixin;
 import com.iluha168.mc4d.util.Err4;
+import com.iluha168.mc4d.world.entity.Entity4;
 import com.iluha168.mc4d.world.entity.player.Input4;
 import com.iluha168.mc4d.world.level.Level4;
 import com.iluha168.mc4d.world.phys.AABB4;
@@ -30,11 +32,10 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.player.Input;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec2;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.*;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.spongepowered.asm.mixin.Mixin;
@@ -381,24 +382,72 @@ abstract class LocalPlayerMixin extends PlayerMixin {
 
 	// TODO getRopeHoldPosition?
 
+	// TODO AttackRange#getClosesetHit does not respect the camera offset
+
+	@ModifyExpressionValue(method = "raycastHitResult", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;getEyePosition(F)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 raycastHitResult(Vec3 eyePosition) {
+		return eyePosition.add(Camera4.getMainCameraOffset());
+	}
+
+	@ModifyExpressionValue(method = "pick", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;getEyePosition(F)Lnet/minecraft/world/phys/Vec3;"
+	))
+	private static Vec3 pick_from(Vec3 original) {
+		return original.add(Camera4.getMainCameraOffset());
+	}
+	@Redirect(method = "pick", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;pick(DFZ)Lnet/minecraft/world/phys/HitResult;"
+	))
+	private static HitResult pick_blockHitResult(Entity cameraEntity, double range, float partialTicks, boolean withLiquids) {
+		Vec4 from = ((Vec4) cameraEntity.getEyePosition(partialTicks)).add(Camera4.getMainCameraOffset());
+		Vec4 viewVector = (Vec4) cameraEntity.getViewVector(partialTicks);
+		Vec4 to = from.add(viewVector.scale(range));
+		BlockHitResult hit = cameraEntity.level().clip(new ClipContext(from, to, ClipContext.Block.OUTLINE, withLiquids ? ClipContext.Fluid.ANY : ClipContext.Fluid.NONE, cameraEntity));
+
+		if (hit.getType() != HitResult.Type.BLOCK || cameraEntity.isShiftKeyDown()) {
+			// Return the 3D hit if sneaking.
+			return hit;
+		}
+		int hitBlockW = Vec4i.getW(hit.getBlockPos());
+		int realCameraBlockW = ((Entity4) cameraEntity).getBlockW();
+		if (hitBlockW == realCameraBlockW) {
+			return hit;
+		}
+
+		// Interpret all hits to other 3D slices as against either kata or ana face of the block.
+		// TODO remove when 4D renderer
+		return hit.withDirection(hitBlockW > realCameraBlockW ? Direction4.KATA : Direction4.ANA);
+	}
 	@Redirect(method = "pick", at = @At(
 		value = "INVOKE",
 		target = "Lnet/minecraft/world/phys/Vec3;add(DDD)Lnet/minecraft/world/phys/Vec3;"
 	))
-	private static Vec3 pick(
+	private static Vec3 pick_to(
 		Vec3 from, double x, double y, double z,
 		@Local(name = "direction") Vec3 direction,
 		@Local(name = "maxDistance") double maxDistance
 	) {
-		double w = ((Position4) direction).w() * maxDistance;
+		final double w = ((Vec4) direction).w * maxDistance;
 		return ((Vec4) from).add(x, y, z, w);
+	}
+	@ModifyExpressionValue(method = "pick", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;getBoundingBox()Lnet/minecraft/world/phys/AABB;"
+	))
+	private static AABB pick_box(AABB original) {
+		return original.move(Camera4.getMainCameraOffset());
 	}
 	@Redirect(method = "pick", at = @At(
 		value = "INVOKE",
 		target = "Lnet/minecraft/world/phys/AABB;inflate(DDD)Lnet/minecraft/world/phys/AABB;"
 	))
-	private static AABB pick(AABB instance, double xAdd, double yAdd, double zAdd) {
-		return instance.inflate(xAdd);
+	private static AABB pick_boxInflate(AABB instance, double xAdd, double yAdd, double zAdd) {
+		return ((AABB4) instance).inflate(xAdd, yAdd, zAdd, zAdd);
 	}
 
 	@Redirect(method = "filterHitResult", at = @At(

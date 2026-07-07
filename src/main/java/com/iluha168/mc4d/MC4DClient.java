@@ -36,6 +36,7 @@ public class MC4DClient {
 
     public static final KeyMapping keyAna = new KeyMapping("key.ana", -1, KeyMapping.Category.MOVEMENT);
     public static final KeyMapping keyKata = new KeyMapping("key.kata", -1, KeyMapping.Category.MOVEMENT);
+    public static final KeyMapping keyCameraOffset = new KeyMapping("key.camera_offset", -1, KeyMapping.Category.GAMEPLAY);
 
     public MC4DClient() {
     }
@@ -44,5 +45,6 @@ public class MC4DClient {
     private static void registerBindings(RegisterKeyMappingsEvent event) {
         event.register(keyAna);
         event.register(keyKata);
+        event.register(keyCameraOffset);
     }
 }
