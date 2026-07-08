@@ -1,8 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.network;
 
 import com.iluha168.mc4d.world.phys.Vec4;
-import com.llamalad7.mixinextras.expression.Definition;
-import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
@@ -39,9 +37,11 @@ class LpVec3Mixin {
 		return new Vec4(x, y, z, input.readDouble()); // Who needs compression when I got laziness
 	}
 
-	@Definition(id = "chessboardLength", local = @Local(type = double.class, name = "chessboardLength"))
-	@Expression("@(chessboardLength) < ?")
-	@ModifyExpressionValue(method = "write", at = @At("MIXINEXTRAS:EXPRESSION"))
+	@ModifyExpressionValue(method = "write", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/util/Mth;absMax(DD)D",
+		ordinal = 1
+	))
 	private static double write_ZERO(
 		double chessboardLength3,
 		@Local(argsOnly = true, name = "value") Vec3 value,
