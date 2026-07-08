@@ -31,7 +31,7 @@ import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ChunkGenerator.class)
-abstract class ChunkGeneratorMixin implements ChunkGenerator4 {
+public abstract class ChunkGeneratorMixin implements ChunkGenerator4 {
 	// TODO findNearestMapStructure
 	// TODO getNearestGeneratedStructure
 	// TODO getNearestGeneratedStructure
@@ -140,9 +140,6 @@ abstract class ChunkGeneratorMixin implements ChunkGenerator4 {
 	boolean createReferences_intersects(BoundingBox instance, int minX, int minZ, int maxX, int maxZ, @Share("targetBlockW") LocalIntRef targetBlockW) {
 		return ((BoundingBox4) instance).intersects(minX, minZ, targetBlockW.get(), maxX, maxZ, targetBlockW.get() + 15);
 	}
-
-	@Override
-	public abstract int getBaseHeight(int x, int z, int w, final Heightmap.Types type, final LevelHeightAccessor heightAccessor, final RandomState randomState);
 
 	@Overwrite
 	@Deprecated

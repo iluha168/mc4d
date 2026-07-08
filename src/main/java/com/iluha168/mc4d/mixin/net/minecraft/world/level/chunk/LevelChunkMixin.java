@@ -5,6 +5,7 @@ import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.level.ChunkPos4;
 import com.iluha168.mc4d.world.level.chunk.ChunkSource4;
 import com.iluha168.mc4d.world.level.chunk.LevelChunkSection4;
+import com.iluha168.mc4d.world.level.levelgen.DebugLevelSource4;
 import com.iluha168.mc4d.world.level.levelgen.Heightmap4;
 import com.iluha168.mc4d.world.level.lighting.ChunkSkyLightSources4;
 import com.llamalad7.mixinextras.expression.Definition;
@@ -42,7 +43,13 @@ class LevelChunkMixin extends ChunkAccessMixin {
 	void getBlockState(BlockPos pos, CallbackInfoReturnable<BlockState> cir, @Share("w") LocalIntRef w) {
 		w.set(Vec4i.getW(pos));
 	}
-	// TODO getBlockState DebugLevelSource
+	@Redirect(method = "getBlockState", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/level/levelgen/DebugLevelSource;getBlockStateFor(II)Lnet/minecraft/world/level/block/state/BlockState;"
+	))
+	BlockState getBlockState_DebugLevelSource(int worldX, int worldZ, @Share("w") LocalIntRef w) {
+		return DebugLevelSource4.getBlockStateFor(worldX, worldZ, w.get());
+	}
 	@Redirect(method = "getBlockState", at = @At(
 		value = "INVOKE",
 		target = "Lnet/minecraft/world/level/chunk/LevelChunkSection;getBlockState(III)Lnet/minecraft/world/level/block/state/BlockState;"

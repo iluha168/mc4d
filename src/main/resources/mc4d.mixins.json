@@ -200,6 +200,7 @@
     "net.minecraft.world.level.entity.EntitySectionStorageMixin",
     "net.minecraft.world.level.gameevent.GameEventDispatcherMixin",
     "net.minecraft.world.level.gamerules.GameRulesMixin",
+    "net.minecraft.world.level.levelgen.DebugLevelSourceMixin",
     "net.minecraft.world.level.levelgen.DensityFunctionMixin",
     "net.minecraft.world.level.levelgen.DensityFunctionMixin$NoiseHolderMixin",
     "net.minecraft.world.level.levelgen.DensityFunctionMixin$SinglePointContextMixin",
