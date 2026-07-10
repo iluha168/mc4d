@@ -13,6 +13,7 @@ import net.minecraft.core.SectionPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -73,9 +74,12 @@ class ClientboundLevelChunkPacketDataMixin implements ClientboundLevelChunkPacke
 		byte read(RegistryFriendlyByteBuf instance) {
 			return 0; // Reading a short instead
 		}
-		@Definition(id = "packedXZ", field = "Lnet/minecraft/network/protocol/game/ClientboundLevelChunkPacketData$BlockEntityInfo;packedXZ:I")
-		@Expression("this.packedXZ = @(?)")
-		@Inject(method = "<init>(Lnet/minecraft/network/RegistryFriendlyByteBuf;)V", at = @At("MIXINEXTRAS:EXPRESSION"))
+		@Inject(method = "<init>(Lnet/minecraft/network/RegistryFriendlyByteBuf;)V", at = @At(
+			value = "FIELD",
+			target = "Lnet/minecraft/network/protocol/game/ClientboundLevelChunkPacketData$BlockEntityInfo;packedXZ:I",
+			opcode = Opcodes.PUTFIELD,
+			shift = At.Shift.AFTER
+		))
 		void read(RegistryFriendlyByteBuf input, CallbackInfo ci) {
 			this.packedXZ = input.readShort();
 		}

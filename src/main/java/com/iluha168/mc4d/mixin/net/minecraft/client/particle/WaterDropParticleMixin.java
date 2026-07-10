@@ -19,6 +19,7 @@ import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.Nullable;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -30,9 +31,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(WaterDropParticle.class)
 abstract class WaterDropParticleMixin extends SingleQuadParticleMixin {
+	@Redirect(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/client/particle/WaterDropParticle;xd:D", opcode = Opcodes.PUTFIELD))
+	void init_postpone_xd(WaterDropParticle instance, double value) {}
+	@Redirect(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/client/particle/WaterDropParticle;yd:D", opcode = Opcodes.PUTFIELD))
+	void init_postpone_yd(WaterDropParticle instance, double value) {}
+	@Redirect(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/client/particle/WaterDropParticle;zd:D", opcode = Opcodes.PUTFIELD))
+	void init_postpone_zd(WaterDropParticle instance, double value) {}
+
 	@Override
 	public void init_finish(double w, double wa) {
 		super.init_finish(w, 0.0);
+		this.xd *= 0.3F;
+		this.yd = this.random.nextFloat() * 0.2F + 0.1F;
+		this.zd *= 0.3F;
 		this.wd *= 0.3F;
 	}
 

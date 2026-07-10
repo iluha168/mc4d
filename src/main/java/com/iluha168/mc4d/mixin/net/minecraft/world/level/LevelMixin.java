@@ -25,6 +25,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.component.FireworkExplosion;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -46,6 +47,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
+
+import java.util.List;
 
 @Mixin(Level.class)
 public abstract class LevelMixin implements Level4, LevelAccessor4 {
@@ -295,7 +298,13 @@ public abstract class LevelMixin implements Level4, LevelAccessor4 {
 		return this.getChunk(chunkX, chunkZ, chunkW, ChunkStatus.FULL, false);
 	}
 
-	// TODO createFireworks
+	@Overwrite
+	@Deprecated
+	public void createFireworks(double x, double y, double z, double xd, double yd, double zd, List<FireworkExplosion> explosions) {
+		throw Err4.arguments3("Level4#createFireworks");
+	}
+	@Override
+	public void createFireworks(double x, double y, double z, double w, double xd, double yd, double zd, double wd, List<FireworkExplosion> explosions) {}
 
 	@Overwrite
 	public BlockPos getBlockRandomPos(int xo, int yo, int zo, int yMask) {

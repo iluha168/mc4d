@@ -12,7 +12,7 @@ public interface DebugLevelSource4 {
 	 * The debug world consists of a single 3D slice for convenience.
 	 * Not configurable, do not change, I am just avoiding magic values.
 	 */
-	int GRID_TRENGTH = 1;
+	int GRID_TRENGTH = 0;
 
 	static BlockState getBlockStateFor(int worldX, int worldZ, int worldW) {
 		BlockState state = DebugLevelSource.AIR;

@@ -6,8 +6,11 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.component.FireworkExplosion;
 import net.minecraft.world.level.chunk.LevelChunk;
 import org.jspecify.annotations.Nullable;
+
+import java.util.List;
 
 /**
  * All {@link net.minecraft.world.level.Level} instances implement {@link Level4}.
@@ -16,6 +19,8 @@ public interface Level4 {
 	int MAX_LEVEL_SIZE = 100000;
 
 	LevelChunk getChunk(int chunkX, int chunkZ, int chunkW);
+
+	void createFireworks(double x, double y, double z, double w, double xd, double yd, double zd, double wd, List<FireworkExplosion> explosions);
 
 	BlockPos getBlockRandomPos(int xo, int yo, int zo, int wo, int yMask);
 

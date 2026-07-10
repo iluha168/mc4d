@@ -19,6 +19,8 @@ import com.iluha168.mc4d.world.level.ColorResolver4;
 import com.iluha168.mc4d.world.phys.AABB4;
 import com.iluha168.mc4d.world.phys.Vec4;
 import com.iluha168.mc4d.world.phys.shapes.VoxelShape4;
+import com.llamalad7.mixinextras.expression.Definition;
+import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.CrashReport;
@@ -50,6 +52,7 @@ import net.minecraft.world.attribute.AmbientParticle;
 import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.component.FireworkExplosion;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.ColorResolver;
 import net.minecraft.world.level.Level;
@@ -57,16 +60,20 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.apache.commons.lang3.NotImplementedException;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
+
+import java.util.List;
 
 @Mixin(ClientLevel.class)
 abstract
@@ -135,7 +142,7 @@ class ClientLevelMixin extends LevelMixin implements ClientLevel4 {
 		Block markerParticleTarget = this.getMarkerParticleTarget();
 		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 
-		for (int i = 0; i < 888; i++) {
+		for (int i = 0; i < 667 * LevelChunkSection.SECTION_WIDTH; i++) {
 			this.doAnimateTick(xt, yt, zt, wt, 16, animateRandom, markerParticleTarget, pos);
 			this.doAnimateTick(xt, yt, zt, wt, 32, animateRandom, markerParticleTarget, pos);
 		}
@@ -190,9 +197,48 @@ class ClientLevelMixin extends LevelMixin implements ClientLevel4 {
 		}
 	}
 
-	// TODO trySpawnDripParticles
-	// TODO spawnParticle
-	// TODO spawnFluidParticle
+	@Definition(id = "spawnFluidParticle", method = "Lnet/minecraft/client/multiplayer/ClientLevel;spawnFluidParticle(DDDDDLnet/minecraft/core/particles/ParticleOptions;)V")
+	@Expression("this.spawnFluidParticle(?, ?, ?, ?, ?, ?)")
+	@Redirect(method = "trySpawnDripParticles", at = @At("MIXINEXTRAS:EXPRESSION"))
+	void trySpawnDripParticles(ClientLevel This, double x1, double x2, double z1, double z2, double y, ParticleOptions dripParticle, @Local(argsOnly = true, name = "pos") BlockPos pos) {
+		final double posW = Vec4i.getW(pos);
+		this.spawnFluidParticle(x1, x2, z1, z2, posW, posW + 1, y, dripParticle);
+	}
+
+	@Definition(id = "spawnFluidParticle", method = "Lnet/minecraft/client/multiplayer/ClientLevel;spawnFluidParticle(DDDDDLnet/minecraft/core/particles/ParticleOptions;)V")
+	@Expression("this.spawnFluidParticle(?, ?, ?, ?, ?, ?)")
+	@Redirect(method = "spawnParticle", at = @At("MIXINEXTRAS:EXPRESSION"))
+	void spawnParticle(
+		ClientLevel This, double x1, double x2, double z1, double z2, double y, ParticleOptions dripParticle,
+		@Local(argsOnly = true, name = "pos") BlockPos pos,
+		@Local(argsOnly = true, name = "dripShape") VoxelShape dripShape
+	) {
+		final double posW = Vec4i.getW(pos);
+		this.spawnFluidParticle(
+			x1, x2, z1, z2,
+			posW + dripShape.min(Direction4.Axis.W),
+			posW + dripShape.max(Direction4.Axis.W),
+			y, dripParticle
+		);
+	}
+
+	@Overwrite
+	@Deprecated
+	private void spawnFluidParticle(double x1, double x2, double z1, double z2, double y, ParticleOptions dripParticle) {
+		throw Err4.arguments3(null);
+	}
+	@Unique
+	private void spawnFluidParticle(double x1, double x2, double z1, double z2, double w1, double w2, double y, ParticleOptions dripParticle) {
+		this.addParticle(
+			dripParticle,
+			Mth.lerp(this.random.nextDouble(), x1, x2),
+			y,
+			Mth.lerp(this.random.nextDouble(), z1, z2),
+			Mth.lerp(this.random.nextDouble(), w1, w2),
+			0.0, 0.0, 0.0, 0.0
+		);
+	}
+
 
 	@Overwrite
 	@Deprecated
@@ -237,7 +283,23 @@ class ClientLevelMixin extends LevelMixin implements ClientLevel4 {
 		}
 	}
 
-	// TODO createFireworks
+	@SuppressWarnings({"RedundantMethodOverride", "deprecation"})
+	@Overwrite
+	@Deprecated
+	public void createFireworks(double x, double y, double z, double xd, double yd, double zd, List<FireworkExplosion> explosions) {
+		throw Err4.arguments3("Level4#createFireworks");
+	}
+	@Override
+	public void createFireworks(double x, double y, double z, double w, double xd, double yd, double zd, double wd, List<FireworkExplosion> explosions) {
+		if (explosions.isEmpty()) {
+			for (int i = 0; i < this.random.nextInt(3) + 2; i++) {
+				this.addParticle(ParticleTypes.POOF, x, y, z, w, this.random.nextGaussian() * 0.05, 0.005, this.random.nextGaussian() * 0.05, this.random.nextGaussian() * 0.05);
+			}
+		} else {
+			throw new NotImplementedException();
+			// TODO this.minecraft.particleEngine.add(new FireworkParticles.Starter(this, x, y, z, xd, yd, zd, this.minecraft.particleEngine, explosions));
+		}
+	}
 
 	@Overwrite
 	@Deprecated
