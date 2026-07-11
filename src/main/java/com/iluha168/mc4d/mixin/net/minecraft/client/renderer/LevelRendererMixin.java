@@ -61,9 +61,19 @@ class LevelRendererMixin implements LevelRenderer4 {
 	@Final
 	LevelRenderState levelRenderState;
 
+ 	@Shadow
+	private int ticks;
+
 	@Unique private int lastCameraSectionW;
 	@Unique private double lastCameraW;
 	@Unique private boolean lastNeighbouringSliceRendererEnabled;
+
+	@Unique private int cameraSectionRefreshTick;
+	@Unique private double cameraSectionRefreshW;
+
+	@Unique private int allSectionsRefreshTick;
+	@Unique private double allSectionsRefreshW;
+
 	/** Compiled sections whose mesh contains W-sliced models. See {@link CompiledSectionMesh4}. */
 	@Unique private final Set<SectionRenderDispatcher.RenderSection> wSlicedSections = ConcurrentHashMap.newKeySet();
 
@@ -93,9 +103,14 @@ class LevelRendererMixin implements LevelRenderer4 {
 	void cullTerrain_repositionCamera(Camera camera, Frustum frustum, boolean spectator, CallbackInfo ci, @Local(name = "cameraPos") Vec3 cameraPos) {
 		// Here we make client recalculate meshes for EVERY chunk when switching slices. See SectionCompilerMixin.
 		final double cameraPosW = ((Vec4) cameraPos).w;
-		final boolean enabled = Minecraft.getInstance().debugEntries.isCurrentlyEnabled(MC4DClient.NEIGHBOURING_SLICE_BLOCK_RENDERER);
-		if (enabled && Math.floor(cameraPosW * 32.0) != Math.floor(this.lastCameraW * 32.0)) {
-			// Update the camera's section more frequently cuz it is cheap.
+		final boolean debug = Minecraft.getInstance().debugEntries.isCurrentlyEnabled(MC4DClient.NEIGHBOURING_SLICE_BLOCK_RENDERER);
+		if (debug
+			&& this.ticks - this.cameraSectionRefreshTick >= LevelRenderer4.REFRESH_CAMERA_SECTION_EVERY_TICKS
+			&& cameraPosW != this.cameraSectionRefreshW
+		) {
+			// Update the camera's section on a faster schedule cuz it is cheap.
+			this.cameraSectionRefreshTick = this.ticks;
+			this.cameraSectionRefreshW = cameraPosW;
 			this.setSectionDirty(
 				SectionPos.blockToSectionCoord(cameraPos.x),
 				SectionPos.blockToSectionCoord(cameraPos.y),
@@ -104,16 +119,21 @@ class LevelRendererMixin implements LevelRenderer4 {
 				false
 			);
 		}
-		final double cameraBlockW = Math.floor(cameraPosW);
-		final double lastCameraBlockW = Math.floor(this.lastCameraW);
 		// Ideally we should update all sections when camera moves, but that is way too taxing on performance.
-		if (enabled != this.lastNeighbouringSliceRendererEnabled || (enabled
-			? Math.floor(cameraPosW * 4.0) != Math.floor(this.lastCameraW * 4.0)
-			: cameraBlockW != lastCameraBlockW // IMPORTANT UPDATE when crossing block W boundary, EVEN OUTSIDE DEBUG MODE.
-		)) {
+		if (
+			debug != this.lastNeighbouringSliceRendererEnabled ||
+			(this.ticks - this.allSectionsRefreshTick >= REFRESH_ALL_SECTIONS_EVERY_TICKS && (debug
+				? cameraPosW != this.allSectionsRefreshW
+				: Math.floor(cameraPosW) != Math.floor(this.allSectionsRefreshW) // IMPORTANT: update when crossing block W boundary, EVEN OUTSIDE DEBUG MODE.
+			))
+		) {
+			this.allSectionsRefreshTick = this.ticks;
+			this.allSectionsRefreshW = cameraPosW;
 			//noinspection DataFlowIssue
 			((ViewArea4) this.viewArea).setAllSectionWDirty(SectionPos.blockToSectionCoord(cameraPosW), true);
 		}
+		final double cameraBlockW = Math.floor(cameraPosW);
+		final double lastCameraBlockW = Math.floor(this.lastCameraW);
 
 		// Re-mesh the sections whose W-ranged models change their selected 3D model between the last and the current camera W.
 		if (cameraPosW != this.lastCameraW && cameraBlockW == lastCameraBlockW) {
@@ -129,7 +149,7 @@ class LevelRendererMixin implements LevelRenderer4 {
 			});
 		}
 		this.lastCameraW = cameraPosW;
-		this.lastNeighbouringSliceRendererEnabled = enabled;
+		this.lastNeighbouringSliceRendererEnabled = debug;
 	}
 
 	@Inject(method = "addRecentlyCompiledSection", at = @At("TAIL"))
