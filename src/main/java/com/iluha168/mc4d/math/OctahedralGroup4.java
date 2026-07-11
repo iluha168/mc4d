@@ -412,7 +412,9 @@ public interface OctahedralGroup4 {
 	OctahedralGroup BLOCK_ROT_ZW_270 = OctahedralGroup4.P2134_INVERT_X___;
 	OctahedralGroup BLOCK_ROT_ZW_180 = OctahedralGroup4.P1234_INVERT_XY__;
 	OctahedralGroup BLOCK_ROT_ZW_90 = OctahedralGroup4.P2134_INVERT__Y__;
-	// TODO AI generalized ts, verify
+	// For these, _90 sends the negative of the first rotating axis to the positive of the second,
+	// e.g. BLOCK_ROT_XY_90 sends north (Z-) to ana (W+).
+	// Vanilla's BLOCK_ROT_YW_90 (= BLOCK_ROT_Y_90) does the opposite (north to east, Z- to X+), so do not extrapolate from it.
 	OctahedralGroup BLOCK_ROT_XY_270 = OctahedralGroup4.P1243_INVERT___Z_;
 	OctahedralGroup BLOCK_ROT_XY_180 = OctahedralGroup4.P1234_INVERT___ZW;
 	OctahedralGroup BLOCK_ROT_XY_90 = OctahedralGroup4.P1243_INVERT____W;

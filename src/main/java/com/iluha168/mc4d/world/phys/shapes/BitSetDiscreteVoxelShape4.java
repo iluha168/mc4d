@@ -70,9 +70,11 @@ public class BitSetDiscreteVoxelShape4 extends DiscreteVoxelShape4 {
 		this.xMin = voxelShape.firstFull(Direction.Axis.X);
 		this.yMin = voxelShape.firstFull(Direction.Axis.Y);
 		this.zMin = voxelShape.firstFull(Direction.Axis.Z);
+		this.wMin = voxelShape.firstFull(Direction4.Axis.W);
 		this.xMax = voxelShape.lastFull(Direction.Axis.X);
 		this.yMax = voxelShape.lastFull(Direction.Axis.Y);
 		this.zMax = voxelShape.lastFull(Direction.Axis.Z);
+		this.wMax = voxelShape.lastFull(Direction4.Axis.W);
 	}
 
 	protected int getIndex(int x, int y, int z, int w) {

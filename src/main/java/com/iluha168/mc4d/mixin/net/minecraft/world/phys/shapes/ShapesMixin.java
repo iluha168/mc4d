@@ -209,7 +209,7 @@ public class ShapesMixin {
 		return Maps.newEnumMap(Map.of(
 			Direction.Axis.Z , zAxis,
 			Direction.Axis.X , Shapes.rotate(zAxis, OctahedralGroup4.BLOCK_ROT_YW_90, rotationCenter), // east
-			Direction4.Axis.W, Shapes.rotate(zAxis, OctahedralGroup4.BLOCK_ROT_XY_270, rotationCenter) // ana
+			Direction4.Axis.W, Shapes.rotate(zAxis, OctahedralGroup4.BLOCK_ROT_XY_90, rotationCenter) // ana
 		));
 	}
 
@@ -228,7 +228,7 @@ public class ShapesMixin {
 				Direction.Axis.Y,
 				Shapes.rotate(north, OctahedralGroup4.BLOCK_ROT_XW_90, rotationCenter), // down (Y-)
 				Direction4.Axis.W,
-				Shapes.rotate(north, OctahedralGroup4.BLOCK_ROT_XY_270, rotationCenter) // ana (W+)
+				Shapes.rotate(north, OctahedralGroup4.BLOCK_ROT_XY_90, rotationCenter) // ana (W+)
 			)
 		);
 	}
@@ -250,9 +250,9 @@ public class ShapesMixin {
 				Direction.WEST,
 				Shapes.rotate(north, OctahedralGroup4.BLOCK_ROT_YW_270.compose(initial), rotationCenter),
 				Direction4.ANA,
-				Shapes.rotate(north, OctahedralGroup4.BLOCK_ROT_XY_270.compose(initial), rotationCenter),
+				Shapes.rotate(north, OctahedralGroup4.BLOCK_ROT_XY_90.compose(initial), rotationCenter),
 				Direction4.KATA,
-				Shapes.rotate(north, OctahedralGroup4.BLOCK_ROT_XY_90.compose(initial), rotationCenter)
+				Shapes.rotate(north, OctahedralGroup4.BLOCK_ROT_XY_270.compose(initial), rotationCenter)
 			)
 		);
 	}
@@ -278,9 +278,9 @@ public class ShapesMixin {
 				Direction.DOWN,
 				Shapes.rotate(north, OctahedralGroup4.BLOCK_ROT_XW_90.compose(initial), rotationCenter),
 				Direction4.ANA,
-				Shapes.rotate(north, OctahedralGroup4.BLOCK_ROT_XY_270.compose(initial), rotationCenter),
+				Shapes.rotate(north, OctahedralGroup4.BLOCK_ROT_XY_90.compose(initial), rotationCenter),
 				Direction4.KATA,
-				Shapes.rotate(north, OctahedralGroup4.BLOCK_ROT_XY_90.compose(initial), rotationCenter)
+				Shapes.rotate(north, OctahedralGroup4.BLOCK_ROT_XY_270.compose(initial), rotationCenter)
 			)
 		);
 	}
