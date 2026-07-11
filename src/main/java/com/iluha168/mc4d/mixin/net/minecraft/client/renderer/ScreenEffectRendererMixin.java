@@ -3,6 +3,7 @@ package com.iluha168.mc4d.mixin.net.minecraft.client.renderer;
 import com.iluha168.mc4d.core.BlockPos4;
 import com.iluha168.mc4d.world.entity.Entity4;
 import com.llamalad7.mixinextras.sugar.Local;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ScreenEffectRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
@@ -29,6 +30,18 @@ class ScreenEffectRendererMixin {
 	) {
 		double wo = ((Entity4) player).getW() + ((i >> 3) % 2 - 0.5F) * player.getBbWidth() * 0.8F;
 		return ((BlockPos4.MutableBlockPos) testPos).set(x, y, z, wo);
+	}
+
+	@Redirect(method = "renderFluid", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/core/BlockPos;containing(DDD)Lnet/minecraft/core/BlockPos;"
+	))
+	private static BlockPos renderFluid(
+		double x, double y, double z,
+		@Local(argsOnly = true, name = "minecraft") Minecraft minecraft
+	) {
+		//noinspection DataFlowIssue
+		return BlockPos4.containing(x, y, z, ((Entity4) minecraft.player).getW());
 	}
 
 	// TODO the rest

@@ -123,7 +123,15 @@ public abstract class LivingEntityMixin extends EntityMixin implements LivingEnt
 
 	// TODO addAdditionalSaveData
 	// TODO readAdditionalSaveData
-	// TODO tickEffects
+
+	@Redirect(method = "tickEffects", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/level/Level;addParticle(Lnet/minecraft/core/particles/ParticleOptions;DDDDDD)V"
+	))
+	void tickEffects(Level level, ParticleOptions particle, double x, double y, double z, double xd, double yd, double zd) {
+		((LevelAccessor4) level).addParticle(particle, x, y, z, this.getRandomW(0.5), xd, yd, zd, zd);
+	}
+
 	// TODO hurtServer
 	// TODO applyItemBlocking
 
