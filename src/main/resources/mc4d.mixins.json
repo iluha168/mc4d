@@ -405,6 +405,7 @@
     "net.minecraft.client.renderer.block.dispatch.SingleVariantMixin",
     "net.minecraft.client.renderer.block.dispatch.SingleVariantMixin$UnbakedMixin",
     "net.minecraft.client.renderer.block.dispatch.VariantMixin",
+    "net.minecraft.client.renderer.block.dispatch.VariantMixin$SimpleModelStateMixin",
     "net.minecraft.client.renderer.blockentity.AbstractEndPortalRendererMixin",
     "net.minecraft.client.renderer.blockentity.AbstractSignRendererMixin",
     "net.minecraft.client.renderer.blockentity.BeaconRendererMixin",

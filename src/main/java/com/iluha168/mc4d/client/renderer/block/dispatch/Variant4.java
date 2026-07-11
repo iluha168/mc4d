@@ -1,7 +1,6 @@
 package com.iluha168.mc4d.client.renderer.block.dispatch;
 
 import com.iluha168.mc4d.MC4D;
-import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
@@ -11,7 +10,6 @@ import net.minecraft.client.renderer.block.dispatch.WeightedVariants;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.random.WeightedList;
-import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -25,54 +23,37 @@ import java.util.function.Supplier;
  * Implemented by {@link Variant}.
  */
 public interface Variant4 {
-	static Variant from(Either<Identifier, List<WRangeModel>> model, Variant.SimpleModelState modelState) {
-		return model.map(
-			legacy3DOnlyModel -> new Variant(legacy3DOnlyModel, modelState),
-			slices -> {
-				final Variant variant = new Variant(slices.getFirst().model(), modelState);
-				Variant4.as(variant).setWRangeModels(slices);
-				return variant;
-			}
-		);
-	}
-
-	static Variant4 as(Variant variant) {
-		return (Variant4) (Object) variant;
-	}
-
 	/**
 	 * Block-local W spans [0;1), scaled by 16 in blockstate definitions for convenience.
 	 * This is because voxel shapes are defined with 16 scale too ({@link net.minecraft.world.level.block.Block#box}).
 	 */
 	float W_SCALE = 16;
 
-	/** The {@code "w=<fromInclusive>;<untilExclusive>"} map key. */
+	/** The {@code "<fromInclusive>;<untilExclusive>"} map key. */
 	record WRange(float minW, float maxW) {
 		public static final Codec<WRange> CODEC = Codec.STRING.comapFlatMap(WRange::parse, WRange::toKey);
 
 		private static DataResult<WRange> parse(String key) {
-			if (key.startsWith("w=")) {
-				final int separator = key.indexOf(';', 2);
-				if (separator >= 0) try {
-					final float minW = Float.parseFloat(key.substring(2, separator));
-					final float maxW = Float.parseFloat(key.substring(separator + 1));
-					if (minW < maxW)
-						return DataResult.success(new WRange(minW, maxW));
-					return DataResult.error(() -> "Empty W range: '" + key + "'");
-				} catch (NumberFormatException ignored) {}
-			}
-			return DataResult.error(() -> "W range must look like \"w=<fromInclusive>;<untilExclusive>\", got: '" + key + "'");
+			final int separator = key.indexOf(';');
+			if (separator >= 0) try {
+				final float minW = Float.parseFloat(key.substring(0, separator));
+				final float maxW = Float.parseFloat(key.substring(separator + 1));
+				if (minW < maxW)
+					return DataResult.success(new WRange(minW, maxW));
+				return DataResult.error(() -> "Empty W range: '" + key + "'");
+			} catch (NumberFormatException ignored) {}
+			return DataResult.error(() -> "W range must look like \"<fromInclusive>;<untilExclusive>\", got: '" + key + "'");
 		}
 
 		private String toKey() {
-			return "w=" + format(this.minW) + ";" + format(this.maxW);
+			return format(this.minW) + ";" + format(this.maxW);
 		}
 		private static String format(float value) {
 			return value == (long) value ? Long.toString((long) value) : Float.toString(value);
 		}
 	}
 
-	/** The {@code "w=<fromInclusive>;<untilExclusive>": "<Identifier>"} map entry. */
+	/** The {@code "<fromInclusive>;<untilExclusive>": "<Identifier>"} map entry of the {@code "w"} field. */
 	record WRangeModel(float minW, float maxW, @NonNull Identifier model) {
 		public boolean contains(float localW) {
 			return localW >= this.minW && localW < this.maxW;
@@ -80,7 +61,7 @@ public interface Variant4 {
 	}
 
 	// A list because the order matters
-	Codec<List<WRangeModel>> W_SLICES_CODEC = ExtraCodecs.nonEmptyMap(Codec.unboundedMap(WRange.CODEC, Identifier.CODEC))
+	Codec<List<WRangeModel>> W_RANGES_CODEC = ExtraCodecs.nonEmptyMap(Codec.unboundedMap(WRange.CODEC, Identifier.CODEC))
 		.xmap(
 			ranges -> ranges.entrySet().stream()
 				.map(entry -> new WRangeModel(entry.getKey().minW(), entry.getKey().maxW(), entry.getValue()))
@@ -92,19 +73,18 @@ public interface Variant4 {
 				return ranges;
 			}
 		);
-	// Preserving backwards compatibility, allowing a vanilla model name, which would render for all slices
-	Codec<Either<Identifier, List<WRangeModel>>> MODEL_CODEC = Codec.either(Identifier.CODEC, W_SLICES_CODEC);
 
-	/** The W cross-sections in declaration order, or {@code null} for a 3D-only ({@code "model": "<Identifier>"}) variant. */
-	@Nullable List<WRangeModel> wRangeModels();
-	void setWRangeModels(@NonNull List<WRangeModel> wRangeModels);
-	@ApiStatus.Internal
-	void setWRangeModelsForce(@Nullable List<WRangeModel> wRangeModels);
+	/**
+	 * Implemented by {@link Variant.SimpleModelState}.
+	 */
+	interface SimpleModelState {
+		static SimpleModelState as(Variant.SimpleModelState state) {
+			return (SimpleModelState) (Object) state;
+		}
 
-	default Either<Identifier, List<WRangeModel>> wModel() {
-		final List<WRangeModel> slices = this.wRangeModels();
-		@SuppressWarnings("DataFlowIssue") final Variant This = (Variant) (Object) this;
-		return slices == null ? Either.left(This.modelLocation()) : Either.right(slices);
+		/** The W cross-sections in declaration order, or {@code null} for a 3D-only variant (no {@code "w"} field). */
+		@Nullable List<WRangeModel> wRangeModels();
+		void setWRangeModels(@Nullable List<WRangeModel> wRangeModels);
 	}
 
 	static void warnWCoverage(BlockStateModel.Unbaked model, String selector, Supplier<String> source) {
@@ -116,7 +96,7 @@ public interface Variant4 {
 		}
 	}
 	private static void warnWCoverage(Variant variant, String selector, Supplier<String> source) {
-		final List<WRangeModel> slices = as(variant).wRangeModels();
+		final List<WRangeModel> slices = SimpleModelState.as(variant.modelState()).wRangeModels();
 		if (slices == null) {
 			MC4D.LOGGER.warn("3D-only model '{}' for variant: '{}' in '{}'", variant.modelLocation(), selector, source.get());
 			return;
