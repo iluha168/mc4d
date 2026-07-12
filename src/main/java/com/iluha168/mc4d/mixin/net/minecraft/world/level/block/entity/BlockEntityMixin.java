@@ -23,7 +23,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(BlockEntity.class)
-class BlockEntityMixin {
+public class BlockEntityMixin {
 	@Shadow
 	@Final
 	protected BlockPos worldPosition;

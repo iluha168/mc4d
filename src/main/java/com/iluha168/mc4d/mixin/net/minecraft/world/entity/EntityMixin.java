@@ -4,6 +4,7 @@ import com.iluha168.mc4d.core.BlockPos4;
 import com.iluha168.mc4d.core.Direction4;
 import com.iluha168.mc4d.core.Position4;
 import com.iluha168.mc4d.core.Vec4i;
+import com.iluha168.mc4d.math.ArrayHelpers;
 import com.iluha168.mc4d.network.protocol.game.ClientboundAddEntityPacket4;
 import com.iluha168.mc4d.server.level.ServerLevel4;
 import com.iluha168.mc4d.util.Err4;
@@ -66,7 +67,7 @@ import java.util.Locale;
 import java.util.Set;
 
 @Mixin(Entity.class)
-public abstract class EntityMixin implements Entity4 {
+public class EntityMixin implements Entity4 {
 	@Shadow
 	private Vec3 position;
 
@@ -283,6 +284,11 @@ public abstract class EntityMixin implements Entity4 {
 		throw new UnsupportedOperationException("Implemented via mixin");
 	}
 
+	@Shadow
+	private double applyPistonMovementRestriction(Direction.Axis axis, double amount) {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
+
 	@Override
 	public void setWO(double wo) {
 		this.wo = wo;
@@ -300,17 +306,31 @@ public abstract class EntityMixin implements Entity4 {
 		return this.wOld;
 	}
 
+	@Redirect(method = "<clinit>", at = @At(
+		value = "NEW",
+		target = "(DDDDDD)Lnet/minecraft/world/phys/AABB;"
+	))
+	private static AABB INITIAL_AABB(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
+		return new AABB4(minX, minY, minZ, minZ, maxX, maxY, maxZ, maxZ);
+	}
+	@Redirect(method = "<init>", at = @At(
+		value = "FIELD",
+		target = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;",
+		opcode = Opcodes.GETSTATIC
+	))
+	private static Vec3 deltaMovement() {
+		return Vec4.ZERO;
+	}
 	@Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;setPos(DDD)V"))
 	void setInitialPosWithVector(Entity instance, double x, double y, double z){
 		this.position = Vec4.ZERO;
 		instance.setPos(new Vec4(x, y, z, 0.0));
 	}
-	@Definition(id = "deltaMovement", field = "Lnet/minecraft/world/entity/Entity;deltaMovement:Lnet/minecraft/world/phys/Vec3;")
-	@Definition(id = "ZERO", field = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;")
-	@Expression("this.deltaMovement = @(ZERO)")
+	@Definition(id = "pistonDeltas", field = "Lnet/minecraft/world/entity/Entity;pistonDeltas:[D")
+	@Expression("this.pistonDeltas = @(?)")
 	@ModifyExpressionValue(method = "<init>", at = @At("MIXINEXTRAS:EXPRESSION"))
-	private static Vec3 deltaMovement(Vec3 original) {
-		return Vec4.ZERO;
+	double[] pistonDeltas(double[] original) {
+		return ArrayHelpers.addAll(original, 0.0);
 	}
 
 	@Overwrite
@@ -402,6 +422,14 @@ public abstract class EntityMixin implements Entity4 {
 		double w = this.getW() + ((Position4) delta).w();
 		This.setPos(new Vec4(x, y, z, w));
 	}
+	@Redirect(method = "move", at = @At(
+		value = "FIELD",
+		target = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;",
+		opcode = Opcodes.GETSTATIC
+	))
+	Vec3 move_pistonCollision() {
+		return Vec4.ZERO;
+	}
 	@Definition(id = "zCollision", local = @Local(type = boolean.class, name = "zCollision"))
 	@Expression("zCollision = ?")
 	@Inject(method = "move", at = @At("MIXINEXTRAS:EXPRESSION"))
@@ -456,7 +484,32 @@ public abstract class EntityMixin implements Entity4 {
 		return BlockPos4.from(x, y, z, Mth.floor(((Vec4) this.position).w));
 	}
 
-	// TODO limitPistonMovement
+	@Redirect(method = "limitPistonMovement", at = @At(
+		value = "NEW",
+		target = "(DDD)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 limitPistonMovement_vec(double x, double y, double z) {
+		return new Vec4(x, y, z, 0.0);
+	}
+	@Redirect(method = "limitPistonMovement", at = @At(
+		value = "FIELD",
+		target = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;",
+		opcode = Opcodes.GETSTATIC
+	))
+	Vec3 limitPistonMovement_ZERO() {
+		return Vec4.ZERO;
+	}
+	@Definition(id = "ZERO", field = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;")
+	@Expression("return @(ZERO)")
+	@ModifyExpressionValue(method = "limitPistonMovement", at = @At("MIXINEXTRAS:EXPRESSION"))
+	Vec3 limitPistonMovement_return(Vec3 ZERO, @Local(argsOnly = true, name = "vec") Vec3 vec) {
+		final double vecW = ((Vec4) vec).w;
+		if (vecW != 0.0) {
+			final double wa = this.applyPistonMovementRestriction(Direction4.Axis.W, vecW);
+			return Math.abs(wa) <= Mth.EPSILON ? ZERO : new Vec4(0.0, 0.0, 0.0, wa);
+		}
+		return ZERO;
+	}
 
 	@Definition(id = "movement", local = @Local(type = Vec3.class, name = "movement", argsOnly = true))
 	@Definition(id = "z", field = "Lnet/minecraft/world/phys/Vec3;z:D")
