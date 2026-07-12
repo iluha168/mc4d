@@ -4,10 +4,13 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.RedstoneSide;
 
-public class BlockStateProperties4 {
-	public static final BooleanProperty ANA = BooleanProperty.create("ana");
-	public static final BooleanProperty KATA = BooleanProperty.create("kata");
+/**
+ * Implemented by {@link net.minecraft.world.level.block.state.properties.BlockStateProperties}.
+ */
+public interface BlockStateProperties4 {
+	BooleanProperty ANA = BooleanProperty.create("ana");
+	BooleanProperty KATA = BooleanProperty.create("kata");
 
-	public static final EnumProperty<RedstoneSide> ANA_REDSTONE = EnumProperty.create("ana", RedstoneSide.class);
-	public static final EnumProperty<RedstoneSide> KATA_REDSTONE = EnumProperty.create("kata", RedstoneSide.class);
+	EnumProperty<RedstoneSide> ANA_REDSTONE = EnumProperty.create("ana", RedstoneSide.class);
+	EnumProperty<RedstoneSide> KATA_REDSTONE = EnumProperty.create("kata", RedstoneSide.class);
 }

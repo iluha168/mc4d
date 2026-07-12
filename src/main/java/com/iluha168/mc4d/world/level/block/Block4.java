@@ -3,13 +3,11 @@ package com.iluha168.mc4d.world.level.block;
 import com.iluha168.mc4d.world.phys.shapes.Shapes4;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class Block4 {
-	public static VoxelShape cube(double sizeX, double sizeY, double sizeZ, double sizeW) {
-		double halfY = sizeY / 2.0;
-		return Block4.column(sizeX, sizeZ, sizeW, 8.0 - halfY, 8.0 + halfY);
-	}
-
-	public static VoxelShape box(
+/**
+ * Implemented by {@link net.minecraft.world.level.block.Block}.
+ */
+public interface Block4 {
+	static VoxelShape box(
 		double minX, double minY, double minZ, double minW,
 		double maxX, double maxY, double maxZ, double maxW
 	) {
@@ -19,7 +17,12 @@ public class Block4 {
 		);
 	}
 
-	public static VoxelShape column(double sizeX, double sizeZ, double sizeW, double minY, double maxY) {
+	static VoxelShape cube(double sizeX, double sizeY, double sizeZ, double sizeW) {
+		double halfY = sizeY / 2.0;
+		return Block4.column(sizeX, sizeZ, sizeW, 8.0 - halfY, 8.0 + halfY);
+	}
+
+	static VoxelShape column(double sizeX, double sizeZ, double sizeW, double minY, double maxY) {
 		double halfX = sizeX / 2.0;
 		double halfZ = sizeZ / 2.0;
 		double halfW = sizeW / 2.0;
@@ -29,17 +32,17 @@ public class Block4 {
 		);
 	}
 
-	public static VoxelShape boxZ(double sizeX, double sizeY, double minZ, double maxZ, double sizeW) {
+	static VoxelShape boxZ(double sizeX, double sizeY, double minZ, double maxZ, double sizeW) {
 		double halfW = sizeW / 2.0;
 		return Block4.boxZ(sizeX, sizeY, minZ, maxZ, 8.0 - halfW, 8.0 + halfW);
 	}
 
-	public static VoxelShape boxZ(double sizeX, double sizeY, double minZ, double maxZ, double minW, double maxW) {
+	static VoxelShape boxZ(double sizeX, double sizeY, double minZ, double maxZ, double minW, double maxW) {
 		double halfY = sizeY / 2.0;
 		return Block4.boxZ(sizeX, 8.0 - halfY, 8.0 + halfY, minZ, maxZ, minW, maxW);
 	}
 
-	public static VoxelShape boxZ(double sizeX, double minY, double maxY, double minZ, double maxZ, double minW, double maxW) {
+	static VoxelShape boxZ(double sizeX, double minY, double maxY, double minZ, double maxZ, double minW, double maxW) {
 		double halfX = sizeX / 2.0;
 		return Block4.box(
 			8.0 - halfX, minY, minZ, minW,

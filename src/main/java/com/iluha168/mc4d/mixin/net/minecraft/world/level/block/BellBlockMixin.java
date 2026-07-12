@@ -11,6 +11,14 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public class BellBlockMixin {
 	@Redirect(method = "<clinit>", at = @At(
 		value = "INVOKE",
+		target = "Lnet/minecraft/world/level/block/Block;cube(DDD)Lnet/minecraft/world/phys/shapes/VoxelShape;",
+		ordinal = 0
+	))
+	private static VoxelShape SHAPE_FLOOR(double sizeX, double sizeY, double sizeZ) {
+		return Block4.cube(sizeX, sizeY, sizeZ, sizeX);
+	}
+	@Redirect(method = "<clinit>", at = @At(
+		value = "INVOKE",
 		target = "Lnet/minecraft/world/level/block/Block;column(DDDD)Lnet/minecraft/world/phys/shapes/VoxelShape;",
 		ordinal = 0
 	))

@@ -3,6 +3,8 @@ package com.iluha168.mc4d.mixin.net.minecraft.world.level.block;
 import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.world.level.Level4;
 import com.iluha168.mc4d.world.level.LevelAccessor4;
+import com.iluha168.mc4d.world.level.block.Block4;
+import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -13,9 +15,12 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.animal.happyghast.HappyGhast;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DriedGhastBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -24,7 +29,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(DriedGhastBlock.class)
 class DriedGhastBlockMixin {
-	// TODO spawnGhastling
+	@Redirect(method = "<clinit>", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/level/block/Block;column(DDDD)Lnet/minecraft/world/phys/shapes/VoxelShape;"
+	))
+	private static VoxelShape SHAPE(double sizeX, double sizeZ, double minY, double maxY) {
+		return Block4.column(sizeX, sizeZ, sizeX, minY, maxY);
+	}
+
+	@Redirect(method = "spawnGhastling", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/animal/happyghast/HappyGhast;snapTo(DDDFF)V"
+	))
+	void spawnGhastling(HappyGhast instance, double x, double y, double z, float yRot, float xRot, @Local(name = "spawnAt") Vec3 spawnAt) {
+		instance.snapTo(new Vec4(x, y, z, ((Vec4) spawnAt).w), yRot, xRot);
+	}
 
 	@Inject(method = "animateTick", at = @At("HEAD"))
 	void animateTick_w(BlockState state, Level level, BlockPos pos, RandomSource random, CallbackInfo ci, @Share("w") LocalDoubleRef w) {

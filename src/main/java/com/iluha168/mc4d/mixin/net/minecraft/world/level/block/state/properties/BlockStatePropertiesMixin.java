@@ -1,6 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.block.state.properties;
 
 import com.iluha168.mc4d.core.Direction4;
+import com.iluha168.mc4d.world.level.block.state.properties.BlockStateProperties4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.lib.apache.commons.ArrayUtils;
@@ -11,7 +12,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(BlockStateProperties.class)
-class BlockStatePropertiesMixin {
+class BlockStatePropertiesMixin implements BlockStateProperties4 {
+	// TODO everything else
+
 	@Definition(id = "FACING", field = "Lnet/minecraft/world/level/block/state/properties/BlockStateProperties;FACING:Lnet/minecraft/world/level/block/state/properties/EnumProperty;")
 	@Expression("FACING = @(?)")
 	@ModifyArg(method = "<clinit>", at = @At("MIXINEXTRAS:EXPRESSION"), index = 2)
