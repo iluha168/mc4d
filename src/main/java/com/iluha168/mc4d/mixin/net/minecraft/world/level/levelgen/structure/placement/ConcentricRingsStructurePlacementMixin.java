@@ -15,7 +15,7 @@ abstract class ConcentricRingsStructurePlacementMixin extends StructurePlacement
 	@Overwrite
 	@Deprecated
 	protected boolean isPlacementChunk(ChunkGeneratorStructureState generatorState, int sourceX, int sourceZ) {
-		throw Err4.arguments2("StructurePlacement4#isPlacementChunk");
+		throw Err4.arguments2(null);
 	}
 	@Override
 	public boolean isPlacementChunk(ChunkGeneratorStructureState generatorState, int sourceX, int sourceZ, int sourceW) {

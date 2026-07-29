@@ -1,12 +1,9 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.player;
 
 import com.iluha168.mc4d.MC4DClient;
-import com.iluha168.mc4d.client.Camera4;
 import com.iluha168.mc4d.world.entity.player.Input4;
 import com.iluha168.mc4d.world.phys.HorizontalVec;
-import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.KeyboardInput;
 import net.minecraft.world.entity.player.Input;
 import net.minecraft.world.phys.Vec2;
@@ -39,21 +36,6 @@ class KeyboardInputMixin extends ClientInputMixin {
 	Vec2 tick_moveVector(float x, float y) {
 		Input4 keyPresses4 = Input4.as(this.keyPresses);
 		final float anaImpulse = calculateImpulse(keyPresses4.ana(), keyPresses4.kata());
-
-		final Minecraft minecraft = Minecraft.getInstance();
-		Camera4 camera = (Camera4) minecraft.gameRenderer.getMainCamera();
-		if (MC4DClient.keyCameraOffset.isDown() && minecraft.player != null) {
-			camera.setOffsetDirection(
-				Vec4.applyLocalCoordinatesToRotation(
-					new Vec2(0, minecraft.player.getYRot()),
-					new Vec4(x, 0, y, anaImpulse)
-				)
-			);
-			// Stops the player from physically moving during camera offsets
-			return new HorizontalVec(0, 0, 0);
-		}
-
-		camera.unsetOffsetDirection();
 		return new HorizontalVec(x, y, anaImpulse);
 	}
 }

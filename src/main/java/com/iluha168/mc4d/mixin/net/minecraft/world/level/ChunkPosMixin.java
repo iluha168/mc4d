@@ -199,7 +199,7 @@ class ChunkPosMixin implements ChunkPos4 {
 
 	@Overwrite
 	public BlockPos getBlockAt(int x, int y, int z) {
-		throw Err4.arguments3("SectionPos4#getBlockAt");
+		throw Err4.arguments3("ChunkPos4#getBlockAt");
 	}
 	@Override
 	public BlockPos getBlockAt(int x, int y, int z, int w) {
@@ -243,7 +243,7 @@ class ChunkPosMixin implements ChunkPos4 {
 
 	@Overwrite
 	public int getChessboardDistance(int x, int z) {
-		throw Err4.arguments2("SectionPos4#getChessboardDistance");
+		throw Err4.arguments2("ChunkPos4#getChessboardDistance");
 	}
 	@Override
 	public int getChessboardDistance(int x, int z, int w) {
@@ -268,7 +268,7 @@ class ChunkPosMixin implements ChunkPos4 {
 
 	@Overwrite
 	private int distanceSquared(int x, int z) {
-		throw Err4.arguments2("SectionPos4#distanceSquared");
+		throw Err4.arguments2(null);
 	}
 	@Unique
 	private int distanceSquared(int x, int z, int w) {

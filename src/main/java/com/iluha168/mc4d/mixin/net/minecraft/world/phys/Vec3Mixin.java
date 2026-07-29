@@ -2,9 +2,8 @@ package com.iluha168.mc4d.mixin.net.minecraft.world.phys;
 
 import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.util.Err4;
+import com.iluha168.mc4d.world.phys.RotationVec;
 import com.iluha168.mc4d.world.phys.Vec4;
-import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.phys.Vec2;
@@ -61,13 +60,22 @@ class Vec3Mixin {
 		throw Err4.return3("Vec4#<init>");
 	}
 
-	// TODO? directionFromRotation
-	// TODO? directionFromRotation
+	@Redirect(method = "directionFromRotation(Lnet/minecraft/world/phys/Vec2;)Lnet/minecraft/world/phys/Vec3;", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/phys/Vec3;directionFromRotation(FF)Lnet/minecraft/world/phys/Vec3;"
+	))
+	private static Vec3 directionFromRotation_fromVec(float rotX, float rotY, @Local(argsOnly = true, name = "rotation") Vec2 rotation) {
+		return Vec4.directionFromRotation(rotX, rotY, ((RotationVec) rotation).w);
+	}
+	@Overwrite
+	@Deprecated
+	public static Vec3 directionFromRotation(float rotX, float rotY) {
+		throw Err4.rotation("Vec4#directionFromRotation");
+	}
 
-	@WrapMethod(method = "applyLocalCoordinatesToRotation")
-	private static Vec3 applyLocalCoordinatesToRotation(Vec2 rotation, Vec3 direction, Operation<Vec3> original) {
-		return direction instanceof Vec4 direction4
-			? Vec4.applyLocalCoordinatesToRotation(rotation, direction4)
-			: original.call(rotation, direction);
+	@Overwrite // Other mods that target this SHOULD fail mixin applications, why modify math?
+	@Deprecated
+	public static Vec3 applyLocalCoordinatesToRotation(Vec2 rotation, Vec3 direction) {
+		return Vec4.applyLocalCoordinatesToRotation((RotationVec) rotation, (Vec4) direction);
 	}
 }

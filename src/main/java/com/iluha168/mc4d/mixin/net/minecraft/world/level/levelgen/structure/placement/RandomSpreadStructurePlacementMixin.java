@@ -47,7 +47,7 @@ abstract class RandomSpreadStructurePlacementMixin extends StructurePlacementMix
 	@Overwrite
 	@Deprecated
 	protected boolean isPlacementChunk(ChunkGeneratorStructureState state, int sourceX, int sourceZ) {
-		throw Err4.arguments2("StructurePlacement4#isPlacementChunk");
+		throw Err4.arguments2(null);
 	}
 	@Override
 	public boolean isPlacementChunk(ChunkGeneratorStructureState state, int sourceX, int sourceZ, int sourceW) {

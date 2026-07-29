@@ -8,6 +8,10 @@ import org.jetbrains.annotations.ApiStatus;
  */
 public interface ClientboundAddEntityPacket4 {
 	@ApiStatus.Internal
-	void setW(double w);
+	void init_finish(double w, float wRot, float vRot, double wHeadRot);
+
 	double getW();
+	float getWRot();
+	float getVRot();
+	float getWHeadRot();
 }

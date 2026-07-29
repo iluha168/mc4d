@@ -16,6 +16,7 @@ import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.entity.Entity4;
 import com.iluha168.mc4d.world.level.ChunkPos4;
 import com.iluha168.mc4d.world.level.ColorResolver4;
+import com.iluha168.mc4d.world.level.storage.LevelData4;
 import com.iluha168.mc4d.world.phys.AABB4;
 import com.iluha168.mc4d.world.phys.Vec4;
 import com.iluha168.mc4d.world.phys.shapes.VoxelShape4;
@@ -43,6 +44,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ParticleStatus;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -62,6 +64,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -108,9 +111,16 @@ class ClientLevelMixin extends LevelMixin implements ClientLevel4 {
 		value = "NEW",
 		target = "(III)Lnet/minecraft/core/BlockPos;"
 	))
-	BlockPos init(BlockPos respawnPos) {
+	BlockPos init_respawnPos(BlockPos respawnPos) {
 		Vec4i.setW(respawnPos, respawnPos.getZ());
 		return respawnPos;
+	}
+	@Redirect(method = "<init>", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/level/storage/LevelData$RespawnData;of(Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/core/BlockPos;FF)Lnet/minecraft/world/level/storage/LevelData$RespawnData;"
+	))
+	LevelData.RespawnData init_of(ResourceKey<Level> dimension, BlockPos pos, float yaw, float pitch) {
+		return LevelData4.RespawnData.of(dimension, pos, yaw, pitch, pitch, yaw);
 	}
 
 	@Redirect(method = "lambda$onChunkLoaded$0", at = @At(

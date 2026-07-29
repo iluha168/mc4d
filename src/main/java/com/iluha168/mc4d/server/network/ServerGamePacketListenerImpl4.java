@@ -9,7 +9,7 @@ import net.minecraft.world.phys.AABB;
  * {@link net.minecraft.server.network.ServerGamePacketListenerImpl} implements this interface.
  */
 public interface ServerGamePacketListenerImpl4 {
-	void teleport(Vec4 pos, float yRot, float xRot);
+	void teleport(Vec4 pos, float yRot, float xRot, float wRot, float vRot);
 
 	boolean isEntityCollidingWithAnythingNew(LevelReader level, Entity entity, AABB oldAABB, Vec4 targetPos);
 }

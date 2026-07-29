@@ -171,14 +171,6 @@ class StructureTemplateMixin implements StructureTemplate4 {
 		throw Err4.arguments3("StructureTemplate4#updateShapeAtEdge");
 	}
 
-	@Redirect(method = "lambda$addEntitiesToWorld$0", at = @At(
-		value = "INVOKE",
-		target = "Lnet/minecraft/world/entity/Entity;snapTo(DDDFF)V"
-	))
-	private static void addEntitiesToWorld(Entity instance, double x, double y, double z, float yRot, float xRot, @Local(argsOnly = true, name = "pos") Vec3 pos) {
-		((Entity4) instance).snapTo(x, y, z, ((Vec4) pos).w, yRot, xRot);
-	}
-
 	@ModifyArg(method = "addEntitiesToWorld", index = 1, at = @At(
 		value = "INVOKE",
 		target = "Lnet/minecraft/nbt/CompoundTag;put(Ljava/lang/String;Lnet/minecraft/nbt/Tag;)Lnet/minecraft/nbt/Tag;"
@@ -186,6 +178,32 @@ class StructureTemplateMixin implements StructureTemplate4 {
 	Tag addEntitiesToWorld(Tag tag, @Local(name = "pos") Vec3 pos) {
 		((ListTag) tag).add(DoubleTag.valueOf(((Vec4) pos).w));
 		return tag;
+	}
+
+	@Redirect(method = "lambda$addEntitiesToWorld$0", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;snapTo(DDDFF)V"
+	))
+	private static void addEntitiesToWorld_snapTo(Entity entity, double x, double y, double z, float yRot, float xRot, @Local(argsOnly = true, name = "pos") Vec3 pos) {
+		// TODO mirror ANTH_KENTH wRot.set()
+		final Entity4 entity4 = (Entity4) entity;
+		entity4.snapTo(x, y, z, ((Vec4) pos).w, yRot, xRot, entity4.getWRot(), entity4.getVRot());
+	}
+	@Redirect(method = "lambda$addEntitiesToWorld$0", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;setYBodyRot(F)V"
+	))
+	private static void addEntitiesToWorld_setYBodyRot(Entity entity, float yBodyRot) {
+		final Entity4 entity4 = (Entity4) entity;
+		entity4.setYBodyRot(yBodyRot, entity4.getWRot()); // TODO wRot.get()
+	}
+	@Redirect(method = "lambda$addEntitiesToWorld$0", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;setYHeadRot(F)V"
+	))
+	private static void addEntitiesToWorld_setYHeadRot(Entity entity, float yHeadRot) {
+		final Entity4 entity4 = (Entity4) entity;
+		entity4.setYHeadRot(yHeadRot, entity4.getWRot()); // TODO wRot.get()
 	}
 
 	@ModifyExpressionValue(method = "getSize(Lnet/minecraft/world/level/block/Rotation;)Lnet/minecraft/core/Vec3i;", at = @At(

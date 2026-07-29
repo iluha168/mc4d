@@ -6,11 +6,22 @@ import java.util.EnumSet;
 import java.util.Set;
 
 /**
- * {@link Relative} implements this interface.
+ * Implemented by {@link Relative}.
  */
 public interface Relative4 {
 	Relative W = Relative.valueOf("W");
+	Relative W_ROT = Relative.valueOf("W_ROT");
+	Relative V_ROT = Relative.valueOf("V_ROT");
 	Relative DELTA_W = Relative.valueOf("DELTA_W");
+
+	static Set<Relative> rotation(boolean relativeYRot, boolean relativeXRot, boolean relativeWRot, boolean relativeVRot) {
+		Set<Relative> relatives = EnumSet.noneOf(Relative.class);
+		if (relativeYRot) relatives.add(Relative.Y_ROT);
+		if (relativeXRot) relatives.add(Relative.X_ROT);
+		if (relativeWRot) relatives.add(Relative4.W_ROT);
+		if (relativeVRot) relatives.add(Relative4.V_ROT);
+		return relatives;
+	}
 
 	static Set<Relative> position(boolean relativeX, boolean relativeY, boolean relativeZ, boolean relativeW) {
 		Set<Relative> relatives = EnumSet.noneOf(Relative.class);

@@ -1,6 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.block;
 
 import com.iluha168.mc4d.core.Vec4i;
+import com.iluha168.mc4d.world.entity.Entity4;
 import com.iluha168.mc4d.world.level.Level4;
 import com.iluha168.mc4d.world.level.LevelAccessor4;
 import com.iluha168.mc4d.world.level.block.Block4;
@@ -39,10 +40,20 @@ class DriedGhastBlockMixin {
 
 	@Redirect(method = "spawnGhastling", at = @At(
 		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/animal/happyghast/HappyGhast;setYHeadRot(F)V"
+	))
+	void spawnGhastling_setYHeadRot(HappyGhast ghast, float yHeadRot) {
+		final Entity4 ghast4 = (Entity4) ghast;
+		// TODO add Direction.getWRot and fix Direction.getYRot
+		ghast4.setYHeadRot(yHeadRot, 0);
+	}
+	@Redirect(method = "spawnGhastling", at = @At(
+		value = "INVOKE",
 		target = "Lnet/minecraft/world/entity/animal/happyghast/HappyGhast;snapTo(DDDFF)V"
 	))
-	void spawnGhastling(HappyGhast instance, double x, double y, double z, float yRot, float xRot, @Local(name = "spawnAt") Vec3 spawnAt) {
-		instance.snapTo(new Vec4(x, y, z, ((Vec4) spawnAt).w), yRot, xRot);
+	void spawnGhastling_snapTo(HappyGhast instance, double x, double y, double z, float yRot, float xRot, @Local(name = "spawnAt") Vec3 spawnAt) {
+		// TODO add Direction.getWRot and fix Direction.getYRot
+		((Entity4) instance).snapTo(new Vec4(x, y, z, ((Vec4) spawnAt).w), yRot, xRot, 0, 0);
 	}
 
 	@Inject(method = "animateTick", at = @At("HEAD"))

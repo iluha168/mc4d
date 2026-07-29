@@ -1,12 +1,14 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.player;
 
-import com.iluha168.mc4d.client.Camera4;
+import com.iluha168.mc4d.MC4D;
+import com.iluha168.mc4d.client.player.LocalPlayer4;
 import com.iluha168.mc4d.core.BlockPos4;
 import com.iluha168.mc4d.core.Direction4;
 import com.iluha168.mc4d.core.Position4;
 import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.math.MathHelpers;
 import com.iluha168.mc4d.mixin.net.minecraft.world.entity.player.PlayerMixin;
+import com.iluha168.mc4d.network.protocol.game.ServerboundMovePlayerPacket4;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.entity.Entity4;
 import com.iluha168.mc4d.world.entity.player.Input4;
@@ -25,6 +27,7 @@ import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -32,10 +35,11 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.player.Input;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.*;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec2;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.spongepowered.asm.mixin.Mixin;
@@ -51,12 +55,16 @@ import java.util.Iterator;
 import java.util.stream.StreamSupport;
 
 @Mixin(LocalPlayer.class)
-abstract class LocalPlayerMixin extends PlayerMixin {
+public abstract class LocalPlayerMixin extends PlayerMixin implements LocalPlayer4 {
 	@Shadow
 	protected abstract boolean suffocatesAt(BlockPos pos);
 
 	@Unique
 	private double wLast;
+	@Unique
+	private float wRotLast;
+	@Unique
+	private float vRotLast;
 
 	@Shadow
 	public ClientInput input;
@@ -70,18 +78,74 @@ abstract class LocalPlayerMixin extends PlayerMixin {
 	@Shadow
 	private int autoJumpTime;
 
+	@Override
+	public float getViewWRot(float partialTick) {
+		return this.isPassenger() ? super.getViewWRot(partialTick) : MC4D.getCameraSliceWRot();
+	}
+
+	@Override
+	public float getViewVRot(float partialTick) {
+		// Makes block/entity selection camera-slice relative
+		return MC4D.getCameraSliceVRot();
+	}
+
+	@Override
+	public void moveRelative(float speed, Vec3 input) {
+		// Makes movement keybinds camera-slice relative
+		this.setDeltaMovement(this.getDeltaMovement().add(Entity4.getInputVector(
+			(Vec4) input, speed, this.getYRot(), MC4D.getCameraSliceWRot(), MC4D.getCameraSliceVRot()
+		)));
+	}
+
+	@ModifyExpressionValue(method = {"tick", "sendPosition"}, at = @At(
+		value = "NEW",
+		target = "(FFZZ)Lnet/minecraft/network/protocol/game/ServerboundMovePlayerPacket$Rot;"
+	))
+	ServerboundMovePlayerPacket.Rot tick_sendPosition_propagate4Drot(ServerboundMovePlayerPacket.Rot packet) {
+		final ServerboundMovePlayerPacket4 packet4 = (ServerboundMovePlayerPacket4) packet;
+		packet4.setWRot(this.getWRot());
+		packet4.setVRot(this.getVRot());
+		return packet;
+	}
+
 	@Redirect(method = "sendPosition", at = @At(
 		value = "INVOKE",
 		target = "Lnet/minecraft/util/Mth;lengthSquared(DDD)D"
 	))
-	double sendPosition(double x, double y, double z) {
-		return MathHelpers.lengthSquared(x, y, z, this.getW() - this.wLast);
+	double sendPosition_move(double x, double y, double z) {
+		final double deltaW = this.getW() - this.wLast;
+		return MathHelpers.lengthSquared(x, y, z, deltaW);
+	}
+	@Definition(id = "deltaXRot", local = @Local(type = double.class, name = "deltaXRot"))
+	@Expression("deltaXRot != 0.0")
+	@ModifyExpressionValue(method = "sendPosition", at = @At("MIXINEXTRAS:EXPRESSION"))
+	boolean sendPosition_rot(boolean original) {
+		final double deltaWRot = this.getWRot() - this.wRotLast;
+		final double deltaVRot = this.getVRot() - this.vRotLast;
+		return original || deltaWRot != 0.0 || deltaVRot != 0.0;
+	}
+	@ModifyExpressionValue(method = "sendPosition", at = @At(
+		value = "NEW",
+		target = "(Lnet/minecraft/world/phys/Vec3;FFZZ)Lnet/minecraft/network/protocol/game/ServerboundMovePlayerPacket$PosRot;"
+	))
+	ServerboundMovePlayerPacket.PosRot sendPosition_posRot(ServerboundMovePlayerPacket.PosRot packet) {
+		final ServerboundMovePlayerPacket4 packet4 = (ServerboundMovePlayerPacket4) packet;
+		packet4.setWRot(this.getWRot());
+		packet4.setVRot(this.getVRot());
+		return packet;
 	}
 	@Definition(id = "zLast", field = "Lnet/minecraft/client/player/LocalPlayer;zLast:D")
 	@Expression("this.zLast = ?")
 	@Inject(method = "sendPosition", at = @At("MIXINEXTRAS:EXPRESSION"))
-	void sendPosition(CallbackInfo ci) {
+	void sendPosition_wLast(CallbackInfo ci) {
 		this.wLast = this.getW();
+	}
+	@Definition(id = "xRotLast", field = "Lnet/minecraft/client/player/LocalPlayer;xRotLast:F")
+	@Expression("this.xRotLast = ?")
+	@Inject(method = "sendPosition", at = @At("MIXINEXTRAS:EXPRESSION"))
+	void sendPosition_wRotLast(CallbackInfo ci) {
+		this.wRotLast = this.getWRot();
+		this.vRotLast = this.getVRot();
 	}
 
 	@Overwrite
@@ -152,6 +216,31 @@ abstract class LocalPlayerMixin extends PlayerMixin {
 	@Inject(method = "applyInput", at = @At("MIXINEXTRAS:EXPRESSION"))
 	void applyInput(CallbackInfo ci, @Local(name = "modifiedInput") Vec2 modifiedInput) {
 		this.wwa = ((HorizontalVec) modifiedInput).z;
+	}
+
+	/** Mirrors {@link com.iluha168.mc4d.world.entity.Entity4#turn} */
+	@Override
+	public void turn_absolute(double xo, double yo, double wo, double vo) {
+		final float xDelta = (float) yo * 0.15F;
+		final float yDelta = (float) xo * 0.15F;
+		final float wDelta = (float) wo * 0.15F;
+		final float vDelta = (float) vo * 0.15F;
+		this.setXRot(this.getXRot() + xDelta);
+		this.setYRot(this.getYRot() + yDelta);
+		this.setWRot(this.getWRot() + wDelta);
+		this.setVRot(this.getVRot() + vDelta);
+		this.setXRot(Mth.clamp(this.getXRot(), -90.0F, 90.0F));
+		this.setWRot(Mth.clamp(this.getWRot(), -90.0F, 90.0F));
+		this.xRotO += xDelta;
+		this.yRotO += yDelta;
+		this.wRotO += wDelta;
+		this.vRotO += vDelta;
+		this.xRotO = Mth.clamp(this.xRotO, -90.0F, 90.0F);
+		this.wRotO = Mth.clamp(this.wRotO, -90.0F, 90.0F);
+		final Entity vehicle = this.getVehicle();
+		if (vehicle != null) {
+			vehicle.onPassengerTurned((Entity) (Object) this);
+		}
 	}
 
 	@Expression("return @(?)")
@@ -259,13 +348,23 @@ abstract class LocalPlayerMixin extends PlayerMixin {
 			float inputXa = currentSpeed * move.x;
 			float inputZa = currentSpeed * move.y;
 			float inputWa = currentSpeed * move.z;
-			float sin = Mth.sin(this.getYRot() * (float) (Math.PI / 180.0));
-			float cos = Mth.cos(this.getYRot() * (float) (Math.PI / 180.0));
+			// Movement keybinds are camera-slice relative, see moveRelative
+			final float wRot = MC4D.getCameraSliceWRot();
+			final float vRot = MC4D.getCameraSliceVRot();
+			float vSin = Mth.sin(vRot * Mth.DEG_TO_RAD);
+			float vCos = Mth.cos(vRot * Mth.DEG_TO_RAD);
+			float rotatedXa = inputXa * vCos + inputWa * vSin;
+			float rotatedWa = inputWa * vCos - inputXa * vSin;
+			float wSin = Mth.sin(wRot * Mth.DEG_TO_RAD);
+			float wCos = Mth.cos(wRot * Mth.DEG_TO_RAD);
+			float rotatedZa = inputZa * wCos - rotatedWa * wSin;
+			float sin = Mth.sin(this.getYRot() * Mth.DEG_TO_RAD);
+			float cos = Mth.cos(this.getYRot() * Mth.DEG_TO_RAD);
 			moveDiff = new Vec4(
-				inputXa * cos - inputZa * sin,
+				rotatedXa * cos - rotatedZa * sin,
 				moveDiff.y,
-				inputZa * cos + inputXa * sin,
-				inputWa
+				rotatedZa * cos + rotatedXa * sin,
+				inputZa * wSin + rotatedWa * wCos
 			);
 			moveDistSq = (float) moveDiff.lengthSqr();
 			if (moveDistSq <= 0.001F) {
@@ -275,8 +374,9 @@ abstract class LocalPlayerMixin extends PlayerMixin {
 
 		float moveDistInverted = Mth.invSqrt(moveDistSq);
 		Vec4 moveDir = moveDiff.scale(moveDistInverted);
-		Vec4 facingDir3 = Vec4.of(this.getForward(), 0);
-		float facingVsMovingDotProduct2 = (float)(facingDir3.x * moveDir.x + facingDir3.z * moveDir.z + facingDir3.w * moveDir.w);
+		// Vanilla does getForward() here, but it would see the real wRot, not getViewWRot() which would make it relative to the camera slice.
+		Vec4 facingDir = this.calculateViewVector(this.getXRot(), this.getYRot(), MC4D.getCameraSliceWRot());
+		float facingVsMovingDotProduct2 = (float)(facingDir.x * moveDir.x + facingDir.z * moveDir.z + facingDir.w * moveDir.w);
 		if (facingVsMovingDotProduct2 < -0.15F) {
 			return;
 		}
@@ -381,48 +481,8 @@ abstract class LocalPlayerMixin extends PlayerMixin {
 	}
 
 	// TODO getRopeHoldPosition?
+	// TODO getVisualRotationYInDegrees (yaw-only heading, no W sibling; see the note in EntityMixin)
 
-	// TODO AttackRange#getClosesetHit does not respect the camera offset
-
-	@ModifyExpressionValue(method = "raycastHitResult", at = @At(
-		value = "INVOKE",
-		target = "Lnet/minecraft/world/entity/Entity;getEyePosition(F)Lnet/minecraft/world/phys/Vec3;"
-	))
-	Vec3 raycastHitResult(Vec3 eyePosition) {
-		return eyePosition.add(Camera4.getMainCameraOffset());
-	}
-
-	@ModifyExpressionValue(method = "pick", at = @At(
-		value = "INVOKE",
-		target = "Lnet/minecraft/world/entity/Entity;getEyePosition(F)Lnet/minecraft/world/phys/Vec3;"
-	))
-	private static Vec3 pick_from(Vec3 original) {
-		return original.add(Camera4.getMainCameraOffset());
-	}
-	@Redirect(method = "pick", at = @At(
-		value = "INVOKE",
-		target = "Lnet/minecraft/world/entity/Entity;pick(DFZ)Lnet/minecraft/world/phys/HitResult;"
-	))
-	private static HitResult pick_blockHitResult(Entity cameraEntity, double range, float partialTicks, boolean withLiquids) {
-		Vec4 from = ((Vec4) cameraEntity.getEyePosition(partialTicks)).add(Camera4.getMainCameraOffset());
-		Vec4 viewVector = (Vec4) cameraEntity.getViewVector(partialTicks);
-		Vec4 to = from.add(viewVector.scale(range));
-		BlockHitResult hit = cameraEntity.level().clip(new ClipContext(from, to, ClipContext.Block.OUTLINE, withLiquids ? ClipContext.Fluid.ANY : ClipContext.Fluid.NONE, cameraEntity));
-
-		if (hit.getType() != HitResult.Type.BLOCK || cameraEntity.isShiftKeyDown()) {
-			// Return the 3D hit if sneaking.
-			return hit;
-		}
-		int hitBlockW = Vec4i.getW(hit.getBlockPos());
-		int realCameraBlockW = ((Entity4) cameraEntity).getBlockW();
-		if (hitBlockW == realCameraBlockW) {
-			return hit;
-		}
-
-		// Interpret all hits to other 3D slices as against either kata or ana face of the block.
-		// TODO remove when 4D renderer
-		return hit.withDirection(hitBlockW > realCameraBlockW ? Direction4.KATA : Direction4.ANA);
-	}
 	@Redirect(method = "pick", at = @At(
 		value = "INVOKE",
 		target = "Lnet/minecraft/world/phys/Vec3;add(DDD)Lnet/minecraft/world/phys/Vec3;"
@@ -434,13 +494,6 @@ abstract class LocalPlayerMixin extends PlayerMixin {
 	) {
 		final double w = ((Vec4) direction).w * maxDistance;
 		return ((Vec4) from).add(x, y, z, w);
-	}
-	@ModifyExpressionValue(method = "pick", at = @At(
-		value = "INVOKE",
-		target = "Lnet/minecraft/world/entity/Entity;getBoundingBox()Lnet/minecraft/world/phys/AABB;"
-	))
-	private static AABB pick_box(AABB original) {
-		return original.move(Camera4.getMainCameraOffset());
 	}
 	@Redirect(method = "pick", at = @At(
 		value = "INVOKE",

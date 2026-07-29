@@ -14,4 +14,16 @@ public class MC4D {
 
     public MC4D() {
     }
+
+    /**
+     * wRot of the 3D slice the client renders and aims within.
+     * Movement keybinds and block/entity selection are taken relative to this orientation, and the server uses the same value when predicting them.
+     */
+    public static float getCameraSliceWRot() {
+        return 0.0F;
+    }
+    /** vRot counterpart of {@link #getCameraSliceWRot}. */
+    public static float getCameraSliceVRot() {
+        return 0.0F;
+    }
 }

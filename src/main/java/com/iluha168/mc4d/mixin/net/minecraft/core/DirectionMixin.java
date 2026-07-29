@@ -89,12 +89,23 @@ public enum DirectionMixin implements Direction4 {
 	}
 
 	// TODO step
+	// TODO fromYRot (Direction4#fromYRotWRot)
 
 	@WrapMethod(method = "fromAxisAndDirection")
 	private static Direction fromAxisAndDirection4(Direction.Axis axis, Direction.AxisDirection direction, Operation<Direction> original) {
 		return axis == Direction4.Axis.W
 			? (direction == Direction.AxisDirection.POSITIVE ? Direction4.ANA : Direction4.KATA)
 			: original.call(axis, direction);
+	}
+
+	@WrapMethod(method = "toYRot")
+	float toYRot(Operation<Float> original) {
+		Direction This = (Direction) (Object) this;
+		return This == Direction4.KATA || This == Direction4.ANA ? 0 : original.call();
+	}
+	@Override
+	public float toWRot() {
+		return this.getStepW() * 90.0F;
 	}
 
 	// TODO getApproximateNearest

@@ -1,5 +1,5 @@
 {
-  "key.ana": "Strafe Ana",
-  "key.kata": "Strafe Kata",
-  "key.camera_offset": "Peek"
+  "key.mc4d.ana": "Strafe Ana",
+  "key.mc4d.kata": "Strafe Kata",
+  "key.mc4d.mouse_alternative_look": "Alternative mouse look"
 }

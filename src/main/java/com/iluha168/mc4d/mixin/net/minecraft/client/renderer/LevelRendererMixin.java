@@ -122,10 +122,8 @@ class LevelRendererMixin implements LevelRenderer4 {
 		// Ideally we should update all sections when camera moves, but that is way too taxing on performance.
 		if (
 			debug != this.lastNeighbouringSliceRendererEnabled ||
-			(this.ticks - this.allSectionsRefreshTick >= REFRESH_ALL_SECTIONS_EVERY_TICKS && (debug
-				? cameraPosW != this.allSectionsRefreshW
-				: Math.floor(cameraPosW) != Math.floor(this.allSectionsRefreshW) // IMPORTANT: update when crossing block W boundary, EVEN OUTSIDE DEBUG MODE.
-			))
+			Math.floor(cameraPosW) != Math.floor(this.allSectionsRefreshW) || // IMPORTANT: update when crossing block W boundary, EVEN OUTSIDE DEBUG MODE.
+			(debug && this.ticks - this.allSectionsRefreshTick >= REFRESH_ALL_SECTIONS_EVERY_TICKS && cameraPosW != this.allSectionsRefreshW)
 		) {
 			this.allSectionsRefreshTick = this.ticks;
 			this.allSectionsRefreshW = cameraPosW;

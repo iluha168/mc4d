@@ -6,6 +6,8 @@ import com.iluha168.mc4d.core.SectionPos4;
 import com.iluha168.mc4d.network.protocol.game.*;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.entity.Entity4;
+import com.iluha168.mc4d.world.entity.PositionMoveRotation4;
+import com.iluha168.mc4d.world.entity.Relative4;
 import com.iluha168.mc4d.world.level.ChunkPos4;
 import com.iluha168.mc4d.world.level.Level4;
 import com.iluha168.mc4d.world.level.border.WorldBorder4;
@@ -13,13 +15,13 @@ import com.iluha168.mc4d.world.level.chunk.ChunkSource4;
 import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.*;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Holder;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.particles.ParticleOptions;
@@ -30,6 +32,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.PositionMoveRotation;
+import net.minecraft.world.entity.Relative;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LightLayer;
@@ -39,13 +42,15 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 import net.minecraft.world.phys.Vec3;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.*;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.BitSet;
 import java.util.Iterator;
+import java.util.Set;
 
 @Mixin(ClientPacketListener.class)
 public abstract class ClientPacketListenerMixin extends ClientCommonPacketListenerImpl {
@@ -63,32 +68,186 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
 
 	// TODO the rest
 
+	@Redirect(method = "handleEntityPositionSync", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;moveOrInterpolateTo(Lnet/minecraft/world/phys/Vec3;FF)V"
+	))
+	void handleEntityPositionSync_moveOrInterpolate(Entity entity, Vec3 position, float yRot, float xRot, @Local(argsOnly = true, name = "packet") ClientboundEntityPositionSyncPacket packet) {
+		final PositionMoveRotation4 values = PositionMoveRotation4.as(packet.values());
+		((Entity4) entity).moveOrInterpolateTo(position, yRot, xRot, values.wRot(), values.vRot());
+	}
+	@Redirect(method = "handleEntityPositionSync", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;snapTo(Lnet/minecraft/world/phys/Vec3;FF)V"
+	))
+	void handleEntityPositionSync_snapTo(Entity entity, Vec3 spawnPos, float yRot, float xRot, @Local(argsOnly = true, name = "packet") ClientboundEntityPositionSyncPacket packet) {
+		final PositionMoveRotation4 values = PositionMoveRotation4.as(packet.values());
+		((Entity4) entity).snapTo(spawnPos, yRot, xRot, values.wRot(), values.vRot());
+	}
+
+	@ModifyExpressionValue(method = "handleTeleportEntity", at = @At(
+		value = "NEW",
+		target = "(DDDFFZZ)Lnet/minecraft/network/protocol/game/ServerboundMovePlayerPacket$PosRot;"
+	))
+	ServerboundMovePlayerPacket.PosRot handleTeleportEntity_posRot(ServerboundMovePlayerPacket.PosRot packet) {
+		final Entity4 player4 = (Entity4) this.minecraft.player;
+		final ServerboundMovePlayerPacket4 packet4 = (ServerboundMovePlayerPacket4) packet;
+		//noinspection DataFlowIssue
+		packet4.setW(player4.getW());
+		packet4.setWRot(player4.getWRot());
+		packet4.setVRot(player4.getVRot());
+		return packet;
+	}
+	@ModifyVariable(method = "handleTeleportEntity", at = @At("STORE"), name = "hasRelative")
+	boolean handleTeleportEntity_hasRelative(boolean hasRelative, @Local(argsOnly = true, name = "packet") ClientboundTeleportEntityPacket packet) {
+		return hasRelative || packet.relatives().contains(Relative4.W);
+	}
+
 	@Redirect(method = "handleMoveEntity", at = @At(
 		value = "INVOKE",
 		target = "Lnet/minecraft/network/protocol/game/VecDeltaCodec;decode(JJJ)Lnet/minecraft/world/phys/Vec3;"
 	))
-	Vec3 handleMoveEntity(VecDeltaCodec positionCodec, long xa, long ya, long za, @Local(argsOnly = true, name = "packet") ClientboundMoveEntityPacket packet) {
+	Vec3 handleMoveEntity_decode(VecDeltaCodec positionCodec, long xa, long ya, long za, @Local(argsOnly = true, name = "packet") ClientboundMoveEntityPacket packet) {
 		return ((VecDeltaCodec4) positionCodec).decode(xa, ya, za, ((ClientboundMoveEntityPacket4) packet).getWa());
 	}
+	@Redirect(method = "handleMoveEntity", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;moveOrInterpolateTo(Lnet/minecraft/world/phys/Vec3;FF)V"
+	))
+	void handleMoveEntity_moveOrInterpolatePosRot(Entity entity, Vec3 position, float yRot, float xRot, @Local(argsOnly = true, name = "packet") ClientboundMoveEntityPacket packet) {
+		final ClientboundMoveEntityPacket4 packet4 = (ClientboundMoveEntityPacket4) packet;
+		((Entity4) entity).moveOrInterpolateTo(position, yRot, xRot, packet4.getWRot(), packet4.getVRot());
+	}
+	@Redirect(method = "handleMoveEntity", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;moveOrInterpolateTo(FF)V"
+	))
+	void handleMoveEntity_moveOrInterpolateRot(Entity entity, float yRot, float xRot, @Local(argsOnly = true, name = "packet") ClientboundMoveEntityPacket packet) {
+		final ClientboundMoveEntityPacket4 packet4 = (ClientboundMoveEntityPacket4) packet;
+		((Entity4) entity).moveOrInterpolateTo(yRot, xRot, packet4.getWRot(), packet4.getVRot());
+	}
 
-	@Redirect(method = "handleMovePlayer", at = @At(
+	@Redirect(method = "handleRotateMob", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;lerpHeadTo(FI)V"
+	))
+	void handleRotateMob(Entity instance, float yRot, int steps, @Local(argsOnly = true, name = "packet") ClientboundRotateHeadPacket packet) {
+		((Entity4) instance).lerpHeadTo(yRot, ((ClientboundRotateHeadPacket4) packet).getWHeadRot(), steps);
+	}
+
+	@ModifyExpressionValue(method = "handleMovePlayer", at = @At(
 		value = "NEW",
 		target = "(DDDFFZZ)Lnet/minecraft/network/protocol/game/ServerboundMovePlayerPacket$PosRot;"
 	))
-	ServerboundMovePlayerPacket.PosRot handleMovePlayer4(
-		double x, double y, double z, float yRot, float xRot, boolean onGround, boolean horizontalCollision,
+	ServerboundMovePlayerPacket.PosRot handleMovePlayer(
+		ServerboundMovePlayerPacket.PosRot packet,
 		@Local(name = "player") Player player
 	) {
-		final double w = ((Entity4) player).getW();
-		return new ServerboundMovePlayerPacket.PosRot(new Vec4(x, y, z, w), yRot, xRot, onGround, horizontalCollision);
+		final Entity4 player4 = (Entity4) player;
+		final ServerboundMovePlayerPacket4 packet4 = (ServerboundMovePlayerPacket4) packet;
+		packet4.setW(player4.getW());
+		packet4.setWRot(player4.getWRot());
+		packet4.setVRot(player4.getVRot());
+		return packet;
 	}
 
-	@WrapOperation(method = "setValuesFromPositionPacket", at = @At(
+	@Redirect(method = "setValuesFromPositionPacket", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;moveOrInterpolateTo(Lnet/minecraft/world/phys/Vec3;FF)V"
+	))
+	private static void setValuesFromPositionPacket_moveOrInterpolate(Entity entity, Vec3 position, float yRot, float xRot, @Local(name = "newValues") PositionMoveRotation newValues) {
+		final PositionMoveRotation4 newValues4 = PositionMoveRotation4.as(newValues);
+		((Entity4) entity).moveOrInterpolateTo(position, yRot, xRot, newValues4.wRot(), newValues4.vRot());
+	}
+	@Inject(method = "setValuesFromPositionPacket", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;setXRot(F)V"
+	))
+	private static void setValuesFromPositionPacket_setXRot(
+		PositionMoveRotation change, Set<Relative> relatives, Entity entity, boolean interpolate, CallbackInfoReturnable<Boolean> cir,
+		@Local(name = "newValues") PositionMoveRotation newValues
+	) {
+		final Entity4 entity4 = (Entity4) entity;
+		final PositionMoveRotation4 newValues4 = PositionMoveRotation4.as(newValues);
+		entity4.setWRot(newValues4.wRot());
+		entity4.setVRot(newValues4.vRot());
+	}
+	@Redirect(method = "setValuesFromPositionPacket", at = @At(
+		value = "FIELD",
+		target = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;",
+		opcode = Opcodes.GETSTATIC
+	))
+	private static Vec3 setValuesFromPositionPacket_ZERO() {
+		return Vec4.ZERO;
+	}
+	@ModifyExpressionValue(method = "setValuesFromPositionPacket", at = @At(
 		value = "NEW",
 		target = "(Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/phys/Vec3;FF)Lnet/minecraft/world/entity/PositionMoveRotation;"
 	))
-	private static PositionMoveRotation setValuesFromPositionPacket(Vec3 position, Vec3 deltaMovement, float yRot, float xRot, Operation<PositionMoveRotation> original) {
-		return original.call(position, Vec4.ZERO, yRot, xRot);
+	private static PositionMoveRotation setValuesFromPositionPacket_init(
+		PositionMoveRotation currentInterpolationValues, @Local(argsOnly = true, name = "entity") Entity entity
+	) {
+		final Entity4 entity4 = (Entity4) entity;
+		final PositionMoveRotation4 currentInterpolationValues4 = PositionMoveRotation4.as(currentInterpolationValues);
+		currentInterpolationValues4.setWRot(entity4.getWRotO());
+		currentInterpolationValues4.setVRot(entity4.getVRotO());
+		return currentInterpolationValues;
+	}
+	@Redirect(method = "setValuesFromPositionPacket", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;setOldPosAndRot(Lnet/minecraft/world/phys/Vec3;FF)V"
+	))
+	private static void setValuesFromPositionPacket_setOldPosAndRot(Entity entity, Vec3 position, float yRot, float xRot, @Local(name = "interpolationValues") PositionMoveRotation interpolationValues) {
+		final PositionMoveRotation4 interpolationValues4 = PositionMoveRotation4.as(interpolationValues);
+		((Entity4) entity).setOldPosAndRot(position, yRot, xRot, interpolationValues4.wRot(), interpolationValues4.vRot());
+	}
+
+	@Redirect(method = "handleRotatePlayer", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Relative;rotation(ZZ)Ljava/util/Set;"
+	))
+	Set<Relative> handleRotatePlayer_rotation(
+		boolean relativeYRot, boolean relativeXRot,
+		@Local(argsOnly = true, name = "packet") ClientboundPlayerRotationPacket packet
+	) {
+		final ClientboundPlayerRotationPacket4 packet4 = ClientboundPlayerRotationPacket4.as(packet);
+		return Relative4.rotation(relativeYRot, relativeXRot, packet4.relativeW(), packet4.relativeV());
+	}
+	@Redirect(method = "handleRotatePlayer", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/PositionMoveRotation;withRotation(FF)Lnet/minecraft/world/entity/PositionMoveRotation;"
+	))
+	PositionMoveRotation handleRotatePlayer_withRotation(
+		PositionMoveRotation currentValues, float yRot, float xRot,
+		@Local(argsOnly = true, name = "packet") ClientboundPlayerRotationPacket packet
+	) {
+		final ClientboundPlayerRotationPacket4 packet4 = ClientboundPlayerRotationPacket4.as(packet);
+		return PositionMoveRotation4.as(currentValues).withRotation(yRot, xRot, packet4.wRot(), packet4.vRot());
+	}
+	@Inject(method = "handleRotatePlayer", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/player/Player;setXRot(F)V"
+	))
+	void handleRotatePlayer_setXRot(
+		ClientboundPlayerRotationPacket packet, CallbackInfo ci,
+		@Local(name = "newValues") PositionMoveRotation newValues,
+		@Local(name = "player") Player player
+	) {
+		final Entity4 player4 = (Entity4) player;
+		final PositionMoveRotation4 newValues4 = PositionMoveRotation4.as(newValues);
+		player4.setWRot(newValues4.wRot());
+		player4.setVRot(newValues4.vRot());
+	}
+	@ModifyExpressionValue(method = "handleRotatePlayer", at = @At(
+		value = "NEW",
+		target = "(FFZZ)Lnet/minecraft/network/protocol/game/ServerboundMovePlayerPacket$Rot;"
+	))
+	ServerboundMovePlayerPacket.Rot handleRotatePlayer_rot(ServerboundMovePlayerPacket.Rot packet, @Local(name = "player") Player player) {
+		final Entity4 player4 = (Entity4) player;
+		final ServerboundMovePlayerPacket4 packet4 = (ServerboundMovePlayerPacket4) packet;
+		packet4.setWRot(player4.getWRot());
+		packet4.setVRot(player4.getVRot());
+		return packet;
 	}
 
 	// TODO the rest
@@ -178,6 +337,20 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
 	// TODO handleEntityEvent
 	// TODO handleExplosion
 	// TODO handleGameEvent
+
+	@Redirect(method = "handleSetEntityPassengersPacket", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/client/player/LocalPlayer;setYHeadRot(F)V"
+	))
+	void handleSetEntityPassengersPacket(LocalPlayer player, float yHeadRot, @Local(name = "vehicle") Entity vehicle) {
+		final Entity4 player4 = ((Entity4) player);
+		final Entity4 vehicle4 = ((Entity4) vehicle);
+		player4.setWRotO(vehicle4.getWRot());
+		player4.setWRot(vehicle4.getWRot());
+		player4.setYHeadRot(yHeadRot, vehicle4.getWRot());
+	}
+
+	// TODO the rest
 
 	@Redirect(method = "handleInitializeBorder", at = @At(
 		value = "INVOKE",

@@ -5,12 +5,14 @@ import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.math.MathHelpers;
 import com.iluha168.mc4d.network.protocol.game.ClientboundAddEntityPacket4;
 import com.iluha168.mc4d.server.level.ServerLevel4;
+import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.entity.Entity4;
 import com.iluha168.mc4d.world.entity.LivingEntity4;
 import com.iluha168.mc4d.world.entity.item.ItemEntity4;
 import com.iluha168.mc4d.world.level.Level4;
 import com.iluha168.mc4d.world.level.LevelAccessor4;
 import com.iluha168.mc4d.world.phys.AABB4;
+import com.iluha168.mc4d.world.phys.RotationVec;
 import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
@@ -30,6 +32,8 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -39,15 +43,26 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends EntityMixin implements LivingEntity4 {
+	@Shadow public float yBodyRot;
+	@Unique public float wBodyRot;
+	@Shadow public float yBodyRotO;
+	@Unique public float wBodyRotO;
+	@Shadow public float yHeadRot;
+	@Unique public float wHeadRot;
+	@Shadow public float yHeadRotO;
+	@Unique public float wHeadRotO;
+	@Unique protected float wwa;
+	@Shadow protected double lerpYHeadRot;
+	@Unique protected double lerpWHeadRot;
+	@Shadow protected int lerpHeadSteps;
 
 	@Shadow
 	public abstract boolean hasEffect(Holder<MobEffect> effect);
@@ -55,15 +70,23 @@ public abstract class LivingEntityMixin extends EntityMixin implements LivingEnt
 	@Shadow
 	public abstract @Nullable MobEffectInstance getEffect(Holder<MobEffect> effect);
 
-	@Unique protected float wwa;
+	@Shadow
+	public abstract double getAttributeValue(Holder<Attribute> attribute);
 
 	@Override
-	public float wwa() {
-		return this.wwa;
+	public float getWBodyRot() {
+		return this.wBodyRot;
 	}
-	@Override
-	public void setWwa(float wwa) {
-		this.wwa = wwa;
+
+	@ModifyConstant(method = "<init>", constant = @Constant(floatValue = Mth.TWO_PI))
+	float init_setYRot(float twoPi) { // Fixes MC-310503
+		return 360.0F;
+	}
+	@Inject(method = "<init>", at = @At("TAIL"))
+	void init_wRotVRot(CallbackInfo ci) {
+		this.setWRot(RotationVec.randomWRotDeg(this.random));
+		this.wHeadRot = this.getWRot();
+		this.setVRot(this.random.nextFloat() * 360.0F);
 	}
 
 	@Definition(id = "z", local = @Local(type = double.class, name = "z"))
@@ -79,7 +102,6 @@ public abstract class LivingEntityMixin extends EntityMixin implements LivingEnt
 	boolean checkFallDamage_condition(boolean original, @Local(argsOnly = true, name = "pos") BlockPos pos, @Local(name = "entityPos") BlockPos entityPos) {
 		return original || Vec4i.getW(pos) != Vec4i.getW(entityPos);
 	}
-
 	@Definition(id = "maxDiff", local = @Local(type = double.class, name = "maxDiff"))
 	@Expression("maxDiff = @(?)")
 	@ModifyExpressionValue(method = "checkFallDamage", at = @At("MIXINEXTRAS:EXPRESSION"))
@@ -98,7 +120,7 @@ public abstract class LivingEntityMixin extends EntityMixin implements LivingEnt
 		value = "INVOKE",
 		target = "Lnet/minecraft/server/level/ServerLevel;sendParticles(Lnet/minecraft/core/particles/ParticleOptions;DDDIDDDD)I"
 	))
-	<T extends ParticleOptions> int checkFallDamage(
+	<T extends ParticleOptions> int checkFallDamage_particles(
 		ServerLevel level, T particle, double x, double y, double z, int count, double xDist, double yDist, double zDist, double speed,
 		@Share("w") LocalDoubleRef w
 	) {
@@ -109,8 +131,19 @@ public abstract class LivingEntityMixin extends EntityMixin implements LivingEnt
 		value = "INVOKE",
 		target = "Lnet/minecraft/core/BlockPos;containing(DDD)Lnet/minecraft/core/BlockPos;"
 	))
-	BlockPos baseTick(double x, double y, double z) {
+	BlockPos baseTick_containing(double x, double y, double z) {
 		return BlockPos4.containing(x, y, z, this.getW());
+	}
+	@Inject(method = "baseTick", at = @At(
+		value = "FIELD",
+		target = "Lnet/minecraft/world/entity/LivingEntity;yRotO:F",
+		opcode = Opcodes.PUTFIELD
+	))
+	void baseTick_old(CallbackInfo ci) {
+		this.wHeadRotO = this.wHeadRot;
+		this.wBodyRotO = this.wBodyRot;
+		this.wRotO = this.getWRot();
+		this.vRotO = this.getVRot();
 	}
 
 	@Redirect(method = "onEquipItem", at = @At(
@@ -133,7 +166,21 @@ public abstract class LivingEntityMixin extends EntityMixin implements LivingEnt
 	}
 
 	// TODO hurtServer
-	// TODO applyItemBlocking
+
+	@Redirect(method = "applyItemBlocking", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/LivingEntity;calculateViewVector(FF)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 applyItemBlocking_calculateViewVector(LivingEntity instance, float xRot, float yHeadRot) {
+		return ((Entity4) instance).calculateViewVector(xRot, yHeadRot, this.getWHeadRot());
+	}
+	@Redirect(method = "applyItemBlocking", at = @At(
+		value = "NEW",
+		target = "(DDD)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 applyItemBlocking_vectorTo(double x, double y, double z, @Local(name = "vectorTo") Vec3 vectorTo) {
+		return new Vec4(x, y, z, ((Vec4) vectorTo).w);
+	}
 
 	@Redirect(method = "playSecondaryHurtSound", at = @At(
 		value = "INVOKE",
@@ -161,8 +208,36 @@ public abstract class LivingEntityMixin extends EntityMixin implements LivingEnt
 		return ItemEntity4.from(level, x, y, z, this.getW(), itemStack);
 	}
 
-	// TODO knockback
-	// TODO indicateDamage
+	@Overwrite
+	@Deprecated
+	public void knockback(double power, double xd, double zd) {
+		throw Err4.arguments2("LivingEntity4#knockback");
+	}
+	@Override
+	public void knockback(double power, double xd, double zd, double wd) {
+		// TODO neo forge onLivingKnockBack
+		power *= 1.0 - this.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE);
+		if (power <= 0.0) {
+			return;
+		}
+		this.needsSync = true;
+		Vec4 deltaMovement = (Vec4) this.getDeltaMovement();
+		while (xd * xd + zd * zd + wd * wd < Mth.EPSILON) {
+			xd = (this.random.nextDouble() - this.random.nextDouble()) * 0.01;
+			zd = (this.random.nextDouble() - this.random.nextDouble()) * 0.01;
+			wd = (this.random.nextDouble() - this.random.nextDouble()) * 0.01;
+		}
+		Vec4 deltaVector = new Vec4(xd, 0.0, zd, wd).normalize().scale(power);
+		this.setDeltaMovement(new Vec4(
+			deltaMovement.x / 2.0 - deltaVector.x,
+			this.onGround() ? Math.min(0.4, deltaMovement.y / 2.0 + power) : deltaMovement.y,
+			deltaMovement.z / 2.0 - deltaVector.z,
+			deltaMovement.w / 2.0 - deltaVector.w
+		));
+	}
+
+	// TODO indicateDamage when 4D renderer
+	// TODO getHurtDir when 4D renderer
 
 	@Redirect(method = "isLookingAtMe", at = @At(
 		value = "NEW",
@@ -179,6 +254,8 @@ public abstract class LivingEntityMixin extends EntityMixin implements LivingEnt
 	BlockPos playBlockFallSound(int x, int y, int z) {
 		return BlockPos4.from(x, y, z, Mth.floor(this.getW()));
 	}
+
+	// TODO animateHurt when 4D renderer
 
 	@Redirect(method = "handleEntityEvent", at = @At(
 		value = "INVOKE",
@@ -206,14 +283,14 @@ public abstract class LivingEntityMixin extends EntityMixin implements LivingEnt
 		value = "INVOKE",
 		target = "Lnet/minecraft/world/entity/LivingEntity;setDeltaMovement(DDD)V"
 	))
-	void jumpFromGround(LivingEntity This, double x, double y, double z, @Local(name = "movement") Vec3 movement) {
+	void jumpFromGround_setDeltaMovement(LivingEntity This, double x, double y, double z, @Local(name = "movement") Vec3 movement) {
 		This.setDeltaMovement(new Vec4(x, y, z, ((Vec4) movement).w));
 	}
 	@Redirect(method = "jumpFromGround", at = @At(
 		value = "NEW",
 		target = "(DDD)Lnet/minecraft/world/phys/Vec3;"
 	))
-	Vec3 jumpFromGround(double x, double y, double z) {
+	Vec3 jumpFromGround_addDeltaMovement(double x, double y, double z) {
 		return new Vec4(x, y, z, 0);
 	}
 
@@ -250,14 +327,14 @@ public abstract class LivingEntityMixin extends EntityMixin implements LivingEnt
 		value = "NEW",
 		target = "(DDD)Lnet/minecraft/world/phys/Vec3;"
 	))
-	Vec3 travelInWater(double x, double y, double z, @Local(name = "ladderMovement") Vec3 ladderMovement) {
+	Vec3 travelInWater_ladderMovement(double x, double y, double z, @Local(name = "ladderMovement") Vec3 ladderMovement) {
 		return new Vec4(x, y, z, ((Vec4) ladderMovement).w);
 	}
 	@Redirect(method = "travelInWater", at = @At(
 		value = "INVOKE",
 		target = "Lnet/minecraft/world/phys/Vec3;multiply(DDD)Lnet/minecraft/world/phys/Vec3;"
 	))
-	Vec3 travelInWater(Vec3 instance, double xScale, double yScale, double zScale) {
+	Vec3 travelInWater_multiply(Vec3 instance, double xScale, double yScale, double zScale) {
 		return ((Vec4) instance).multiply(xScale, yScale, zScale, zScale);
 	}
 
@@ -344,12 +421,31 @@ public abstract class LivingEntityMixin extends EntityMixin implements LivingEnt
 
 	@Redirect(method = "causeExtraKnockback", at = @At(
 		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/LivingEntity;knockback(DDD)V"
+	))
+	void causeExtraKnockback_knockback(LivingEntity target, double power, double xd, double zd) {
+		float wr = this.getWRot() * Mth.DEG_TO_RAD;
+		float wCos = Mth.cos(wr);
+		((LivingEntity4) target).knockback(power, xd * wCos, zd * wCos, -Mth.sin(wr));
+	}
+	@Redirect(method = "causeExtraKnockback", at = @At(
+		value = "INVOKE",
 		target = "Lnet/minecraft/world/phys/Vec3;multiply(DDD)Lnet/minecraft/world/phys/Vec3;"
 	))
-	Vec3 causeExtraKnockback(Vec3 instance, double xScale, double yScale, double zScale) {
+	Vec3 causeExtraKnockback_multiply(Vec3 instance, double xScale, double yScale, double zScale) {
 		return ((Vec4) instance).multiply(xScale, yScale, zScale, zScale);
 	}
 
+	// TODO tick
+	// TODO tickHeadTurn
+
+	@Redirect(method = "aiStep", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/LivingEntity;lerpHeadRotationStep(ID)V"
+	))
+	void aiStep_lerpHeadRotationStep(LivingEntity instance, int lerpHeadSteps, double targetYHeadRot) {
+		((LivingEntity4) instance).lerpHeadRotationStep(lerpHeadSteps, targetYHeadRot, this.lerpWHeadRot);
+	}
 	@Definition(id = "dz", local = @Local(type = double.class, name = "dz"))
 	@Definition(id = "movement", local = @Local(type = Vec3.class, name = "movement"))
 	@Definition(id = "z", field = "Lnet/minecraft/world/phys/Vec3;z:D")
@@ -408,7 +504,55 @@ public abstract class LivingEntityMixin extends EntityMixin implements LivingEnt
 		this.wwa *= 0.98F;
 	}
 
+	@SuppressWarnings({"deprecation", "RedundantMethodOverride"})
+	@Overwrite
+	@Deprecated
+	public void lerpHeadTo(float yRot, int steps) {
+		throw Err4.rotation("Entity4#lerpHeadTo");
+	}
+	@Override
+	public void lerpHeadTo(float yHeadRot, float wHeadRot, int steps) {
+		this.lerpYHeadRot = yHeadRot;
+		this.lerpWHeadRot = wHeadRot;
+		this.lerpHeadSteps = steps;
+	}
+
 	// TODO hasLineOfSight
+
+	@Override
+	public float getViewWRot(float a) {
+		return a == 1.0F ? this.wHeadRot : Mth.lerp(a, this.wHeadRotO, this.wHeadRot);
+	}
+
+	@Override
+	public float getWHeadRot() {
+		return this.wHeadRot;
+	}
+
+	@SuppressWarnings({"deprecation", "RedundantMethodOverride"})
+	@Overwrite
+	@Deprecated
+	public void setYHeadRot(float yHeadRot) {
+		throw Err4.rotation("Entity4#setYHeadRot");
+	}
+	@Override
+	public void setYHeadRot(float yHeadRot, float wHeadRot) {
+		this.yHeadRot = yHeadRot;
+		this.wHeadRot = wHeadRot;
+	}
+
+	@SuppressWarnings({"deprecation", "RedundantMethodOverride"})
+	@Overwrite
+	@Deprecated
+	public void setYBodyRot(float yBodyRot) {
+		throw Err4.rotation("Entity4#setYBodyRot");
+	}
+	@Override
+	public void setYBodyRot(float yBodyRot, float wBodyRot) {
+		this.yBodyRot = yBodyRot;
+		this.wBodyRot = wBodyRot;
+	}
+
 	// TODO resetForwardDirectionOfRelativePortalPosition
 
 	@Redirect(method = "createItemStackToDrop", at = @At(
@@ -423,22 +567,50 @@ public abstract class LivingEntityMixin extends EntityMixin implements LivingEnt
 		target = "Lnet/minecraft/world/entity/item/ItemEntity;setDeltaMovement(DDD)V",
 		ordinal = 0
 	))
-	void createItemStackToDrop_randomly(ItemEntity instance, double x, double y, double z) {
-		final float pow2 = this.random.nextFloat() * 0.5F;
-		final float dir2 = this.random.nextFloat() * (float) (Math.PI * 2);
-		instance.setDeltaMovement(new Vec4(x, y, z, Mth.cos(dir2) * pow2));
+	void createItemStackToDrop_randomly(
+		ItemEntity entity, double x, double y, double z,
+		@Local(name = "pow") float pow,
+		@Local(name = "dir") float dir
+	) {
+		final double dirW = RotationVec.randomWRotRad(this.random);
+		final double cosW = Math.cos(dirW);
+		entity.setDeltaMovement(new Vec4(
+			-Mth.sin(dir) * cosW * pow,
+			y,
+			Mth.cos(dir) * cosW * pow,
+			Math.sin(dirW) * pow
+		));
 	}
 	@Redirect(method = "createItemStackToDrop", at = @At(
 		value = "INVOKE",
 		target = "Lnet/minecraft/world/entity/item/ItemEntity;setDeltaMovement(DDD)V",
 		ordinal = 1
 	))
-	void createItemStackToDrop_setDeltaMovement(ItemEntity instance, double x, double y, double z) {
-		final float pow2 = 0.02F * this.random.nextFloat();
-		final float dir2 = this.random.nextFloat() * (float) (Math.PI * 2);
-		instance.setDeltaMovement(new Vec4(x, y, z, Mth.sin(dir2) * pow2));
+	void createItemStackToDrop_setDeltaMovement(
+		ItemEntity instance, double x, double y, double z,
+		@Local(name = "pow") float pow,
+		@Local(name = "dir") float dir,
+		@Local(name = "pow2") float pow2
+	) {
+		final double dirW = RotationVec.randomWRotRad(this.random);
+		final double cosW = Math.cos(dirW);
+		final Vec4 look = this.calculateViewVector(this.getXRot(), this.getYRot(), this.getWRot());
+		instance.setDeltaMovement(new Vec4(
+			look.x * pow + Math.cos(dir) * cosW * pow2,
+			y,
+			look.z * pow + Math.sin(dir) * cosW * pow2,
+			look.w * pow + Math.sin(dirW) * pow2
+		));
 	}
 
+	@Inject(method = "lookAt", at = @At("TAIL"))
+	void lookAt(CallbackInfo ci) {
+		this.wHeadRotO = this.wHeadRot;
+		this.wBodyRot = this.wHeadRot;
+		this.wBodyRotO = this.wBodyRot;
+	}
+
+	// TODO getPreciseBodyRotation when 4D renderer
 	// TODO spawnItemParticles
 	// TODO randomTeleport
 	// TODO randomTeleport
@@ -460,6 +632,7 @@ public abstract class LivingEntityMixin extends EntityMixin implements LivingEnt
 	}
 
 	// TODO stopSleeping
+	// TODO getVisualRotationYInDegrees (compass)
 
 	@Redirect(method = "recreateFromPacket", at = @At(
 		value = "INVOKE",
@@ -473,6 +646,22 @@ public abstract class LivingEntityMixin extends EntityMixin implements LivingEnt
 		target = "Lnet/minecraft/world/entity/LivingEntity;absSnapTo(DDDFF)V"
 	))
 	void recreateFromPacket_absSnapTo(LivingEntity instance, double x, double y, double z, float yaw, float pitch, @Local(argsOnly = true, name = "packet") ClientboundAddEntityPacket packet) {
-		((Entity4) instance).absSnapTo(x, y, z, ((ClientboundAddEntityPacket4) packet).getW(), yaw, pitch);
+		final ClientboundAddEntityPacket4 packet4 = (ClientboundAddEntityPacket4) packet;
+		((Entity4) instance).absSnapTo(x, y, z, packet4.getW(), yaw, pitch, packet4.getWRot(), packet4.getVRot());
+	}
+	@Inject(method = "recreateFromPacket", at = @At("TAIL"))
+	void recreateFromPacket_wRot(ClientboundAddEntityPacket packet, CallbackInfo ci) {
+		this.wBodyRotO = this.wHeadRotO = this.wBodyRot = this.wHeadRot = ((ClientboundAddEntityPacket4) packet).getWHeadRot();
+	}
+
+	@Overwrite
+	@Deprecated
+	protected void lerpHeadRotationStep(int lerpHeadSteps, double targetYHeadRot) {
+		throw Err4.rotation("LivingEntity4#lerpHeadRotationStep");
+	}
+	@Override
+	public void lerpHeadRotationStep(int lerpHeadSteps, double targetYHeadRot, double targetWHeadRot) {
+		this.yHeadRot = (float) Mth.rotLerp(1.0 / lerpHeadSteps, this.yHeadRot, targetYHeadRot);
+		this.wHeadRot = (float) Mth.lerp(1.0 / lerpHeadSteps, this.wHeadRot, targetWHeadRot);
 	}
 }

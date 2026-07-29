@@ -9,18 +9,21 @@ import com.iluha168.mc4d.network.protocol.game.ClientboundAddEntityPacket4;
 import com.iluha168.mc4d.server.level.ServerLevel4;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.entity.Entity4;
+import com.iluha168.mc4d.world.entity.InterpolationHandler4;
+import com.iluha168.mc4d.world.entity.PositionMoveRotation4;
 import com.iluha168.mc4d.world.entity.Relative4;
 import com.iluha168.mc4d.world.entity.item.ItemEntity4;
 import com.iluha168.mc4d.world.level.ChunkPos4;
 import com.iluha168.mc4d.world.level.Level4;
 import com.iluha168.mc4d.world.level.LevelAccessor4;
 import com.iluha168.mc4d.world.level.LevelReader4;
+import com.iluha168.mc4d.world.level.portal.TeleportTransition4;
 import com.iluha168.mc4d.world.phys.AABB4;
+import com.iluha168.mc4d.world.phys.RotationVec;
 import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -30,6 +33,7 @@ import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
 import com.llamalad7.mixinextras.sugar.ref.LocalDoubleRef;
 import com.mojang.serialization.Codec;
+import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.SectionPos;
@@ -42,6 +46,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.util.Util;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
@@ -52,6 +57,7 @@ import net.minecraft.world.level.entity.EntityInLevelCallback;
 import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.waypoints.WaypointTransmitter;
 import org.jspecify.annotations.Nullable;
@@ -64,6 +70,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 
 @Mixin(Entity.class)
@@ -119,24 +126,20 @@ public class EntityMixin implements Entity4 {
 	}
 
 	@Shadow
-	public double xo;
+	public @Nullable InterpolationHandler getInterpolation() {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
 
-	@Shadow
-	public double yo;
+	@Shadow	public double xo, yo, zo;
+	@Unique	public double wo;
 
-	@Shadow
-	public double zo;
+	@Unique	public float wRot, vRot;
 
-	@Unique
-	public double wo;
+	@Shadow	public float yRotO, xRotO;
+	@Unique	public float wRotO, vRotO;
 
 	@Unique
 	public double wOld;
-
-	@Shadow
-	public void absSnapRotationTo(float yRot, float xRot) {
-		throw new UnsupportedOperationException("Implemented via mixin");
-	}
 
 	@Shadow
 	public void setDeltaMovement(Vec3 deltaMovement) {
@@ -167,11 +170,6 @@ public class EntityMixin implements Entity4 {
 	public boolean horizontalCollision;
 
 	@Shadow
-	public @Nullable Entity teleport(TeleportTransition transition) {
-		throw new UnsupportedOperationException("Implemented via mixin");
-	}
-
-	@Shadow
 	public float getYRot() {
 		throw new UnsupportedOperationException("Implemented via mixin");
 	}
@@ -192,16 +190,21 @@ public class EntityMixin implements Entity4 {
 	}
 
 	@Shadow
-	public void setOldPosAndRot() {
-		throw new UnsupportedOperationException("Implemented via mixin");
-	}
-
-	@Shadow public Vec3 position() {
+	public void setOldRot() {
 		throw new UnsupportedOperationException("Implemented via mixin");
 	}
 
 	@Shadow
-	public Vec3 getForward() {
+	public void setOldPosAndRot() {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
+
+	@Shadow
+	private void setOldPos(Vec3 position) {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
+
+	@Shadow public Vec3 position() {
 		throw new UnsupportedOperationException("Implemented via mixin");
 	}
 
@@ -275,17 +278,38 @@ public class EntityMixin implements Entity4 {
 	}
 
 	@Shadow
-	protected void setRot(float yRot, float xRot) {
-		throw new UnsupportedOperationException("Implemented via mixin");
-	}
-
-	@Shadow
 	public BlockPos blockPosition() {
 		throw new UnsupportedOperationException("Implemented via mixin");
 	}
 
 	@Shadow
 	private double applyPistonMovementRestriction(Direction.Axis axis, double amount) {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
+
+	@Shadow
+	public @Nullable Entity teleport(TeleportTransition transition) {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
+
+	@Shadow
+	public @Nullable Entity getVehicle() {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
+
+	@Shadow
+	public boolean isPassenger() {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
+
+	@Shadow
+	public boolean onGround() {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
+
+	@SuppressWarnings("unused") // Actually used for overriding
+	@Shadow
+	public void moveRelative(float speed, Vec3 input) {
 		throw new UnsupportedOperationException("Implemented via mixin");
 	}
 
@@ -306,6 +330,48 @@ public class EntityMixin implements Entity4 {
 		return this.wOld;
 	}
 
+	@Override
+	public float getWRot() {
+		return this.wRot;
+	}
+	@Override
+	public void setWRot(float wRot) {
+		if (!Float.isFinite(wRot)) {
+			Util.logAndPauseIfInIde("Invalid entity rotation: " + wRot + ", discarding.");
+		} else {
+			this.wRot = Math.clamp(wRot % 360.0F, -90.0F, 90.0F);
+		}
+	}
+	@Override
+	public float getWRotO() {
+		return this.wRotO;
+	}
+	@Override
+	public void setWRotO(float wRotO) {
+		this.wRotO = Math.clamp(wRotO % 360.0F, -90.0F, 90.0F);
+	}
+
+	@Override
+	public float getVRot() {
+		return this.vRot;
+	}
+	@Override
+	public void setVRot(float vRot) {
+		if (!Float.isFinite(vRot)) {
+			Util.logAndPauseIfInIde("Invalid entity rotation: " + vRot + ", discarding.");
+		} else {
+			this.vRot = vRot;
+		}
+	}
+	@Override
+	public float getVRotO() {
+		return this.vRotO;
+	}
+	@Override
+	public void setVRotO(float vRotO) {
+		this.vRotO = vRotO;
+	}
+
 	@Redirect(method = "<clinit>", at = @At(
 		value = "NEW",
 		target = "(DDDDDD)Lnet/minecraft/world/phys/AABB;"
@@ -313,23 +379,23 @@ public class EntityMixin implements Entity4 {
 	private static AABB INITIAL_AABB(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
 		return new AABB4(minX, minY, minZ, minZ, maxX, maxY, maxZ, maxZ);
 	}
+
 	@Redirect(method = "<init>", at = @At(
 		value = "FIELD",
 		target = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;",
 		opcode = Opcodes.GETSTATIC
 	))
-	private static Vec3 deltaMovement() {
+	private static Vec3 init_deltaMovement_stuckSpeedMultiplier_lastKnownSpeed_position() {
 		return Vec4.ZERO;
 	}
 	@Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;setPos(DDD)V"))
-	void setInitialPosWithVector(Entity instance, double x, double y, double z){
-		this.position = Vec4.ZERO;
-		instance.setPos(new Vec4(x, y, z, 0.0));
+	void init_setPos(Entity instance, double x, double y, double z){
+		instance.setPos(new Vec4(x, y, z, z));
 	}
 	@Definition(id = "pistonDeltas", field = "Lnet/minecraft/world/entity/Entity;pistonDeltas:[D")
 	@Expression("this.pistonDeltas = @(?)")
 	@ModifyExpressionValue(method = "<init>", at = @At("MIXINEXTRAS:EXPRESSION"))
-	double[] pistonDeltas(double[] original) {
+	double[] init_pistonDeltas(double[] original) {
 		return ArrayHelpers.addAll(original, 0.0);
 	}
 
@@ -354,6 +420,19 @@ public class EntityMixin implements Entity4 {
 
 	@Overwrite
 	@Deprecated
+	protected void setRot(float yRot, float xRot) {
+		throw Err4.rotation("Entity4#setRot");
+	}
+	@Override
+	public void setRot(float yRot, float xRot, float wRot, float vRot) {
+		this.setYRot(yRot % 360.0F);
+		this.setXRot(xRot % 360.0F);
+		this.setWRot(wRot % 360.0F);
+		this.setVRot(vRot % 360.0F);
+	}
+
+	@Overwrite
+	@Deprecated
 	public void setPos(double x, double y, double z) {
 		throw Err4.arguments3("Entity#setPos(Vec4)");
 	}
@@ -371,7 +450,35 @@ public class EntityMixin implements Entity4 {
 		instance.setPos(new Vec4(x, y, z, ((Vec4) this.position).w));
 	}
 
-	// TODO? turn
+	@Overwrite
+	@Deprecated
+	public void turn(double xo, double yo) {
+		throw Err4.rotation("Entity4#turn");
+	}
+	@Override
+	public void turn(double xo, double yo, double wo, double vo) {
+		final float vr = this.getVRot() * Mth.DEG_TO_RAD;
+		final float vSin = Mth.sin(vr);
+		final float vCos = Mth.cos(vr);
+		final float xDelta = (float) yo * 0.15F;
+		final float yDelta = (float) (vCos * xo - vSin * wo) * 0.15F;
+		final float wDelta = (float) (vSin * xo + vCos * wo) * 0.15F;
+		final float vDelta = (float) vo * 0.15F;
+		this.setXRot(this.getXRot() + xDelta);
+		this.setYRot(this.getYRot() + yDelta);
+		this.setWRot(Mth.clamp(this.getWRot() + wDelta, -90.0F, 90.0F));
+		this.setVRot(this.getVRot() + vDelta);
+		this.setXRot(Mth.clamp(this.getXRot(), -90.0F, 90.0F));
+		this.xRotO += xDelta;
+		this.yRotO += yDelta;
+		this.wRotO += wDelta;
+		this.vRotO += vDelta;
+		this.xRotO = Mth.clamp(this.xRotO, -90.0F, 90.0F);
+		this.wRotO = Mth.clamp(this.wRotO, -90.0F, 90.0F);
+		if (this.vehicle != null) {
+			this.vehicle.onPassengerTurned((Entity) (Object) this);
+		}
+	}
 
 	@Redirect(method = "lavaHurt", at = @At(
 		value = "INVOKE",
@@ -629,12 +736,18 @@ public class EntityMixin implements Entity4 {
 		((LevelAccessor4) level).addParticle(particle, x, y, z, w, xd, yd, zd, ((Vec4) movement).w * -4.0);
 	}
 
-	@Redirect(method = "getInputVector", at = @At(
-		value = "NEW",
-		target = "(DDD)Lnet/minecraft/world/phys/Vec3;"
+	@Redirect(method = "moveRelative", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;getInputVector(Lnet/minecraft/world/phys/Vec3;FF)Lnet/minecraft/world/phys/Vec3;"
 	))
-	private static Vec3 getInputVector(double x, double y, double z, @Local(name = "movement") Vec3 movement) {
-		return new Vec4(x, y, z, ((Vec4) movement).w);
+	Vec3 moveRelative(Vec3 input, float speed, float yRot) {
+		return Entity4.getInputVector((Vec4) input, speed, yRot, this.getWRot(), this.getVRot());
+	}
+
+	@Overwrite
+	@Deprecated
+	protected static Vec3 getInputVector(Vec3 input, float speed, float yRot) {
+		throw Err4.rotation("Entity4#getInputVector");
 	}
 
 	@Redirect(method = "getLightLevelDependentMagicValue", at = @At(
@@ -658,15 +771,32 @@ public class EntityMixin implements Entity4 {
 		throw Err4.arguments3("Entity4#absSnapTo");
 	}
 	@Override
-	public void absSnapTo(double x, double y, double z, double w, float yRot, float xRot) {
+	public void absSnapTo(double x, double y, double z, double w, float yRot, float xRot, float wRot, float vRot) {
 		this.absSnapTo(x, y, z, w);
-		this.absSnapRotationTo(yRot, xRot);
+		this.absSnapRotationTo(yRot, xRot, wRot, vRot);
+	}
+
+	@Overwrite
+	@Deprecated
+	public void absSnapRotationTo(float yRot, float xRot) {
+		throw Err4.rotation("Entity4#absSnapRotationTo");
+	}
+	@Override
+	public void absSnapRotationTo(float yRot, float xRot, float wRot, float vRot) {
+		this.setYRot(yRot % 360.0F);
+		this.setXRot(Mth.clamp(xRot, -90.0F, 90.0F) % 360.0F);
+		this.setWRot(Mth.clamp(wRot, -90.0F, 90.0F) % 360.0F);
+		this.setVRot(vRot % 360.0F);
+		this.yRotO = this.getYRot();
+		this.xRotO = this.getXRot();
+		this.wRotO = this.getWRot();
+		this.vRotO = this.getVRot();
 	}
 
 	@Overwrite
 	@Deprecated
 	public void absSnapTo(double x, double y, double z) {
-		throw Err4.arguments3("Entity4#absSnapTo instead.");
+		throw Err4.arguments3("Entity4#absSnapTo");
 	}
 	@Override
 	public void absSnapTo(double x, double y, double z, double w) {
@@ -695,34 +825,79 @@ public class EntityMixin implements Entity4 {
 	}
 	@Override
 	public void snapTo(double x, double y, double z, double w) {
-		this.snapTo(x, y, z, w, this.getYRot(), this.getXRot());
+		this.snapTo(x, y, z, w, this.getYRot(), this.getXRot(), this.getWRot(), this.getVRot());
 	}
 
-	@Redirect(method = "snapTo(Lnet/minecraft/world/phys/Vec3;FF)V", at = @At(
-		value = "INVOKE",
-		target = "Lnet/minecraft/world/entity/Entity;snapTo(DDDFF)V"
-	))
-	void snapTo(Entity entity, double x, double y, double z, float yRot, float xRot, @Local(argsOnly = true, name = "spawnPos") Vec3 spawnPos) {
-		((Entity4) entity).snapTo(spawnPos.x, spawnPos.y, spawnPos.z, ((Vec4) spawnPos).w, yRot, xRot);
+	@Overwrite
+	@Deprecated
+	public void snapTo(BlockPos spawnPos, float yRot, float xRot) {
+		throw Err4.rotation("Entity4#snapTo");
+	}
+	@Override
+	public void snapTo(BlockPos spawnPos, float yRot, float xRot, float wRot, float vRot) {
+		this.snapTo(spawnPos.getBottomCenter(), yRot, xRot, wRot, vRot);
+	}
+
+	@Overwrite
+	@Deprecated
+	public void snapTo(Vec3 spawnPos, float yRot, float xRot) {
+		throw Err4.rotation("Entity4#snapTo");
+	}
+	@Override
+	public void snapTo(Vec3 spawnPos, float yRot, float xRot, float wRot, float vRot) {
+		this.snapTo(spawnPos.x, spawnPos.y, spawnPos.z, ((Vec4) spawnPos).w, yRot, xRot, wRot, vRot);
 	}
 
 	@Overwrite
 	@Deprecated
 	public void snapTo(double x, double y, double z, float yRot, float xRot) {
-		throw Err4.arguments3("Entity#snapTo(Vec4, yRot, xRot).");
+		throw Err4.arguments3("Entity4#snapTo");
 	}
 	@Override
-	public void snapTo(double x, double y, double z, double w, float yRot, float xRot) {
+	public void snapTo(double x, double y, double z, double w, float yRot, float xRot, float wRot, float vRot) {
 		this.setPosRaw(x, y, z, w);
 		this.setYRot(yRot);
 		this.setXRot(xRot);
+		this.setWRot(wRot);
+		this.setVRot(vRot);
 		this.setOldPosAndRot();
 		this.reapplyPosition();
+	}
+
+	@Overwrite
+	@Deprecated
+	public final void setOldPosAndRot(Vec3 position, float yRot, float xRot) {
+		throw Err4.rotation("Entity4#setOldPosAndRot");
+	}
+	@Override
+	public void setOldPosAndRot(Vec3 position, float yRot, float xRot, float wRot, float vRot) {
+		this.setOldPos(position);
+		this.setOldRot(yRot, xRot, wRot, vRot);
+	}
+
+	@Definition(id = "setOldRot", method = "Lnet/minecraft/world/entity/Entity;setOldRot(FF)V")
+	@Expression("this.setOldRot(?, ?)")
+	@Redirect(method = "setOldRot()V", at = @At("MIXINEXTRAS:EXPRESSION"))
+	void setOldRot(Entity This, float yRot, float xRot) {
+		this.setOldRot(yRot, xRot, this.getWRot(), this.getVRot());
 	}
 
 	@Inject(method = "setOldPos(Lnet/minecraft/world/phys/Vec3;)V", at = @At("TAIL"))
 	void setOldPos(Vec3 position, CallbackInfo ci) {
 		this.wo = this.wOld = ((Vec4) position).w;
+	}
+
+	@Overwrite
+	@Deprecated
+	void setOldRot(float yRot, float xRot) {
+		throw Err4.rotation(null);
+	}
+	@Unique
+	private void setOldRot(float yRot, float xRot, float wRot, float vRot) {
+		this.yRotO = yRot;
+		this.xRotO = xRot;
+		this.wRotO = wRot;
+		this.vRotO = vRot;
 	}
 
 	@Redirect(method = "oldPosition", at = @At(
@@ -815,9 +990,57 @@ public class EntityMixin implements Entity4 {
 		}
 	}
 
-	@ModifyReturnValue(method = "calculateViewVector", at = @At("RETURN"))
-	Vec3 calculateViewVector(Vec3 original) {
-		return Vec4.of(original, 0);
+	@Redirect(method = "getViewVector", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;calculateViewVector(FF)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 getViewVector(Entity instance, float xRot, float yRot, @Local(argsOnly = true, name = "a") float a) {
+		return this.calculateViewVector(xRot, yRot, this.getViewWRot(a));
+	}
+
+	@Override
+	public float getViewWRot(float partialTick) {
+		return this.getWRot(partialTick);
+	}
+	@Override
+	public float getViewVRot(float partialTick) {
+		return this.getVRot(partialTick);
+	}
+	@Override
+	public float getWRot(float partialTick) {
+		return partialTick == 1.0F ? this.getWRot() : Mth.lerp(partialTick, this.wRotO, this.getWRot());
+	}
+	@Override
+	public float getVRot(float partialTick) {
+		return partialTick == 1.0F ? this.getVRot() : Mth.rotLerp(partialTick, this.vRotO, this.getVRot());
+	}
+
+	@Overwrite
+	@Deprecated
+	public final Vec3 calculateViewVector(float xRot, float yRot) {
+		throw Err4.rotation("Entity4#calculateViewVector");
+	}
+	@Override
+	public Vec4 calculateViewVector(float xRot, float yRot, float wRot) {
+		return Vec4.directionFromRotation(xRot, yRot, wRot);
+	}
+
+	@Redirect(method = "getUpVector", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;calculateUpVector(FF)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 getUpVector(Entity instance, float xRot, float yRot, @Local(argsOnly = true, name = "a") float a) {
+		return this.calculateUpVector(xRot, yRot, this.getViewWRot(a));
+	}
+
+	@Overwrite
+	@Deprecated
+	protected final Vec3 calculateUpVector(float xRot, float yRot) {
+		throw Err4.rotation(null);
+	}
+	@Unique
+	protected Vec4 calculateUpVector(float xRot, float yRot, float wRot) {
+		return this.calculateViewVector(xRot - 90.0F, yRot, wRot);
 	}
 
 	@Redirect(method = "getEyePosition()Lnet/minecraft/world/phys/Vec3;", at = @At(
@@ -874,59 +1097,121 @@ public class EntityMixin implements Entity4 {
 		return this.shouldRenderAtSqrDistance(distance);
 	}
 
-	@Definition(id = "store", method = "Lnet/minecraft/world/level/storage/ValueOutput;store(Ljava/lang/String;Lcom/mojang/serialization/Codec;Ljava/lang/Object;)V")
-	@Definition(id = "CODEC", field = "Lnet/minecraft/world/phys/Vec3;CODEC:Lcom/mojang/serialization/Codec;")
-	@Expression("?.store(?, CODEC, ?)")
-	@ModifyArg(method = "saveWithoutId", at = @At("MIXINEXTRAS:EXPRESSION"), index = 1)
-	Codec<Vec4> storePosAndMotionCodec(Codec<Vec3> codec) {
+	@Redirect(method = "saveWithoutId", at = @At(
+		value = "FIELD",
+		target = "Lnet/minecraft/world/phys/Vec3;CODEC:Lcom/mojang/serialization/Codec;",
+		opcode = Opcodes.GETSTATIC
+	))
+	Codec<Vec4> saveWithoutId_PosAndMotion_CODEC() {
 		return Vec4.CODEC;
 	}
 	@Redirect(method = "saveWithoutId", at = @At(
 		value = "NEW",
-		target = "(DDD)Lnet/minecraft/world/phys/Vec3;",
-		ordinal = 0
+		target = "(DDD)Lnet/minecraft/world/phys/Vec3;"
 	))
-	Vec3 storePosInVehicle(double x, double y, double z) {
+	Vec3 saveWithoutId_PosInVehicle(double x, double y, double z) {
 		assert this.vehicle != null;
 		return new Vec4(x, y, z, ((Entity4) this.vehicle).getW());
 	}
+	@Redirect(method = "saveWithoutId", at = @At(
+		value = "FIELD",
+		target = "Lnet/minecraft/world/phys/Vec2;CODEC:Lcom/mojang/serialization/Codec;",
+		opcode = Opcodes.GETSTATIC
+	))
+	Codec<RotationVec> saveWithoutId_Rotation_CODEC() {
+		return RotationVec.CODEC;
+	}
+	@Redirect(method = "saveWithoutId", at = @At(
+		value = "NEW",
+		target = "(FF)Lnet/minecraft/world/phys/Vec2;"
+	))
+	Vec2 saveWithoutId_Rotation(float x, float y) {
+		return new RotationVec(x, y, this.getWRot(), this.getVRot());
+	}
 
-	@Definition(id = "input", local = @Local(type = ValueInput.class, name = "input", argsOnly = true))
-	@Definition(id = "read", method = "Lnet/minecraft/world/level/storage/ValueInput;read(Ljava/lang/String;Lcom/mojang/serialization/Codec;)Ljava/util/Optional;")
-	@Definition(id = "CODEC", field = "Lnet/minecraft/world/phys/Vec3;CODEC:Lcom/mojang/serialization/Codec;")
-	@Expression("input.read(?, CODEC)")
-	@ModifyArg(method = "load", at = @At("MIXINEXTRAS:EXPRESSION"), index = 1)
-	Codec<Vec4> load_PosAndMotionCodec(Codec<Vec3> codec){
+	@Redirect(method = "load", at = @At(
+		value = "FIELD",
+		target = "Lnet/minecraft/world/phys/Vec3;CODEC:Lcom/mojang/serialization/Codec;",
+		opcode = Opcodes.GETSTATIC
+	))
+	Codec<Vec4> load_PosAndMotion_CODEC(){
 		return Vec4.CODEC;
 	}
-	@Definition(id = "orElse", method = "Ljava/util/Optional;orElse(Ljava/lang/Object;)Ljava/lang/Object;")
-	@Definition(id = "ZERO", field = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;")
-	@Expression("?.orElse(ZERO)")
-	@ModifyArg(method = "load", at = @At("MIXINEXTRAS:EXPRESSION"), index = 0)
-	Object loadPosAndMotionDefault(Object o){
+	@Redirect(method = "load", at = @At(
+		value = "FIELD",
+		target = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;",
+		opcode = Opcodes.GETSTATIC
+	))
+	Vec3 load_PosAndMotion_ZERO(){
 		return Vec4.ZERO;
+	}
+	@Redirect(method = "load", at = @At(
+		value = "FIELD",
+		target = "Lnet/minecraft/world/phys/Vec2;CODEC:Lcom/mojang/serialization/Codec;",
+		opcode = Opcodes.GETSTATIC
+	))
+	Codec<RotationVec> load_Rotation_CODEC() {
+		return RotationVec.CODEC;
+	}
+	@Redirect(method = "load", at = @At(
+		value = "FIELD",
+		target = "Lnet/minecraft/world/phys/Vec2;ZERO:Lnet/minecraft/world/phys/Vec2;",
+		opcode = Opcodes.GETSTATIC
+	))
+	Vec2 load_Rotation_ZERO() {
+		return RotationVec.ZERO;
+	}
+	@Redirect(method = "load", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;setDeltaMovement(DDD)V"
+	))
+	void load_setDeltaMovement(
+		Entity instance, double xd, double yd, double zd,
+		@Local(name = "motion") Vec3 motion
+	) {
+		double wd = ((Vec4) motion).w;
+		this.setDeltaMovement(new Vec4(xd, yd, zd, Math.abs(wd) > 10.0 ? 0.0 : wd));
 	}
 	@Redirect(method = "load", at = @At(
 		value = "INVOKE",
 		target = "Lnet/minecraft/world/entity/Entity;setPosRaw(DDD)V"
 	))
-	void loadPosRaw(
+	void load_setPosRaw(
 		Entity instance, double x, double y, double z,
 		@Local(name = "pos") Vec3 pos,
 		@Local(name = "maxHorizontalPosition") double maxHorizontalPosition
 	) {
 		this.setPosRaw(x, y, z, Mth.clamp(((Vec4) pos).w, -maxHorizontalPosition, maxHorizontalPosition));
 	}
+	@Inject(method = "load", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;setXRot(F)V"
+	))
+	void load_setWRot_setVRot(ValueInput input, CallbackInfo ci, @Local(name = "rotation") Vec2 rotation) {
+		final RotationVec rot4 = (RotationVec) rotation;
+		this.setWRot(rot4.w);
+		this.setVRot(rot4.v);
+	}
 	@Redirect(method = "load", at = @At(
 		value = "INVOKE",
-		target = "Lnet/minecraft/world/entity/Entity;setDeltaMovement(DDD)V"
+		target = "Lnet/minecraft/world/entity/Entity;setYHeadRot(F)V"
 	))
-	void loadDeltaMovementRaw(
-		Entity instance, double xd, double yd, double zd,
-		@Local(name = "motion") Vec3 motion
-	) {
-		double wd = ((Vec4) motion).w;
-		this.setDeltaMovement(new Vec4(xd, yd, zd, Math.abs(wd) > 10.0 ? 0.0 : wd));
+	void load_setYHeadRot(Entity instance, float yHeadRot) {
+		((Entity4) instance).setYHeadRot(yHeadRot, this.getWRot());
+	}
+	@Redirect(method = "load", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;setYBodyRot(F)V"
+	))
+	void load_setYBodyRot(Entity instance, float yBodyRot) {
+		((Entity4) instance).setYBodyRot(yBodyRot, this.getWRot());
+	}
+	@Redirect(method = "load", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;setRot(FF)V"
+	))
+	void load_setRot(Entity instance, float yRot, float xRot) {
+		this.setRot(yRot, xRot, this.getWRot(), this.getVRot());
 	}
 
 	@Redirect(method = "spawnAtLocation(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/entity/item/ItemEntity;", at = @At(
@@ -936,6 +1221,7 @@ public class EntityMixin implements Entity4 {
 	ItemEntity spawnAtLocation(Level level, double x, double y, double z, ItemStack itemStack, @Local(argsOnly = true, name = "offset") Vec3 offset) {
 		return ItemEntity4.from(level, x, y, z, this.getW() + ((Vec4) offset).w, itemStack);
 	}
+
 	@Redirect(method = "spawnAtLocation(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/item/ItemStack;F)Lnet/minecraft/world/entity/item/ItemEntity;", at = @At(
 		value = "NEW",
 		target = "(DDD)Lnet/minecraft/world/phys/Vec3;"
@@ -962,7 +1248,117 @@ public class EntityMixin implements Entity4 {
 	}
 
 	// TODO positionRider
-	// TODO? getHandHoldingItemAngle
+	// TODO getVehicleAttachmentPoint
+	// TODO getDefaultPassengerAttachmentPoint
+
+	@Overwrite
+	@Deprecated
+	public final void moveOrInterpolateTo(Vec3 position, float yRot, float xRot) {
+		throw Err4.rotation("Entity4#moveOrInterpolateTo");
+	}
+	@Override
+	public final void moveOrInterpolateTo(Vec3 position, float yRot, float xRot, float wRot, float vRot) {
+		this.moveOrInterpolateTo(Optional.of(position), Optional.of(yRot), Optional.of(xRot), Optional.of(wRot), Optional.of(vRot));
+	}
+
+	@Overwrite
+	@Deprecated
+	public final void moveOrInterpolateTo(float yRot, float xRot) {
+		throw Err4.rotation("Entity4#moveOrInterpolateTo");
+	}
+	@Override
+	public final void moveOrInterpolateTo(float yRot, float xRot, float wRot, float vRot) {
+		this.moveOrInterpolateTo(Optional.empty(), Optional.of(yRot), Optional.of(xRot), Optional.of(wRot), Optional.of(vRot));
+	}
+
+	@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+	@Redirect(method = "moveOrInterpolateTo(Lnet/minecraft/world/phys/Vec3;)V", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;moveOrInterpolateTo(Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V"
+	))
+	void moveOrInterpolateTo_positionOnly(Entity instance, Optional<Vec3> position, Optional<Float> yRot, Optional<Float> xRot) {
+		((Entity4) instance).moveOrInterpolateTo(position, yRot, xRot, xRot, yRot);
+	}
+
+	@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+	@Overwrite
+	@Deprecated
+	public final void moveOrInterpolateTo(Optional<Vec3> position, Optional<Float> yRot, Optional<Float> xRot) {
+		throw Err4.rotation("Entity4#moveOrInterpolateTo");
+	}
+	@Override
+	public final void moveOrInterpolateTo(Optional<Vec3> position, Optional<Float> yRot, Optional<Float> xRot, Optional<Float> wRot, Optional<Float> vRot) {
+		final InterpolationHandler interpolationHandler = this.getInterpolation();
+		if (interpolationHandler != null) {
+			final InterpolationHandler4 interpolationHandler4 = (InterpolationHandler4) interpolationHandler;
+			interpolationHandler4.interpolateTo(
+				position.orElse(interpolationHandler.position()),
+				yRot.orElse(interpolationHandler.yRot()),
+				xRot.orElse(interpolationHandler.xRot()),
+				wRot.orElse(interpolationHandler4.wRot()),
+				vRot.orElse(interpolationHandler4.vRot())
+			);
+		} else {
+			position.ifPresent(this::setPos);
+			yRot.ifPresent(y -> this.setYRot(y % 360.0F));
+			xRot.ifPresent(x -> this.setXRot(x % 360.0F));
+			wRot.ifPresent(w -> this.setWRot(w % 360.0F));
+			vRot.ifPresent(v -> this.setVRot(v % 360.0F));
+		}
+	}
+
+	@Overwrite
+	@Deprecated
+	public void lerpHeadTo(float yRot, int steps) {
+		throw Err4.rotation("Entity4#lerpHeadTo");
+	}
+	@Override
+	public void lerpHeadTo(float yHeadRot, float wHeadRot, int steps) {
+		this.setYHeadRot(yHeadRot, wHeadRot);
+	}
+
+	@Redirect(method = "getLookAngle", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;calculateViewVector(FF)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 getLookAngle(Entity instance, float xRot, float yRot) {
+		return this.calculateViewVector(xRot, yRot, this.getWRot());
+	}
+
+	@Redirect(method = "getHeadLookAngle", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;calculateViewVector(FF)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 getHeadLookAngle(Entity instance, float xRot, float yRot) {
+		return this.calculateViewVector(xRot, yRot, this.getWHeadRot());
+	}
+
+	@Redirect(method = "getHandHoldingItemAngle", at = @At(
+		value = "FIELD",
+		target = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;",
+		opcode = Opcodes.GETSTATIC
+	))
+	Vec3 getHandHoldingItemAngle_ZERO() {
+		return Vec4.ZERO;
+	}
+	@Redirect(method = "getHandHoldingItemAngle", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;calculateViewVector(FF)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 getHandHoldingItemAngle_calculateViewVector(Entity instance, float xRot, float yRot) {
+		final float armOffset = (yRot - this.getYRot()) * Mth.DEG_TO_RAD;
+		final RotationVec rotation = new RotationVec(xRot, this.getYRot(), this.getWRot(), this.getVRot());
+		return        Vec4.directionFromRotation(rotation).scale(Mth.cos(armOffset))
+			.subtract(Vec4.leftFromRotation     (rotation).scale(Mth.sin(armOffset)));
+	}
+
+	@Redirect(method = "getRotationVector", at = @At(
+		value = "NEW",
+		target = "(FF)Lnet/minecraft/world/phys/Vec2;"
+	))
+	Vec2 getRotationVector(float x, float y) {
+		return new RotationVec(x, y, this.getWRot(), this.getVRot());
+	}
 
 	@Redirect(method = "handleOnAboveBubbleColumn", at = @At(
 		value = "INVOKE",
@@ -1033,6 +1429,27 @@ public class EntityMixin implements Entity4 {
 		}
 	}
 
+	@Override
+	public float getWHeadRot() {
+		return 0.0F;
+	}
+
+	@Overwrite
+	@Deprecated
+	public void setYHeadRot(float yHeadRot) {
+		throw Err4.rotation("Entity4#setYHeadRot");
+	}
+	@Override
+	public void setYHeadRot(float yHeadRot, float wHeadRot) {}
+
+	@Overwrite
+	@Deprecated
+	public void setYBodyRot(float yBodyRot) {
+		throw Err4.rotation("Entity4#setYBodyRot");
+	}
+	@Override
+	public void setYBodyRot(float yBodyRot, float wBodyRot) {}
+
 	@WrapOperation(method = "toString", at = @At(
 		value = "INVOKE",
 		target = "Ljava/lang/String;format(Ljava/util/Locale;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;"
@@ -1051,28 +1468,78 @@ public class EntityMixin implements Entity4 {
 		value = "INVOKE",
 		target = "Lnet/minecraft/world/entity/Entity;snapTo(DDDFF)V"
 	))
-	void copyPosition(Entity instance, double x, double y, double z, float yRot, float xRot, @Local(argsOnly = true, name = "target") Entity target) {
-		((Entity4) instance).snapTo(x, y, z, ((Entity4) target).getW(), yRot, xRot);
+	void copyPosition(Entity This, double x, double y, double z, float yRot, float xRot, @Local(argsOnly = true, name = "target") Entity target) {
+		final Entity4 target4 = (Entity4) target;
+		((Entity4) This).snapTo(x, y, z, target4.getW(), yRot, xRot, target4.getWRot(), target4.getVRot());
 	}
 
 	@Redirect(method = "calculatePassengerTransition", at = @At(
 		value = "INVOKE",
 		target = "Lnet/minecraft/world/phys/Vec3;add(DDD)Lnet/minecraft/world/phys/Vec3;"
 	))
-	Vec3 calculatePassengerTransition(
+	Vec3 calculatePassengerTransition_passengerPos(
 		Vec3 instance, double x, double y, double z,
 		@Local(argsOnly = true, name = "transition") TeleportTransition transition,
 		@Local(name = "passengerOffset") Vec3 passengerOffset
 	) {
-		return ((Vec4) instance).add(x, y, z, transition.relatives().contains(Relative4.W) ? 0.0 : ((Vec4) passengerOffset).w);
+		return ((Vec4) instance).add(
+			x, y, z,
+			transition.relatives().contains(Relative4.W) ? 0.0 : ((Vec4) passengerOffset).w
+		);
+	}
+	@Redirect(method = "calculatePassengerTransition", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/level/portal/TeleportTransition;withRotation(FF)Lnet/minecraft/world/level/portal/TeleportTransition;"
+	))
+	TeleportTransition calculatePassengerTransition_withRotation(
+		TeleportTransition instance, float yRot, float xRot,
+		@Local(argsOnly = true, name = "transition") TeleportTransition transition,
+		@Local(argsOnly = true, name = "passenger") Entity passenger
+	) {
+		final TeleportTransition4 transition4 = TeleportTransition4.as(transition);
+		final Entity4 passenger4 = (Entity4) passenger;
+		final float passengerWRot = transition4.wRot() + (transition.relatives().contains(Relative4.W_ROT) ? 0.0F : passenger4.getWRot() - this.getWRot());
+		final float passengerVRot = transition4.vRot() + (transition.relatives().contains(Relative4.V_ROT) ? 0.0F : passenger4.getVRot() - this.getVRot());
+		return TeleportTransition4.as(instance).withRotation(yRot, xRot, passengerWRot, passengerVRot);
 	}
 
 	@Redirect(method = "teleportSetPosition(Lnet/minecraft/world/entity/PositionMoveRotation;Lnet/minecraft/world/entity/PositionMoveRotation;Ljava/util/Set;)V", at = @At(
 		value = "INVOKE",
 		target = "Lnet/minecraft/world/entity/Entity;setPosRaw(DDD)V"
 	))
-	void teleportSetPosition(Entity entity, double x, double y, double z, @Local(name = "absoluteDestination") PositionMoveRotation absoluteDestination) {
+	void teleportSetPosition_setPosRaw(Entity entity, double x, double y, double z, @Local(name = "absoluteDestination") PositionMoveRotation absoluteDestination) {
 		((Entity4) entity).setPosRaw(x, y, z, ((Vec4) absoluteDestination.position()).w);
+	}
+	@Redirect(method = "teleportSetPosition(Lnet/minecraft/world/entity/PositionMoveRotation;Lnet/minecraft/world/entity/PositionMoveRotation;Ljava/util/Set;)V", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;setYHeadRot(F)V"
+	))
+	void teleportSetPosition_setYHeadRot(Entity entity, float yHeadRot, @Local(name = "absoluteDestination") PositionMoveRotation absoluteDestination) {
+		final Entity4 entity4 = (Entity4) entity;
+		final PositionMoveRotation4 absoluteDestination4 = PositionMoveRotation4.as(absoluteDestination);
+		entity4.setYHeadRot(yHeadRot, absoluteDestination4.wRot());
+		entity4.setWRot(absoluteDestination4.wRot());
+		entity4.setVRot(absoluteDestination4.vRot());
+	}
+
+	@Overwrite
+	@Deprecated
+	public void forceSetRotation(float yRot, boolean relativeY, float xRot, boolean relativeX) {
+		throw Err4.rotation("Entity4#forceSetRotation");
+	}
+	@Override
+	public void forceSetRotation(float yRot, boolean relativeY, float xRot, boolean relativeX, float wRot, boolean relativeW, float vRot, boolean relativeV) {
+		final Set<Relative> relatives = Relative4.rotation(relativeY, relativeX, relativeW, relativeV);
+		final PositionMoveRotation currentValues = PositionMoveRotation.of((Entity) (Object) this);
+		final PositionMoveRotation destination = PositionMoveRotation4.as(currentValues).withRotation(yRot, xRot, wRot, vRot);
+		final PositionMoveRotation absoluteDestination = PositionMoveRotation.calculateAbsolute(currentValues, destination, relatives);
+		final PositionMoveRotation4 absoluteDestination4 = PositionMoveRotation4.as(absoluteDestination);
+		this.setYRot(absoluteDestination.yRot());
+		this.setWRot(absoluteDestination4.wRot());
+		this.setVRot(absoluteDestination4.vRot());
+		this.setYHeadRot(absoluteDestination.yRot(), absoluteDestination4.wRot());
+		this.setXRot(absoluteDestination.xRot());
+		this.setOldRot();
 	}
 
 	// TODO fillCrashReportCategory
@@ -1083,8 +1550,9 @@ public class EntityMixin implements Entity4 {
 		throw Err4.arguments3("Entity4#teleportTo");
 	}
 	@Override
-	public boolean teleportTo(ServerLevel level, double x, double y, double z, double w, Set<Relative> relatives, float newYRot, float newXRot, boolean resetCamera) {
-		return this.teleport(new TeleportTransition(level, new Vec4(x, y, z, w), Vec4.ZERO, newYRot, newXRot, relatives, TeleportTransition.DO_NOTHING)) != null;
+	public boolean teleportTo(ServerLevel level, double x, double y, double z, double w, Set<Relative> relatives, float newYRot, float newXRot, float newWRot, float newVRot, boolean resetCamera) {
+		final TeleportTransition transition = TeleportTransition4.from(level, new Vec4(x, y, z, w), Vec4.ZERO, newYRot, newXRot, newWRot, newVRot, relatives, TeleportTransition.DO_NOTHING);
+		return this.teleport(transition) != null;
 	}
 
 	@Overwrite
@@ -1106,7 +1574,7 @@ public class EntityMixin implements Entity4 {
 	public void teleportTo(double x, double y, double z, double w) {
 		//noinspection resource
 		if (this.level() instanceof ServerLevel) {
-			this.snapTo(x, y, z, w, this.getYRot(), this.getXRot());
+			this.snapTo(x, y, z, w, this.getYRot(), this.getXRot(), this.getWRot(), this.getVRot());
 			this.teleportPassengers();
 		}
 	}
@@ -1130,15 +1598,21 @@ public class EntityMixin implements Entity4 {
 		return ((Vec4) instance).add(x, y, z, z);
 	}
 
+	@Redirect(method = "getDirection", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/core/Direction;fromYRot(D)Lnet/minecraft/core/Direction;"
+	))
+	Direction getDirection(double yRot) {
+		return Direction4.fromYRotWRot(this.getYRot(), this.getWRot());
+	}
+
 	// TODO rotate
 	// TODO mirror
 
-	@Redirect(method = "getCollisionHorizontalEscapeVector", at = @At(
-		value = "NEW",
-		target = "(DDD)Lnet/minecraft/world/phys/Vec3;"
-	))
-	private static Vec3 getCollisionHorizontalEscapeVector(double x, double y, double z) {
-		return new Vec4(x, y, z, 0.0); // Ugh
+	@Overwrite
+	@Deprecated
+	protected static Vec3 getCollisionHorizontalEscapeVector(double colliderWidth, double collidingWidth, float directionDegrees) {
+		throw Err4.rotation("Entity4#getCollisionHorizontalEscapeVector");
 	}
 
 	@Redirect(method = "getDismountLocationForPassenger", at = @At(
@@ -1149,7 +1623,20 @@ public class EntityMixin implements Entity4 {
 		return new Vec4(x, y, z, this.getW());
 	}
 
-	// TODO? lookAt
+	@Overwrite // I am lazy, can be made with proper injections later
+	public void lookAt(EntityAnchorArgument.Anchor anchor, Vec3 pos) {
+		final Vec4 from = (Vec4) anchor.apply((Entity) (Object) this);
+		final RotationVec rot = from.vectorTo(pos).rotation();
+		this.setXRot(Mth.wrapDegrees(rot.x));
+		this.setYRot(Mth.wrapDegrees(rot.y));
+		this.setWRot(Mth.wrapDegrees(rot.w));
+		this.setYHeadRot(this.getYRot(), this.getWRot());
+		this.xRotO = this.getXRot();
+		this.yRotO = this.getYRot();
+		this.wRotO = this.getWRot();
+	}
+
+	// TODO getPreciseBodyRotation
 
 	@Redirect(method = "touchingUnloadedChunk", at = @At(
 		value = "INVOKE",
@@ -1166,6 +1653,7 @@ public class EntityMixin implements Entity4 {
 			throw Err4.container3();
 		}
 	}
+
 	@Overwrite
 	@Deprecated
 	public void setDeltaMovement(double xd, double yd, double zd) {
@@ -1249,8 +1737,11 @@ public class EntityMixin implements Entity4 {
 		target = "Lnet/minecraft/world/entity/Entity;snapTo(DDDFF)V"
 	))
 	void recreateFromPacket(Entity instance, double x, double y, double z, float yRot, float xRot, @Local(argsOnly = true, name = "packet") ClientboundAddEntityPacket packet) {
-		((Entity4) instance).snapTo(x, y, z, ((ClientboundAddEntityPacket4) packet).getW(), yRot, xRot);
+		final ClientboundAddEntityPacket4 packet4 = (ClientboundAddEntityPacket4) packet;
+		((Entity4) instance).snapTo(x, y, z, packet4.getW(), yRot, xRot, packet4.getWRot(), packet4.getVRot());
 	}
+
+	// TODO getVisualRotationYInDegrees (compass)
 
 	@Overwrite
 	@Deprecated
@@ -1258,7 +1749,7 @@ public class EntityMixin implements Entity4 {
 		throw Err4.arguments3("Entity4#lerpPositionAndRotationStep");
 	}
 	@Override
-	public void lerpPositionAndRotationStep(int stepsToTarget, double targetX, double targetY, double targetZ, double targetW, double targetYRot, double targetXRot) {
+	public void lerpPositionAndRotationStep(int stepsToTarget, double targetX, double targetY, double targetZ, double targetW, double targetYRot, double targetXRot, double targetWRot, double targetVRot) {
 		final double alpha = 1.0 / stepsToTarget;
 		final double x = Mth.lerp(alpha, this.getX(), targetX);
 		final double y = Mth.lerp(alpha, this.getY(), targetY);
@@ -1266,8 +1757,10 @@ public class EntityMixin implements Entity4 {
 		final double w = Mth.lerp(alpha, this.getW(), targetW);
 		float yRot = (float)Mth.rotLerp(alpha, this.getYRot(), targetYRot);
 		float xRot = (float)Mth.lerp(alpha, this.getXRot(), targetXRot);
+		float wRot = (float)Mth.lerp(alpha, this.getWRot(), targetWRot);
+		float vRot = (float)Mth.rotLerp(alpha, this.getVRot(), targetVRot);
 		this.setPos(new Vec4(x, y, z, w));
-		this.setRot(yRot, xRot);
+		this.setRot(yRot, xRot, wRot, vRot);
 	}
 
 	// TODO MoveFunction

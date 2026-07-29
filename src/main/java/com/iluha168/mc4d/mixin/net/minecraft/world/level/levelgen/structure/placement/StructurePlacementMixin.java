@@ -85,7 +85,7 @@ abstract class StructurePlacementMixin implements StructurePlacement4 {
 	@Overwrite
 	@Deprecated
 	private static boolean legacyProbabilityReducerWithDouble(long seed, int salt, int sourceX, int sourceZ, float probability) {
-		throw Err4.arguments2("StructurePlacement4#legacyProbabilityReducer");
+		throw Err4.arguments2("StructurePlacement4#legacyProbabilityReducerWithDouble");
 	}
 
 	@Overwrite

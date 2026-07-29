@@ -110,7 +110,7 @@ public enum SymmetricGroup3Mixin implements SymmetricGroup4 {
 
 	@Overwrite
 	public Vector3i permuteVector(Vector3i v) {
-		throw Err4.arguments3("SymmetricGroup4#permutedVector");
+		throw Err4.arguments3("SymmetricGroup4#permuteVector");
 	}
 
 	@Override

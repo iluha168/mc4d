@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.iluha168.mc4d.world.phys.Vec4;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
+import net.minecraft.util.Mth;
 
 /**
  * <b>All {@link Direction}</b> instances implement {@link Direction4}.
@@ -52,6 +53,23 @@ public interface Direction4 {
 	static Direction getApproximateNearest(Vec4 vec) {
 		return Direction4.getApproximateNearest(vec.x, vec.y, vec.z, vec.w);
 	}
+
+	/**
+	 * See {@link Direction#fromYRot}.
+	 * {@return the nearest of the six absolute horizontal directions to the heading}
+	 */
+	static Direction fromYRotWRot(double yRot, double wRot) {
+		double yRad = yRot * (Math.PI / 180.0);
+		double wRad = wRot * (Math.PI / 180.0);
+		float wCos = Mth.cos(wRad);
+		return getApproximateNearest(-Mth.sin(yRad) * wCos, 0.0F, Mth.cos(yRad) * wCos, Mth.sin(wRad));
+	}
+
+	/**
+	 * The wRot version of {@link Direction#toYRot}.
+	 */
+	// TODO Every caller of Direction#toYRot must read both.
+	float toWRot();
 
 	/**
 	 * <b>All {@link Direction.Axis}</b> instances implement {@link Direction4.Axis}.
