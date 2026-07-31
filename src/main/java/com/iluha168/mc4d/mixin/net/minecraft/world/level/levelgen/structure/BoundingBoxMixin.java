@@ -290,8 +290,8 @@ class BoundingBoxMixin implements BoundingBox4 {
 		value = "INVOKE",
 		target = "Lnet/minecraft/world/level/levelgen/structure/BoundingBox;isInside(III)Z"
 	))
-	boolean isInside(BoundingBox instance, int x, int y, int z) {
-		return ((BoundingBox4) instance).isInside(x, y, z, z);
+	boolean isInside(BoundingBox instance, int x, int y, int z, @Local(argsOnly = true, name = "pos") Vec3i pos) {
+		return ((BoundingBox4) instance).isInside(x, y, z, Vec4i.getW(pos));
 	}
 
 	@Overwrite

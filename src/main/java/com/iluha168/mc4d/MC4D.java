@@ -1,6 +1,8 @@
 package com.iluha168.mc4d;
 
+import com.iluha168.mc4d.gametest.framework.StatesTestFunctions;
 import com.mojang.logging.LogUtils;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import org.slf4j.Logger;
 
@@ -12,7 +14,8 @@ public class MC4D {
     // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public MC4D() {
+    public MC4D(IEventBus modBus) {
+        StatesTestFunctions.DEFERRED_REGISTER.register(modBus);
     }
 
     /**
