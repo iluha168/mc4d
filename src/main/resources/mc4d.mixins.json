@@ -388,6 +388,7 @@
     "net.minecraft.client.color.block.BlockTintCacheMixin$LatestCacheInfoMixin",
     "net.minecraft.client.gui.GuiMixin",
     "net.minecraft.client.gui.components.DebugScreenOverlayMixin",
+    "net.minecraft.client.gui.components.SubtitleOverlayMixin",
     "net.minecraft.client.gui.components.debug.DebugEntryLookingAtMixin",
     "net.minecraft.client.gui.components.debug.DebugEntryPositionMixin",
     "net.minecraft.client.gui.components.debug.DebugEntrySectionPositionMixin",
