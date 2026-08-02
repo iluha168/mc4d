@@ -204,7 +204,7 @@ public abstract class Vec3iMixin implements Vec4i {
 	))
 	double distToCenterSqr(Vec3i instance, double x, double y, double z, @Local(argsOnly = true, name = "pos") Position pos) {
 		if (!(pos instanceof Vec4 pos4)) throw Err4.container3();
-		return this.distToCenterSqr(x, y, z, pos4.w());
+		return this.distToCenterSqr(x, y, z, pos4.w);
 	}
 
 	@Overwrite

@@ -4,6 +4,9 @@ import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.phys.RotationVec;
 import com.iluha168.mc4d.world.phys.Vec4;
+import com.llamalad7.mixinextras.expression.Definition;
+import com.llamalad7.mixinextras.expression.Expression;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.phys.Vec2;
@@ -17,6 +20,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Vec3.class)
 class Vec3Mixin {
+	@Definition(id = "Vec3", type = Vec3.class)
+	@Expression("@(new Vec3(?, ?, ?))")
+	@ModifyExpressionValue(method = "<clinit>", at = @At("MIXINEXTRAS:EXPRESSION"))
+	private static Vec3 ZERO__XYZ_AXIS(Vec3 original) {
+		return new Vec4(original.x, original.y, original.z, 0.0);
+	}
+
 	@Redirect(method = "atLowerCornerOf", at = @At(
 		value = "NEW",
 		target = "(DDD)Lnet/minecraft/world/phys/Vec3;"

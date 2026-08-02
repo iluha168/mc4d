@@ -12,7 +12,6 @@ import net.minecraft.world.entity.InterpolationHandler;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -57,15 +56,6 @@ abstract class InterpolationHandlerMixin implements InterpolationHandler4 {
 
 	@Shadow
 	public abstract void cancel();
-
-	@Redirect(method = "<init>(Lnet/minecraft/world/entity/Entity;ILjava/util/function/Consumer;)V", at = @At(
-		value = "FIELD",
-		target = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;",
-		opcode = Opcodes.GETSTATIC
-	))
-	Vec3 init() {
-		return Vec4.ZERO;
-	}
 
 	@Override
 	public float wRot() {

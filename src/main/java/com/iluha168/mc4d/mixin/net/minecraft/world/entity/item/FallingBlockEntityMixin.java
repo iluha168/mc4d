@@ -12,7 +12,6 @@ import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -32,14 +31,6 @@ public abstract class FallingBlockEntityMixin extends EntityMixin implements Fal
 	))
 	void init_setPos(FallingBlockEntity instance, double x, double y, double z) {
 		this.initIncomplete = 1;
-	}
-	@Redirect(method = "<init>(Lnet/minecraft/world/level/Level;DDDLnet/minecraft/world/level/block/state/BlockState;)V", at = @At(
-		value = "FIELD",
-		target = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;",
-		opcode = Opcodes.GETSTATIC
-	))
-	Vec3 init_setDeltaMovement() {
-		return Vec4.ZERO;
 	}
 	@Override
 	public void init_finish(double x, double y, double z, double w) {

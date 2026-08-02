@@ -12,8 +12,6 @@ import com.iluha168.mc4d.world.level.storage.LevelData4;
 import com.iluha168.mc4d.world.phys.AABB4;
 import com.iluha168.mc4d.world.phys.RotationVec;
 import com.iluha168.mc4d.world.phys.Vec4;
-import com.llamalad7.mixinextras.expression.Definition;
-import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.serialization.Codec;
@@ -52,12 +50,6 @@ abstract class ServerPlayerMixin extends PlayerMixin {
 	))
 	SectionPos init_lastSectionPos(int x, int y, int z) {
 		return SectionPos4.of(x, y, z, z);
-	}
-	@Definition(id = "lastKnownClientMovement", field = "Lnet/minecraft/server/level/ServerPlayer;lastKnownClientMovement:Lnet/minecraft/world/phys/Vec3;")
-	@Expression("this.lastKnownClientMovement = @(?)")
-	@ModifyExpressionValue(method = "<init>", at = @At("MIXINEXTRAS:EXPRESSION"))
-	private static Vec3 init_lastKnownClientMovement(Vec3 original) {
-		return Vec4.ZERO;
 	}
 
 	// TODO readAdditionalSaveData

@@ -9,7 +9,6 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior;
 import net.minecraft.world.phys.Vec3;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -69,14 +68,6 @@ class NewMinecartBehaviorMixin implements NewMinecartBehavior4 {
 			);
 		}
 
-		@Redirect(method = "<clinit>", at = @At(
-			value = "FIELD",
-			target = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;",
-			opcode = Opcodes.GETSTATIC
-		))
-		private static Vec3 ZERO_position() {
-			return Vec4.ZERO;
-		}
 		@ModifyExpressionValue(method = "<clinit>", at = @At(
 			value = "NEW",
 			target = "(Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/phys/Vec3;FFF)Lnet/minecraft/world/entity/vehicle/minecart/NewMinecartBehavior$MinecartStep;"

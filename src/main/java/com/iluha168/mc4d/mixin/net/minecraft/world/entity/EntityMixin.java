@@ -2,7 +2,6 @@ package com.iluha168.mc4d.mixin.net.minecraft.world.entity;
 
 import com.iluha168.mc4d.core.BlockPos4;
 import com.iluha168.mc4d.core.Direction4;
-import com.iluha168.mc4d.core.Position4;
 import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.math.ArrayHelpers;
 import com.iluha168.mc4d.network.protocol.game.ClientboundAddEntityPacket4;
@@ -380,14 +379,6 @@ public class EntityMixin implements Entity4 {
 		return new AABB4(minX, minY, minZ, minZ, maxX, maxY, maxZ, maxZ);
 	}
 
-	@Redirect(method = "<init>", at = @At(
-		value = "FIELD",
-		target = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;",
-		opcode = Opcodes.GETSTATIC
-	))
-	private static Vec3 init_deltaMovement_stuckSpeedMultiplier_lastKnownSpeed_position() {
-		return Vec4.ZERO;
-	}
 	@Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;setPos(DDD)V"))
 	void init_setPos(Entity instance, double x, double y, double z){
 		instance.setPos(new Vec4(x, y, z, z));
@@ -526,16 +517,8 @@ public class EntityMixin implements Entity4 {
 		target = "Lnet/minecraft/world/entity/Entity;setPos(DDD)V"
 	))
 	void moveNoPhysics(Entity This, double x, double y, double z, @Local(argsOnly = true, name = "delta") Vec3 delta) {
-		double w = this.getW() + ((Position4) delta).w();
+		double w = this.getW() + ((Vec4) delta).w;
 		This.setPos(new Vec4(x, y, z, w));
-	}
-	@Redirect(method = "move", at = @At(
-		value = "FIELD",
-		target = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;",
-		opcode = Opcodes.GETSTATIC
-	))
-	Vec3 move_pistonCollision() {
-		return Vec4.ZERO;
 	}
 	@Definition(id = "zCollision", local = @Local(type = boolean.class, name = "zCollision"))
 	@Expression("zCollision = ?")
@@ -598,14 +581,6 @@ public class EntityMixin implements Entity4 {
 	Vec3 limitPistonMovement_vec(double x, double y, double z) {
 		return new Vec4(x, y, z, 0.0);
 	}
-	@Redirect(method = "limitPistonMovement", at = @At(
-		value = "FIELD",
-		target = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;",
-		opcode = Opcodes.GETSTATIC
-	))
-	Vec3 limitPistonMovement_ZERO() {
-		return Vec4.ZERO;
-	}
 	@Definition(id = "ZERO", field = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;")
 	@Expression("return @(ZERO)")
 	@ModifyExpressionValue(method = "limitPistonMovement", at = @At("MIXINEXTRAS:EXPRESSION"))
@@ -630,6 +605,13 @@ public class EntityMixin implements Entity4 {
 	) {
 		return original || ((Vec4) movement).w != ((Vec4) movementStep).w;
 	}
+	@Redirect(method = "collide", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/phys/AABB;move(DDD)Lnet/minecraft/world/phys/AABB;"
+	))
+	AABB collide_groundedAABB(AABB instance, double xa, double ya, double za) {
+		return ((AABB4) instance).move(xa, ya, za, za);
+	}
 	@Definition(id = "expandTowards", method = "Lnet/minecraft/world/phys/AABB;expandTowards(DDD)Lnet/minecraft/world/phys/AABB;")
 	@Definition(id = "movement", local = @Local(type = Vec3.class, name = "movement", argsOnly = true))
 	@Definition(id = "z", field = "Lnet/minecraft/world/phys/Vec3;z:D")
@@ -642,6 +624,14 @@ public class EntityMixin implements Entity4 {
 		return ((AABB4) instance).expandTowards(xa, ya, za, ((Vec4) movement).w);
 	}
 	@Redirect(method = "collide", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/phys/AABB;expandTowards(DDD)Lnet/minecraft/world/phys/AABB;",
+		ordinal = 1
+	))
+	AABB collide_stepUpAABB(AABB instance, double xa, double ya, double za) {
+		return ((AABB4) instance).expandTowards(xa, ya, za, za);
+	}
+	@Redirect(method = "collide", at = @At(
 		value = "NEW",
 		target = "(DDD)Lnet/minecraft/world/phys/Vec3;"
 	))
@@ -651,14 +641,12 @@ public class EntityMixin implements Entity4 {
 	) {
 		return new Vec4(x, y, z, ((Vec4) movement).w);
 	}
-
-	@ModifyExpressionValue(method = "collideWithShapes", at = @At(
-		value = "FIELD",
-		target = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;",
-		opcode = Opcodes.GETSTATIC
+	@Redirect(method = "collide", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/phys/Vec3;subtract(DDD)Lnet/minecraft/world/phys/Vec3;"
 	))
-	private static Vec3 collideWithShapes_resolvedMovement(Vec3 original) {
-		return Vec4.ZERO;
+	Vec3 collide_stepFromGround(Vec3 instance, double x, double y, double z) {
+		return ((Vec4) instance).subtract(x, y, z, z);
 	}
 
 	@ModifyArg(method = "waterSwimSound", at = @At(
@@ -668,6 +656,14 @@ public class EntityMixin implements Entity4 {
 	double waterSwimSound(double lengthSquared, @Local(name = "deltaMovement") Vec3 deltaMovement) {
 		final double w = ((Vec4) deltaMovement).w;
 		return lengthSquared + w * w * 0.2F;
+	}
+
+	@Redirect(method = "applyGravity", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/phys/Vec3;add(DDD)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 applyGravity(Vec3 instance, double x, double y, double z) {
+		return ((Vec4) instance).add(x, y, z, z);
 	}
 
 	@Redirect(method = "playSound(Lnet/minecraft/sounds/SoundEvent;FF)V", at = @At(
@@ -1078,7 +1074,7 @@ public class EntityMixin implements Entity4 {
 		@Local(name = "viewVector") Vec3 viewVector,
 		@Local(argsOnly = true, name = "range") double range
 	) {
-		double w = ((Position4) viewVector).w() * range;
+		double w = ((Vec4) viewVector).w * range;
 		return ((Vec4) from).add(x, y, z, w);
 	}
 
@@ -1136,14 +1132,6 @@ public class EntityMixin implements Entity4 {
 	))
 	Codec<Vec4> load_PosAndMotion_CODEC(){
 		return Vec4.CODEC;
-	}
-	@Redirect(method = "load", at = @At(
-		value = "FIELD",
-		target = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;",
-		opcode = Opcodes.GETSTATIC
-	))
-	Vec3 load_PosAndMotion_ZERO(){
-		return Vec4.ZERO;
 	}
 	@Redirect(method = "load", at = @At(
 		value = "FIELD",
@@ -1238,15 +1226,6 @@ public class EntityMixin implements Entity4 {
 		return AABB4.ofSize((Vec4) center, sizeX, sizeY, sizeZ, sizeX);
 	}
 
-	@Redirect(method = "rideTick", at = @At(
-		value = "FIELD",
-		target = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;",
-		opcode = Opcodes.GETSTATIC
-	))
-	Vec3 rideTick() {
-		return Vec4.ZERO;
-	}
-
 	// TODO positionRider
 	// TODO getVehicleAttachmentPoint
 	// TODO getDefaultPassengerAttachmentPoint
@@ -1333,14 +1312,6 @@ public class EntityMixin implements Entity4 {
 		return this.calculateViewVector(xRot, yRot, this.getWHeadRot());
 	}
 
-	@Redirect(method = "getHandHoldingItemAngle", at = @At(
-		value = "FIELD",
-		target = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;",
-		opcode = Opcodes.GETSTATIC
-	))
-	Vec3 getHandHoldingItemAngle_ZERO() {
-		return Vec4.ZERO;
-	}
 	@Redirect(method = "getHandHoldingItemAngle", at = @At(
 		value = "INVOKE",
 		target = "Lnet/minecraft/world/entity/Entity;calculateViewVector(FF)Lnet/minecraft/world/phys/Vec3;"
@@ -1723,6 +1694,14 @@ public class EntityMixin implements Entity4 {
 				SectionPos.blockToSectionCoord(w)
 			);
 		}
+	}
+
+	@Redirect(method = "getRopeHoldPosition", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/phys/Vec3;add(DDD)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 getRopeHoldPosition(Vec3 instance, double x, double y, double z) {
+		return ((Vec4) instance).add(x, y, z, z);
 	}
 
 	@Redirect(method = "recreateFromPacket", at = @At(

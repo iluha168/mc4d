@@ -2,7 +2,6 @@ package com.iluha168.mc4d.mixin.net.minecraft.core;
 
 import com.iluha168.mc4d.core.BlockPos4;
 import com.iluha168.mc4d.core.Direction4;
-import com.iluha168.mc4d.core.Position4;
 import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.level.Level4;
@@ -117,7 +116,7 @@ public abstract class BlockPosMixin implements BlockPos4 {
 	))
 	private static BlockPos containing(double x, double y, double z, @Local(argsOnly = true, name = "pos") Position pos) {
 		if (pos instanceof Vec4 pos4) {
-			return BlockPos4.containing(x, y, z, pos4.w());
+			return BlockPos4.containing(x, y, z, pos4.w);
 		}
 		throw Err4.arguments3("BlockPos4#containing");
 	}
@@ -395,8 +394,8 @@ public abstract class BlockPosMixin implements BlockPos4 {
 		if (!(direction instanceof Vec4 direction4)) {
 			throw Err4.container3();
 		}
-		int firstCornerW = Mth.floor(((Position4) minCorner).w());
-		int secondCornerW = Mth.floor(((Position4) maxCorner).w());
+		int firstCornerW = Mth.floor(((Vec4) minCorner).w);
+		int secondCornerW = Mth.floor(((Vec4) maxCorner).w);
 		return BlockPos4.betweenCornersInDirection(
 			firstCornerX, firstCornerY, firstCornerZ, firstCornerW,
 			secondCornerX, secondCornerY, secondCornerZ, secondCornerW,

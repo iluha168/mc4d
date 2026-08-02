@@ -3,7 +3,6 @@ package com.iluha168.mc4d.mixin.net.minecraft.world.level.block;
 import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.world.level.LevelAccessor4;
 import com.iluha168.mc4d.world.level.portal.TeleportTransition4;
-import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
@@ -14,8 +13,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.EndGatewayBlock;
 import net.minecraft.world.level.portal.TeleportTransition;
-import net.minecraft.world.phys.Vec3;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -55,14 +52,6 @@ class EndGatewayBlockMixin {
 		((LevelAccessor4) level).addParticle(particle, x, y, z, w, xd, yd, zd, wa);
 	}
 
-	@Redirect(method = "getPortalDestination", at = @At(
-		value = "FIELD",
-		target = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;",
-		opcode = Opcodes.GETSTATIC
-	))
-	private Vec3 getPortalDestination_ZERO() {
-		return Vec4.ZERO;
-	}
 	@ModifyExpressionValue(method = "getPortalDestination", at = @At(
 		value = "NEW",
 		target = "(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/phys/Vec3;FFLjava/util/Set;Lnet/minecraft/world/level/portal/TeleportTransition$PostTeleportTransition;)Lnet/minecraft/world/level/portal/TeleportTransition;"

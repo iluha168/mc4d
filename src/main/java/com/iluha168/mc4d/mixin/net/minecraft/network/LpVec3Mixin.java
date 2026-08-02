@@ -8,7 +8,6 @@ import com.llamalad7.mixinextras.sugar.ref.LocalDoubleRef;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.LpVec3;
 import net.minecraft.world.phys.Vec3;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,14 +20,6 @@ class LpVec3Mixin {
 		throw new UnsupportedOperationException("Implemented via mixin");
 	}
 
-	@Redirect(method = "read", at = @At(
-		value = "FIELD",
-		target = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;",
-		opcode = Opcodes.GETSTATIC
-	))
-	private static Vec3 read_ZERO() {
-		return Vec4.ZERO;
-	}
 	@Redirect(method = "read", at = @At(
 		value = "NEW",
 		target = "(DDD)Lnet/minecraft/world/phys/Vec3;"

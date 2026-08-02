@@ -303,7 +303,7 @@ class StructureTemplateMixin implements StructureTemplate4 {
 	private static Vec3 load_entityPos(Vec3 original, @Local(name = "posTag") ListTag posTag) {
 		Optional<Double> w = posTag.getDouble(3);
 		if (w.isPresent()) {
-			return Vec4.of(original, w.get());
+			return new Vec4(original.x, original.y, original.z, w.get());
 		}
 		return original;
 	}

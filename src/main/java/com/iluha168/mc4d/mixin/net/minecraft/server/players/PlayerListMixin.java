@@ -1,6 +1,5 @@
 package com.iluha168.mc4d.mixin.net.minecraft.server.players;
 
-import com.iluha168.mc4d.core.Position4;
 import com.iluha168.mc4d.server.network.ServerGamePacketListenerImpl4;
 import com.iluha168.mc4d.server.players.PlayerList4;
 import com.iluha168.mc4d.util.Err4;
@@ -91,7 +90,7 @@ public class PlayerListMixin implements PlayerList4 {
 		@Local(name = "respawnInfo") TeleportTransition respawnInfo
 	) {
 		final TeleportTransition4 respawnInfo4 = TeleportTransition4.as(respawnInfo);
-		double w = ((Position4) pos).w();
+		double w = ((Vec4) pos).w;
 		((Entity4) player).snapTo(new Vec4(x, y, z, w), yRot, xRot, respawnInfo4.wRot(), respawnInfo4.vRot());
 	}
 	// TODO respawn

@@ -1,9 +1,11 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.entity;
 
-import com.iluha168.mc4d.core.Position4;
 import com.iluha168.mc4d.util.Err4;
+import com.iluha168.mc4d.world.entity.EntityAttachments4;
 import com.iluha168.mc4d.world.phys.AABB4;
+import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.sugar.Local;
+import net.minecraft.world.entity.EntityAttachments;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -29,7 +31,7 @@ public class EntityDimensionsMixin {
 		target = "Lnet/minecraft/world/entity/EntityDimensions;makeBoundingBox(DDD)Lnet/minecraft/world/phys/AABB;"
 	))
 	AABB makeBoundingBox(EntityDimensions instance, double x, double y, double z, @Local(argsOnly = true, name = "pos") Vec3 pos) {
-		double w = ((Position4) pos).w();
+		double w = ((Vec4) pos).w;
 		float width = this.width / 2.0F;
 		float h = this.height;
 		return new AABB4(
@@ -39,7 +41,16 @@ public class EntityDimensionsMixin {
 	}
 
 	@Overwrite
+	@Deprecated
 	public AABB makeBoundingBox(double x, double y, double z) {
 		throw Err4.arguments3("EntityDimensions#makeBoundingBox(Vec4)");
+	}
+
+	@Redirect(method = "scale(FF)Lnet/minecraft/world/entity/EntityDimensions;", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/EntityAttachments;scale(FFF)Lnet/minecraft/world/entity/EntityAttachments;"
+	))
+	EntityAttachments scale(EntityAttachments attachments, float x, float y, float z) {
+		return ((EntityAttachments4) attachments).scale(x, y, z, z);
 	}
 }

@@ -12,7 +12,6 @@ import com.iluha168.mc4d.world.level.ChunkPos4;
 import com.iluha168.mc4d.world.level.Level4;
 import com.iluha168.mc4d.world.level.border.WorldBorder4;
 import com.iluha168.mc4d.world.level.chunk.ChunkSource4;
-import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
@@ -42,7 +41,6 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 import net.minecraft.world.phys.Vec3;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -171,14 +169,6 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
 		final PositionMoveRotation4 newValues4 = PositionMoveRotation4.as(newValues);
 		entity4.setWRot(newValues4.wRot());
 		entity4.setVRot(newValues4.vRot());
-	}
-	@Redirect(method = "setValuesFromPositionPacket", at = @At(
-		value = "FIELD",
-		target = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;",
-		opcode = Opcodes.GETSTATIC
-	))
-	private static Vec3 setValuesFromPositionPacket_ZERO() {
-		return Vec4.ZERO;
 	}
 	@ModifyExpressionValue(method = "setValuesFromPositionPacket", at = @At(
 		value = "NEW",

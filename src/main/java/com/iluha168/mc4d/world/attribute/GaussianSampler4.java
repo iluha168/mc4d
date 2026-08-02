@@ -7,15 +7,15 @@ import net.minecraft.world.attribute.GaussianSampler;
 public class GaussianSampler4 extends GaussianSampler {
 	public static <V> void sample(Vec4 position, GaussianSampler4.Sampler<V> sampler, GaussianSampler.Accumulator<V> accumulator) {
 		position = position.subtract(0.5, 0.5, 0.5, 0.5);
-		int integralX = Mth.floor(position.x());
-		int integralY = Mth.floor(position.y());
-		int integralZ = Mth.floor(position.z());
-		int integralW = Mth.floor(position.w());
+		int integralX = Mth.floor(position.x);
+		int integralY = Mth.floor(position.y);
+		int integralZ = Mth.floor(position.z);
+		int integralW = Mth.floor(position.w);
 
-		double relativeX = position.x() - integralX;
-		double relativeY = position.y() - integralY;
-		double relativeZ = position.z() - integralZ;
-		double relativeW = position.w() - integralW;
+		double relativeX = position.x - integralX;
+		double relativeY = position.y - integralY;
+		double relativeZ = position.z - integralZ;
+		double relativeW = position.w - integralW;
 
 		for (int w = 0; w < GAUSSIAN_SAMPLE_BREADTH; w++) {
 			double weightW = Mth.lerp(relativeW, GAUSSIAN_SAMPLE_KERNEL[w + 1], GAUSSIAN_SAMPLE_KERNEL[w]);

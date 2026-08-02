@@ -7,7 +7,6 @@ import com.iluha168.mc4d.world.entity.Entity4;
 import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.culling.Frustum;
@@ -15,6 +14,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3fc;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -34,14 +34,6 @@ class CameraMixin {
 
 	@Shadow
 	private Vec3 position;
-
-	@Definition(id = "position", field = "Lnet/minecraft/client/Camera;position:Lnet/minecraft/world/phys/Vec3;")
-	@Definition(id = "ZERO", field = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;")
-	@Expression("this.position = @(ZERO)")
-	@ModifyExpressionValue(method = "<init>", at = @At("MIXINEXTRAS:EXPRESSION"))
-	Vec3 initialPosition(Vec3 original) {
-		return Vec4.ZERO;
-	}
 
 	@Redirect(method = "prepareCullFrustum", at = @At(
 		value = "INVOKE",
@@ -83,7 +75,7 @@ class CameraMixin {
 	@Redirect(method = "move", at = @At("MIXINEXTRAS:EXPRESSION"))
 	void move(Camera This, Vec3 position) {
 		// TODO rework when 4D renderer
-		this.setPosition(Vec4.of(position, ((Vec4) this.position).w));
+		this.setPosition(new Vec4(position.x, position.y, position.z, ((Vec4) this.position).w));
 	}
 
 	@Redirect(method = "setPosition(Lnet/minecraft/world/phys/Vec3;)V", at = @At(
@@ -97,5 +89,12 @@ class CameraMixin {
 		return ((BlockPos4.MutableBlockPos) blockPosition).set(x, y, z, pos4.w);
 	}
 
-	// TODO? NearPlane
+	@Redirect(method = "getNearPlane", at = @At(
+		value = "NEW",
+		target = "(Lorg/joml/Vector3fc;)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 getNearPlane(Vector3fc vec) {
+		// TODO rework when 4D renderer
+		return new Vec4(vec.x(), vec.y(), vec.z(), 0.0);
+	}
 }

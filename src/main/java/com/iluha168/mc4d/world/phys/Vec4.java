@@ -1,7 +1,6 @@
 package com.iluha168.mc4d.world.phys;
 
 import com.iluha168.mc4d.core.Direction4;
-import com.iluha168.mc4d.core.Position4;
 import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.util.Err4;
 import com.mojang.serialization.Codec;
@@ -25,14 +24,14 @@ import static com.iluha168.mc4d.math.MathHelpers.det3;
  * Any operation on Vec4 returns a Vec4: Vec3 + Vec4 = Vec3; Vec4 + Vec3 = Vec4.
  * Callers should be oblivious that they work with 4D vectors.
  */
-public class Vec4 extends Vec3 implements Position4 {
+public class Vec4 extends Vec3 {
 	public static final Codec<Vec4> CODEC = Codec.DOUBLE
 		.listOf()
 		.comapFlatMap(
 			input -> Util
 				.fixedSize(input, 4)
 				.map(doubles -> new Vec4(doubles.getFirst(), doubles.get(1), doubles.get(2), doubles.get(3))),
-			pos -> List.of(pos.x(), pos.y(), pos.z(), pos.w())
+			pos -> List.of(pos.x, pos.y, pos.z, pos.w)
 		);
 
 	public static final StreamCodec<ByteBuf, Vec4> STREAM_CODEC = new StreamCodec<>() {
@@ -43,18 +42,14 @@ public class Vec4 extends Vec3 implements Position4 {
 
 		@Override
 		public void encode(ByteBuf output, Vec4 value) {
-			output.writeDouble(value.x());
-			output.writeDouble(value.y());
-			output.writeDouble(value.z());
-			output.writeDouble(value.w());
+			output.writeDouble(value.x);
+			output.writeDouble(value.y);
+			output.writeDouble(value.z);
+			output.writeDouble(value.w);
 		}
 	};
 
 	public static final Vec4 ZERO = new Vec4(0.0, 0.0, 0.0, 0.0);
-	public static final Vec4 X_AXIS = new Vec4(1.0, 0.0, 0.0, 0.0);
-	public static final Vec4 Y_AXIS = new Vec4(0.0, 1.0, 0.0, 0.0);
-	public static final Vec4 Z_AXIS = new Vec4(0.0, 0.0, 1.0, 0.0);
-	public static final Vec4 W_AXIS = new Vec4(0.0, 0.0, 0.0, 1.0);
 
 	public final double w;
 
@@ -71,14 +66,6 @@ public class Vec4 extends Vec3 implements Position4 {
 		this(vec.getX(), vec.getY(), vec.getZ(), Vec4i.getW(vec));
 	}
 
-	/**
-	 * Backwards compatibility helper. Adds 4th coordinate to a 3D/4D vector, if it does not have one.
-	 */
-	public static Vec4 of(Vec3 vec, double w) {
-		if (vec instanceof Vec4 vec4) return vec4;
-		return new Vec4(vec.x, vec.y, vec.z, w);
-	}
-
 	@Override
 	public @NonNull Vec4 vectorTo(Vec3 vec) {
 		return new Vec4(vec.x - this.x, vec.y - this.y, vec.z - this.z, ((Vec4) vec).w - this.w);
@@ -92,7 +79,7 @@ public class Vec4 extends Vec3 implements Position4 {
 
 	@Override
 	public double dot(Vec3 vec) {
-		return this.x * vec.x + this.y * vec.y + this.z * vec.z + this.w * ((Position4) vec).w();
+		return this.x * vec.x + this.y * vec.y + this.z * vec.z + this.w * ((Vec4) vec).w;
 	}
 
 	@Override
@@ -118,7 +105,7 @@ public class Vec4 extends Vec3 implements Position4 {
 
 	@Override
 	public @NonNull Vec4 subtract(Vec3 vec) {
-		return this.subtract(vec.x, vec.y, vec.z, ((Position4) vec).w());
+		return this.subtract(vec.x, vec.y, vec.z, ((Vec4) vec).w);
 	}
 
 	@Override
@@ -131,7 +118,7 @@ public class Vec4 extends Vec3 implements Position4 {
 	public @NonNull Vec4 subtract(double x, double y, double z) {
 		if (x == 0 && z == 0) {
 			// Call site intends to modify only the Y axis
-			// Do not rely on this hack while writing mixins - redirect the calls anyway, this is planned for removal
+			// Do not rely on this hack while writing mixins - redirect the calls anyway
 			return this.subtract(x, y, z, z);
 		}
 		throw Err4.arguments3("Vec4#subtract");
@@ -148,7 +135,7 @@ public class Vec4 extends Vec3 implements Position4 {
 
 	@Override
 	public @NonNull Vec4 add(Vec3 vec) {
-		return this.add(vec.x, vec.y, vec.z, ((Position4) vec).w());
+		return this.add(vec.x, vec.y, vec.z, ((Vec4) vec).w);
 	}
 
 	@Override
@@ -156,7 +143,7 @@ public class Vec4 extends Vec3 implements Position4 {
 	public @NonNull Vec4 add(double x, double y, double z) {
 		if (x == 0 && z == 0) {
 			// Call site intends to modify only the Y axis
-			// Do not rely on this hack while writing mixins - redirect the calls anyway, this is planned for removal
+			// Do not rely on this hack while writing mixins - redirect the calls anyway
 			return this.add(x, y, z, z);
 		}
 		throw Err4.arguments3("Vec4#add");
@@ -168,7 +155,7 @@ public class Vec4 extends Vec3 implements Position4 {
 
 	@Override
 	public boolean closerThan(net.minecraft.core.Position pos, double distance) {
-		return this.distanceToSqr(pos.x(), pos.y(), pos.z(), ((Position4) pos).w()) < distance * distance;
+		return this.distanceToSqr(pos.x(), pos.y(), pos.z(), ((Vec4) pos).w) < distance * distance;
 	}
 
 	@Override
@@ -181,7 +168,7 @@ public class Vec4 extends Vec3 implements Position4 {
 		double xd = vec.x - this.x;
 		double yd = vec.y - this.y;
 		double zd = vec.z - this.z;
-		double wd = ((Position4) vec).w() - this.w;
+		double wd = ((Vec4) vec).w - this.w;
 		return xd * xd + yd * yd + zd * zd + wd * wd;
 	}
 
@@ -204,7 +191,7 @@ public class Vec4 extends Vec3 implements Position4 {
 		double dx = vec.x() - this.x;
 		double dy = vec.y() - this.y;
 		double dz = vec.z() - this.z;
-		double dw = ((Position4) vec).w() - this.w;
+		double dw = ((Vec4) vec).w - this.w;
 		return Mth.lengthSquared(dx, dz, dw) < Mth.square(distanceXZW) && Math.abs(dy) < distanceY;
 	}
 
@@ -220,7 +207,7 @@ public class Vec4 extends Vec3 implements Position4 {
 
 	@Override
 	public @NonNull Vec4 multiply(Vec3 scale) {
-		return this.multiply(scale.x, scale.y, scale.z, ((Position4) scale).w());
+		return this.multiply(scale.x, scale.y, scale.z, ((Vec4) scale).w);
 	}
 
 	@Override
@@ -282,13 +269,13 @@ public class Vec4 extends Vec3 implements Position4 {
 	public boolean equals(@NonNull Object o) {
 		if (this == o) {
 			return true;
-		} else if (!(o instanceof Vec3 vec3)) {
+		} else if (!(o instanceof Vec4 vec4)) {
 			return false;
 		} else {
-			return Double.compare(vec3.x, this.x) == 0
-				&& Double.compare(vec3.y, this.y) == 0
-				&& Double.compare(vec3.z, this.z) == 0
-				&& Double.compare(((Position4) vec3).w(), this.w) == 0;
+			return Double.compare(vec4.x, this.x) == 0
+				&& Double.compare(vec4.y, this.y) == 0
+				&& Double.compare(vec4.z, this.z) == 0
+				&& Double.compare(vec4.w, this.w) == 0;
 		}
 	}
 
@@ -311,7 +298,7 @@ public class Vec4 extends Vec3 implements Position4 {
 			Mth.lerp(alpha, this.x, vec.x),
 			Mth.lerp(alpha, this.y, vec.y),
 			Mth.lerp(alpha, this.z, vec.z),
-			Mth.lerp(alpha, this.w, ((Position4) vec).w())
+			Mth.lerp(alpha, this.w, ((Vec4) vec).w)
 		);
 	}
 
@@ -359,7 +346,7 @@ public class Vec4 extends Vec3 implements Position4 {
 	/** Rotates the XZ plane (around the YW plane). */
 	@Override
 	public @NonNull Vec4 rotateClockwise90() {
-		return Vec4.of(super.rotateClockwise90(), this.w);
+		return new Vec4(-this.z, this.y, this.x, this.w);
 	}
 
 	/** Alternatively called "forwards" or "look direction". */
@@ -447,12 +434,6 @@ public class Vec4 extends Vec3 implements Position4 {
 			this.z + distance * normal.getZ(),
 			this.w + distance * Vec4i.getW(normal)
 		);
-	}
-
-	@Override
-	@Deprecated // Just access w directly
-	public final double w() {
-		return this.w;
 	}
 
 	// do not remove `toVector3f`, it is used in rendering

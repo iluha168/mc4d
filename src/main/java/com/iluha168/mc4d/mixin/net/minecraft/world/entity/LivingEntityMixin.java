@@ -378,15 +378,6 @@ public abstract class LivingEntityMixin extends EntityMixin implements LivingEnt
 
 	// TODO updateFallFlyingMovement
 
-	@ModifyExpressionValue(method = "travelRidden", at = @At(
-		value = "FIELD",
-		target = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;",
-		opcode = Opcodes.GETSTATIC
-	))
-	Vec3 travelRidden(Vec3 original) {
-		return Vec4.ZERO;
-	}
-
 	@Redirect(method = "calculateEntityAnimation", at = @At(
 		value = "INVOKE",
 		target = "Lnet/minecraft/util/Mth;length(DDD)D"

@@ -4,7 +4,6 @@ import com.iluha168.mc4d.MC4D;
 import com.iluha168.mc4d.client.player.LocalPlayer4;
 import com.iluha168.mc4d.core.BlockPos4;
 import com.iluha168.mc4d.core.Direction4;
-import com.iluha168.mc4d.core.Position4;
 import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.math.MathHelpers;
 import com.iluha168.mc4d.mixin.net.minecraft.world.entity.player.PlayerMixin;
@@ -175,7 +174,7 @@ public abstract class LocalPlayerMixin extends PlayerMixin implements LocalPlaye
 
 			if (dir != null) {
 				Vec3 oldMovement = This.getDeltaMovement();
-				double oldMovementW = ((Position4) oldMovement).w();
+				double oldMovementW = ((Vec4) oldMovement).w;
 				if (dir.getAxis() == Direction.Axis.X) {
 					This.setDeltaMovement(new Vec4(0.1 * dir.getStepX(), oldMovement.y, oldMovement.z, oldMovementW));
 				} else if (dir.getAxis() == Direction.Axis.Z) {
@@ -284,6 +283,13 @@ public abstract class LocalPlayerMixin extends PlayerMixin implements LocalPlaye
 		final double wMinus = w - This.getBbWidth() * 0.35;
 		this.moveTowardsClosestSpace(This, x, z, wPlus);
 		this.moveTowardsClosestSpace(This, x, z, wMinus);
+	}
+	@Redirect(method = "aiStep", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/phys/Vec3;add(DDD)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 aiStep_flyingUpDown(Vec3 instance, double x, double y, double z) {
+		return ((Vec4) instance).add(x, y, z, z);
 	}
 
 	@ModifyExpressionValue(method = "rideTick", at = @At(

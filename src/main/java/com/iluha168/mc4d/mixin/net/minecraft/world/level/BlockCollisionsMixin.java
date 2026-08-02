@@ -6,7 +6,6 @@ import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.level.ChunkPos4;
 import com.iluha168.mc4d.world.level.CollisionGetter4;
 import com.iluha168.mc4d.world.phys.AABB4;
-import com.iluha168.mc4d.world.phys.IAABB4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -48,10 +47,10 @@ public class BlockCollisionsMixin {
 		target = "(IIIIII)Lnet/minecraft/core/Cursor3D;"
 	))
 	Cursor3D useCursor4D(int minX, int minY, int minZ, int maxX, int maxY, int maxZ, @Local(argsOnly = true, name = "box") AABB box) {
-		IAABB4 box4 = (IAABB4) box;
+		final AABB4 box4 = (AABB4) box;
 		return new Cursor4D(
-			minX, minY, minZ, Mth.floor(box4.minW() - AABB4.EPSILON) - 1,
-			maxX, maxY, maxZ, Mth.floor(box4.maxW() + AABB4.EPSILON) + 1
+			minX, minY, minZ, Mth.floor(box4.minW - AABB4.EPSILON) - 1,
+			maxX, maxY, maxZ, Mth.floor(box4.maxW + AABB4.EPSILON) + 1
 		);
 	}
 

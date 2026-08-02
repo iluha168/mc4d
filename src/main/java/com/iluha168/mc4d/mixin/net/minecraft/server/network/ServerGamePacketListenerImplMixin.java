@@ -236,7 +236,7 @@ public abstract class ServerGamePacketListenerImplMixin implements ServerGamePac
 	@Expression("?.move(PLAYER, new Vec3(?, ?, zDist))")
 	@ModifyArg(method = "handleMovePlayer", index = 1, at = @At("MIXINEXTRAS:EXPRESSION"))
 	Vec3 handleMovePlayer_move(Vec3 vec3, @Share("wDist") LocalDoubleRef wDist) {
-		return Vec4.of(vec3, wDist.get());
+		return new Vec4(vec3.x, vec3.y, vec3.z, wDist.get());
 	}
 	@Definition(id = "zDist", local = @Local(type = double.class, name = "zDist"))
 	@Definition(id = "targetZ", local = @Local(type = double.class, name = "targetZ"))
@@ -273,7 +273,7 @@ public abstract class ServerGamePacketListenerImplMixin implements ServerGamePac
 	@Expression("new Vec3(?, ?, this.player.getZ() - startZ)")
 	@ModifyExpressionValue(method = "handleMovePlayer", at = @At("MIXINEXTRAS:EXPRESSION"))
 	Vec3 handleMovePlayer_clientDeltaMovement(Vec3 original, @Share("startW") LocalDoubleRef startW) {
-		return Vec4.of(original, ((Entity4) this.player).getW() - startW.get());
+		return new Vec4(original.x, original.y, original.z, ((Entity4) this.player).getW() - startW.get());
 	}
 	@Definition(id = "doCheckFallDamage", method = "Lnet/minecraft/server/level/ServerPlayer;doCheckFallDamage(DDDZ)V")
 	@Definition(id = "clientDeltaMovement", local = @Local(type = Vec3.class, name = "clientDeltaMovement"))
@@ -394,14 +394,6 @@ public abstract class ServerGamePacketListenerImplMixin implements ServerGamePac
 	void resyncPlayerWithVehicle(Entity vehicle, CallbackInfo ci, @Local(name = "oldPos") Vec3 oldPos) {
 		Entity4 player4 = (Entity4) this.player;
 		player4.setWO(((Vec4) oldPos).w);
-	}
-
-	@ModifyArg(method = "handleClientTickEnd", at = @At(
-		value = "INVOKE",
-		target = "Lnet/minecraft/server/level/ServerPlayer;setKnownMovement(Lnet/minecraft/world/phys/Vec3;)V"
-	))
-	Vec3 handleClientTickEnd(Vec3 lastKnownClientMovement) {
-		return Vec4.ZERO;
 	}
 
 	@Expression("? < 1.0000001")
