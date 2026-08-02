@@ -27,6 +27,11 @@ public interface Direction4 {
 		return (Direction4) (Object) direction;
 	}
 
+	/** Mirrors {@link Direction#getYRot}. */
+	static float getWRot(Direction direction) {
+		return Direction4.as(direction).toWRot();
+	}
+
 	static Direction getApproximateNearest(double dx, double dy, double dz, double dw) {
 		return getApproximateNearest((float) dx, (float) dy, (float) dz, (float) dw);
 	}

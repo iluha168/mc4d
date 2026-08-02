@@ -54,7 +54,11 @@ public enum DirectionMixin implements Direction4 {
 	// TODO orderedByNearest
 	// TODO makeDirectionArray
 	// TODO rotate
-	// TODO getYRot
+
+	@WrapMethod(method = "getYRot")
+	private static float getYRot(Direction direction, Operation<Float> original) {
+		return direction == Direction4.KATA || direction == Direction4.ANA ? 0 : original.call(direction);
+	}
 
 	@WrapMethod(method = "getRotation")
 	Quaternionf getRotation(Operation<Quaternionf> original) {

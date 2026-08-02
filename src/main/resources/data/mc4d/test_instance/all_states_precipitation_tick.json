@@ -1,6 +1,6 @@
 {
 	"type": "minecraft:function",
-	"function": "mc4d:all_states_handle_precipitation",
+	"function": "mc4d:all_states_precipitation_tick",
 	"environment": "minecraft:default",
 	"structure": "mc4d:empty_size3",
 	"max_ticks": 1,

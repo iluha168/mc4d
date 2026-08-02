@@ -97,9 +97,13 @@ public final class StatesTestFunctions {
 		for (final BlockState state : DebugLevelSource.ALL_BLOCKS) {
 			if (!predicate.test(state)) continue;
 			// Ticking
-			level.setBlock(center, state, PLACE_FLAGS);
-			for (int attempt = 0; attempt < TICK_ATTEMPTS; attempt++)
-				tick.exec(state, level, center, level.getRandom());
+			try {
+				level.setBlock(center, state, PLACE_FLAGS);
+				for (int attempt = 0; attempt < TICK_ATTEMPTS; attempt++)
+					tick.exec(state, level, center, level.getRandom());
+			} catch (Throwable e) {
+				throw new RuntimeException("State "+state+" not implemented: "+e.getMessage(), e);
+			}
 
 			// Clearing
 			level.getBlockTicks().clearArea(bounds);
