@@ -7,6 +7,7 @@ import com.iluha168.mc4d.world.entity.Entity4;
 import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.culling.Frustum;
@@ -68,6 +69,13 @@ class CameraMixin {
 	Vec3 getMaxZoom_from(Vec3 position, double x, double y, double z, @Local(name = "i") int i) {
 		float offsetW = (i >> 3 & 1) * 2 - 1;
 		return ((Vec4) position).add(x, y, z, offsetW * 0.1F);
+	}
+	@ModifyExpressionValue(method = "getMaxZoom", at = @At(
+		value = "NEW",
+		target = "(Lorg/joml/Vector3fc;)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 getMaxZoom_forwards(Vec3 f) {
+		return new Vec4(f.x, f.y, f.z, 0);
 	}
 
 	@Definition(id = "setPosition", method = "Lnet/minecraft/client/Camera;setPosition(Lnet/minecraft/world/phys/Vec3;)V")

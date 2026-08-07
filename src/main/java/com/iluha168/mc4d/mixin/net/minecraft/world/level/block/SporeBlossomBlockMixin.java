@@ -12,8 +12,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.SporeBlossomBlock;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Constant;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(SporeBlossomBlock.class)
@@ -30,10 +28,6 @@ class SporeBlossomBlockMixin {
 	) {
 		final double wFalling = Vec4i.getW(pos) + random.nextDouble();
 		((LevelAccessor4) instance).addParticle(particle, x, y, z, wFalling, xd, yd, zd, zd);
-	}
-	@ModifyConstant(method = "animateTick", constant = @Constant(intValue = 14))
-	int animateTick_attempts(int addParticleAttempts) {
-		return addParticleAttempts * 21; // Preserve vanilla's density (21*10*21 -> 21*10*21*21).
 	}
 	@Redirect(method = "animateTick", at = @At(
 		value = "INVOKE",

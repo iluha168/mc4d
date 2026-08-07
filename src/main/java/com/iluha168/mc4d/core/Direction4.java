@@ -21,6 +21,11 @@ public interface Direction4 {
 	ImmutableList<Direction.Axis> YWXZ_AXIS_ORDER = ImmutableList.of(Direction.Axis.Y, Axis.W, Direction.Axis.X, Direction.Axis.Z);
 	ImmutableList<Direction.Axis> YWZX_AXIS_ORDER = ImmutableList.of(Direction.Axis.Y, Axis.W, Direction.Axis.Z, Direction.Axis.X);
 
+	/**
+	 * {@return every horizontal direction perpendicular to this one}
+	 */
+	Direction[] getHorizontalPerpendiculars();
+
 	int getStepW();
 
 	static Direction4 as(Direction direction) {

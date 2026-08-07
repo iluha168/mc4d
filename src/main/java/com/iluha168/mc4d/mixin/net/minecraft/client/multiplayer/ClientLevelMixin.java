@@ -62,7 +62,6 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.phys.AABB;
@@ -152,9 +151,9 @@ class ClientLevelMixin extends LevelMixin implements ClientLevel4 {
 		Block markerParticleTarget = this.getMarkerParticleTarget();
 		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 
-		for (int i = 0; i < 667 * LevelChunkSection.SECTION_WIDTH; i++) {
-			this.doAnimateTick(xt, yt, zt, wt, 16, animateRandom, markerParticleTarget, pos);
-			this.doAnimateTick(xt, yt, zt, wt, 32, animateRandom, markerParticleTarget, pos);
+		for (int i = 0; i < 667; i++) {
+			for (int j = 0; j < 16; j++) this.doAnimateTick(xt, yt, zt, wt, 16, animateRandom, markerParticleTarget, pos);
+			for (int j = 0; j < 32; j++) this.doAnimateTick(xt, yt, zt, wt, 32, animateRandom, markerParticleTarget, pos);
 		}
 	}
 
