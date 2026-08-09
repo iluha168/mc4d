@@ -9,6 +9,8 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(ChestRenderer.class)
 class ChestRendererMixin {
+	// TODO createModelTransformation toWRot
+
 	@Redirect(method = "getRenderBoundingBox", at = @At(
 		value = "INVOKE",
 		target = "Lnet/minecraft/core/BlockPos;offset(III)Lnet/minecraft/core/BlockPos;"

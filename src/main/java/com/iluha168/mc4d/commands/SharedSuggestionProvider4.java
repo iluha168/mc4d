@@ -1,7 +1,9 @@
 package com.iluha168.mc4d.commands;
 
+/**
+ * Implemented by {@link net.minecraft.commands.SharedSuggestionProvider}.
+ */
 public interface SharedSuggestionProvider4 {
-
 	/**
 	 * Implemented by {@link net.minecraft.commands.SharedSuggestionProvider.TextCoordinates}.
 	 */

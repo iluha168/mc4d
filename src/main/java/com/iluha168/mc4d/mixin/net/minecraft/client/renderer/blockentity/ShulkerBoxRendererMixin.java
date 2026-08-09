@@ -12,6 +12,8 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(ShulkerBoxRenderer.class)
 class ShulkerBoxRendererMixin {
+	// TODO createModelTransform somehow display ANA/KATA
+
 	@Redirect(method = "getRenderBoundingBox(Lnet/minecraft/world/level/block/entity/ShulkerBoxBlockEntity;)Lnet/minecraft/world/phys/AABB;", at = @At(
 		value = "NEW",
 		target = "(DDDDDD)Lnet/minecraft/world/phys/AABB;"

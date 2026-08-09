@@ -1,5 +1,7 @@
 {
   "key.mc4d.ana": "Strafe Ana",
   "key.mc4d.kata": "Strafe Kata",
-  "key.mc4d.mouse_alternative_look": "Alternative mouse look"
+  "key.mc4d.mouse_alternative_look": "Alternative mouse look",
+  "structure_block.position.w": "relative position w",
+  "structure_block.size.w": "structure size w"
 }

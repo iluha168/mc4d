@@ -1,5 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.levelgen.structure.templatesystem;
 
+import com.iluha168.mc4d.core.BlockPos4;
 import com.iluha168.mc4d.core.Direction4;
 import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.math.ArrayHelpers;
@@ -40,10 +41,7 @@ import net.minecraft.world.phys.shapes.DiscreteVoxelShape;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Comparator;
@@ -58,7 +56,30 @@ class StructureTemplateMixin implements StructureTemplate4 {
 	@Shadow
 	public abstract Vec3i getSize();
 
-	// TODO fillFromWorld
+	@Definition(id = "size", local = @Local(type = Vec3i.class, name = "size", argsOnly = true))
+	@Definition(id = "getZ", method = "Lnet/minecraft/core/Vec3i;getZ()I")
+	@Expression("size.getZ() >= 1")
+	@ModifyExpressionValue(method = "fillFromWorld", at = @At("MIXINEXTRAS:EXPRESSION"))
+	boolean fillFromWorld_sizeCheck(boolean original, @Local(argsOnly = true, name = "size") Vec3i size) {
+		return original && Vec4i.getW(size) >= 1;
+	}
+	@Redirect(method = "fillFromWorld", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/core/BlockPos;offset(III)Lnet/minecraft/core/BlockPos;"
+	))
+	BlockPos fillFromWorld_offset(BlockPos instance, int x, int y, int z) {
+		return ((BlockPos4) instance).offset(x, y, z, z);
+	}
+	@ModifyVariable(method = "fillFromWorld", name = "minCorner", at = @At("STORE"))
+	BlockPos fillFromWorld_minCorner(BlockPos minCorner, @Local(argsOnly = true, name = "position") BlockPos position, @Local(name = "corner2") BlockPos corner2) {
+		Vec4i.setW(minCorner, Math.min(Vec4i.getW(position), Vec4i.getW(corner2)));
+		return minCorner;
+	}
+	@ModifyVariable(method = "fillFromWorld", name = "maxCorner", at = @At("STORE"))
+	BlockPos fillFromWorld_maxCorner(BlockPos maxCorner, @Local(argsOnly = true, name = "position") BlockPos position, @Local(name = "corner2") BlockPos corner2) {
+		Vec4i.setW(maxCorner, Math.max(Vec4i.getW(position), Vec4i.getW(corner2)));
+		return maxCorner;
+	}
 
 	@Definition(id = "comparator", local = @Local(type = Comparator.class, name = "comparator"))
 	@Expression("comparator = @(?)")
@@ -67,7 +88,13 @@ class StructureTemplateMixin implements StructureTemplate4 {
 		return original.thenComparingInt(o -> Vec4i.getW(o.pos()));
 	}
 
-	// TODO fillEntityList
+	@Redirect(method = "fillEntityList", at = @At(
+		value = "NEW",
+		target = "(DDD)Lnet/minecraft/world/phys/Vec3;"
+	))
+	Vec3 fillEntityList(double x, double y, double z, @Local(name = "entity") Entity entity, @Local(argsOnly = true, name = "minCorner") BlockPos minCorner) {
+		return new Vec4(x, y, z, ((Entity4) entity).getW() - Vec4i.getW(minCorner));
+	}
 
 	@Expression("? >= 1")
 	@ModifyExpressionValue(method = "placeInWorld", at = @At(value = "MIXINEXTRAS:EXPRESSION", ordinal = 0))

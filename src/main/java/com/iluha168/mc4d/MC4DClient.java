@@ -1,6 +1,8 @@
 package com.iluha168.mc4d;
 
+import com.iluha168.mc4d.world.phys.Vec4;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.neoforged.api.distmarker.Dist;
@@ -26,6 +28,11 @@ public class MC4DClient {
             2 / (1 + (float) Math.exp(-Math.abs(0.2 * dw))) - 1, // Makes rendered stuff that is closer less tinted using a sigmoid
             ARGB.transparent(dw > 0 ? MC4DClient.COLOR_ANA : MC4DClient.COLOR_KATA)
         );
+    }
+
+    /** @return camera's absolute position along the W axis. */
+    public static double cameraW() {
+        return ((Vec4) Minecraft.getInstance().gameRenderer.getMainCamera().position()).w;
     }
 
     public static final Identifier NEIGHBOURING_SLICE_BLOCK_RENDERER = Identifier.fromNamespaceAndPath(MC4D.MODID, "neighbouring_slice_block_renderer");

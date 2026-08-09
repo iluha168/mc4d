@@ -12,6 +12,8 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(EnchantTableRenderer.class)
 class EnchantTableRendererMixin {
+	// TODO extractRenderState state.wRot
+
 	@Redirect(method = "getRenderBoundingBox(Lnet/minecraft/world/level/block/entity/EnchantingTableBlockEntity;)Lnet/minecraft/world/phys/AABB;", at = @At(
 		value = "NEW",
 		target = "(DDDDDD)Lnet/minecraft/world/phys/AABB;"

@@ -12,6 +12,8 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(ConduitRenderer.class)
 class ConduitRendererMixin {
+	// TODO spin in more planes when 4D renderer
+
 	@Redirect(method = "getRenderBoundingBox(Lnet/minecraft/world/level/block/entity/ConduitBlockEntity;)Lnet/minecraft/world/phys/AABB;", at = @At(
 		value = "NEW",
 		target = "(DDDDDD)Lnet/minecraft/world/phys/AABB;"

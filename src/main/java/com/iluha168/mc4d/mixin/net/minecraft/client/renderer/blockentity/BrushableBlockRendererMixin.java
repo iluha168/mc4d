@@ -12,7 +12,8 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(BrushableBlockRenderer.class)
 class BrushableBlockRendererMixin {
-	// TODO? translations
+	// TODO submit when 4D renderer
+	// TODO translations when 4D renderer
 
 	@Redirect(method = "getRenderBoundingBox(Lnet/minecraft/world/level/block/entity/BrushableBlockEntity;)Lnet/minecraft/world/phys/AABB;", at = @At(
 		value = "NEW",
