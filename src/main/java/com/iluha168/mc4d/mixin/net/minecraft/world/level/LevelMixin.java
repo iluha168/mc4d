@@ -9,6 +9,7 @@ import com.iluha168.mc4d.world.level.LevelAccessor4;
 import com.iluha168.mc4d.world.level.border.WorldBorder4;
 import com.iluha168.mc4d.world.level.chunk.ChunkAccess4;
 import com.iluha168.mc4d.world.level.chunk.ChunkSource4;
+import com.iluha168.mc4d.world.level.storage.LevelData4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
@@ -38,6 +39,7 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.storage.LevelData;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -139,7 +141,7 @@ public abstract class LevelMixin implements Level4, LevelAccessor4 {
 	@Overwrite
 	@Deprecated
 	public int getHeight(Heightmap.Types type, int x, int z) {
-		throw Err4.arguments2("Level4#getHeight");
+		throw Err4.arguments2("LevelReader4#getHeight");
 	}
 	@Override
 	public int getHeight(Heightmap.Types type, int x, int z, int w) {
@@ -284,8 +286,19 @@ public abstract class LevelMixin implements Level4, LevelAccessor4 {
 		value = "INVOKE",
 		target = "Lnet/minecraft/core/BlockPos;containing(DDD)Lnet/minecraft/core/BlockPos;"
 	))
-	BlockPos getWorldBorderAdjustedRespawnData(double x, double y, double z, @Local(name = "worldBorder") WorldBorder worldBorder) {
+	BlockPos getWorldBorderAdjustedRespawnData_containing(double x, double y, double z, @Local(name = "worldBorder") WorldBorder worldBorder) {
 		return BlockPos4.containing(x, y, z, ((WorldBorder4) worldBorder).getCenterW());
+	}
+	@Redirect(method = "getWorldBorderAdjustedRespawnData", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/level/storage/LevelData$RespawnData;of(Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/core/BlockPos;FF)Lnet/minecraft/world/level/storage/LevelData$RespawnData;"
+	))
+	LevelData.RespawnData getWorldBorderAdjustedRespawnData_of(
+		ResourceKey<Level> dimension, BlockPos pos, float yaw, float pitch,
+		@Local(argsOnly = true, name = "respawnData") LevelData.RespawnData respawnData
+	) {
+		final LevelData4.RespawnData respawnData4 = LevelData4.RespawnData.as(respawnData);
+		return LevelData4.RespawnData.of(dimension, pos, yaw, pitch, respawnData4.wRot(), respawnData4.vRot());
 	}
 
 	@Overwrite

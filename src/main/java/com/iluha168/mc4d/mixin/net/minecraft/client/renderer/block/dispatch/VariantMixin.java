@@ -25,7 +25,7 @@ import java.util.Optional;
 
 @Mixin(Variant.class)
 abstract
-class VariantMixin {
+class VariantMixin implements Variant4 {
 	@Shadow
 	@Final
 	private Variant.SimpleModelState modelState;

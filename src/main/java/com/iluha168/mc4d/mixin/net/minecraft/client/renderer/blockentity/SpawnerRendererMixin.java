@@ -12,6 +12,8 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(SpawnerRenderer.class)
 class SpawnerRendererMixin {
+	// submitEntityInSpawner intentionally not patched, to make the entity always be rendered when the block is rendered.
+
 	@Redirect(method = "getRenderBoundingBox(Lnet/minecraft/world/level/block/entity/SpawnerBlockEntity;)Lnet/minecraft/world/phys/AABB;", at = @At(
 		value = "NEW",
 		target = "(DDDDDD)Lnet/minecraft/world/phys/AABB;"

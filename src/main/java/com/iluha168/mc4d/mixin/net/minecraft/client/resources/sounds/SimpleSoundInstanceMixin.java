@@ -50,7 +50,7 @@ class SimpleSoundInstanceMixin extends AbstractSoundInstanceMixin implements Sim
 	))
 	private static SimpleSoundInstance forJukeboxSong(SimpleSoundInstance original, @Local(argsOnly = true, name = "pos") Vec3 pos) {
 		if (!(pos instanceof Vec4 pos4)) throw Err4.container3();
-		((SoundInstance4) original).setW(pos4.w());
+		((SoundInstance4) original).setW(pos4.w);
 		return original;
 	}
 

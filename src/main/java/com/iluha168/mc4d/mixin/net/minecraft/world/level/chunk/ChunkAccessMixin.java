@@ -132,7 +132,7 @@ public abstract class ChunkAccessMixin implements ChunkAccess4 {
 	@Overwrite
 	@Deprecated
 	public Holder<Biome> getNoiseBiome(int quartX, int quartY, int quartZ) {
-		throw Err4.arguments3("ChunkAccess4#getNoiseBiome");
+		throw Err4.arguments3("BiomeManager4.NoiseBiomeSource#getNoiseBiome");
 	}
 	@Override
 	public Holder<Biome> getNoiseBiome(int quartX, int quartY, int quartZ, int quartW) {

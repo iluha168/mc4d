@@ -2,7 +2,6 @@ package com.iluha168.mc4d.mixin.net.minecraft.world.phys.shapes;
 
 import com.iluha168.mc4d.core.AxisCycle4;
 import com.iluha168.mc4d.core.Direction4;
-import com.iluha168.mc4d.core.Position4;
 import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.phys.AABB4;
@@ -81,7 +80,7 @@ class VoxelShapeMixin implements VoxelShape4 {
 		target = "Lnet/minecraft/world/phys/shapes/VoxelShape;move(DDD)Lnet/minecraft/world/phys/shapes/VoxelShape;"
 	))
 	VoxelShape move(VoxelShape instance, double dx, double dy, double dz, @Local(argsOnly = true, name = "delta") Vec3 delta) {
-		return ((VoxelShape4) instance).move(dx, dy, dz, ((Position4) delta).w());
+		return ((VoxelShape4) instance).move(dx, dy, dz, ((Vec4) delta).w);
 	}
 
 	@Redirect(method = "move(Lnet/minecraft/core/Vec3i;)Lnet/minecraft/world/phys/shapes/VoxelShape;", at = @At(

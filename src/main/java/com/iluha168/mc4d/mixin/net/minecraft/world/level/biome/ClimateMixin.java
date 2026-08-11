@@ -67,7 +67,7 @@ abstract class ClimateMixin implements Climate4 {
 		@Overwrite
 		private void radialSearch(List<Climate.ParameterPoint> targetClimates, Climate.Sampler sampler, float maxRadius, float radiusIncrement) {
 			float theta = 0.0F;
-			float phi = -(float)(Math.PI / 2);
+			float phi = -Mth.HALF_PI;
 			float radius = radiusIncrement;
 			BlockPos searchOrigin = this.result.location();
 			int originW = Vec4i.getW(searchOrigin);
@@ -83,11 +83,11 @@ abstract class ClimateMixin implements Climate4 {
 				}
 
 				theta += radiusIncrement / radius;
-				if (theta > Math.PI * 2) {
+				if (theta > Mth.TWO_PI) {
 					theta = 0.0F;
 					phi += radiusIncrement / radius;
-					if (phi > Math.PI / 2) {
-						phi = -(float)(Math.PI / 2);
+					if (phi > Mth.HALF_PI) {
+						phi = -Mth.HALF_PI;
 						radius += radiusIncrement;
 					}
 				}

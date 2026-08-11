@@ -32,6 +32,9 @@ public final class Err4 {
 	public static @NonNull RuntimeException arguments2(@Nullable String replacementMethod) {
 		return arguments("A method that has arguments for only 2 out of 3 horizontal dimensions has been called." , replacementMethod);
 	}
+	public static @NonNull RuntimeException rotation(@Nullable String replacementMethod) {
+		return arguments("A method that has arguments for less than the 4 rotation angles has been called.", replacementMethod);
+	}
 
 	public static @NonNull RuntimeException field4missing(@NonNull String ...fieldNames) {
 		return err("4D coordinate fields ("+String.join(", ", fieldNames)+") are not set." +

@@ -10,8 +10,8 @@ import org.jspecify.annotations.NonNull;
 import java.util.List;
 
 /**
- * Vanilla uses Vec2 for representing rotation and horizontal dimensions.
- * This class can be used to extend the second case usages.
+ * Vanilla uses {@link Vec2} for representing rotation and horizontal dimensions.
+ * This class can be used to extend the horizontal usages.
  */
 public class HorizontalVec extends Vec2 {
 	public static final HorizontalVec ZERO = new HorizontalVec(0.0F, 0.0F, 0.0F);
@@ -31,9 +31,8 @@ public class HorizontalVec extends Vec2 {
 		.listOf()
 		.comapFlatMap(input -> Util
 			.fixedSize(input, 3)
-			.map(
-				floats -> new HorizontalVec(floats.getFirst(), floats.get(1), floats.get(3))),
-				vec -> List.of(vec.x, vec.y, vec.z)
+			.map(floats -> new HorizontalVec(floats.getFirst(), floats.get(1), floats.get(2))),
+			vec -> List.of(vec.x, vec.y, vec.z)
 		);
 
 	public final float z;
@@ -73,8 +72,8 @@ public class HorizontalVec extends Vec2 {
 
 	@Override
 	public @NonNull HorizontalVec normalized() {
-		float dist = 1 / this.length();
-		return dist < 1.0E-4F ? HorizontalVec.ZERO : new HorizontalVec(this.x * dist, this.y * dist, this.z * dist);
+		float dist = this.length();
+		return dist < 1.0E-4F ? HorizontalVec.ZERO : new HorizontalVec(this.x / dist, this.y / dist, this.z / dist);
 	}
 
 	@Override

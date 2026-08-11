@@ -1,6 +1,8 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.block;
 
+import com.iluha168.mc4d.core.Direction4;
 import com.iluha168.mc4d.core.Vec4i;
+import com.iluha168.mc4d.world.entity.Entity4;
 import com.iluha168.mc4d.world.level.Level4;
 import com.iluha168.mc4d.world.level.LevelAccessor4;
 import com.iluha168.mc4d.world.level.block.Block4;
@@ -10,6 +12,7 @@ import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalDoubleRef;
+import com.llamalad7.mixinextras.sugar.ref.LocalFloatRef;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.sounds.SoundEvent;
@@ -18,6 +21,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.animal.happyghast.HappyGhast;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DriedGhastBlock;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -39,10 +43,26 @@ class DriedGhastBlockMixin {
 
 	@Redirect(method = "spawnGhastling", at = @At(
 		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/animal/happyghast/HappyGhast;setYHeadRot(F)V"
+	))
+	void spawnGhastling_setYHeadRot(
+		HappyGhast ghast, float yHeadRot,
+		@Local(argsOnly = true, name = "state") BlockState state,
+		@Share("wRot") LocalFloatRef wRot
+	) {
+		wRot.set(Direction4.getWRot(state.getValue(HorizontalDirectionalBlock.FACING)));
+		((Entity4) ghast).setYHeadRot(yHeadRot, wRot.get());
+	}
+	@Redirect(method = "spawnGhastling", at = @At(
+		value = "INVOKE",
 		target = "Lnet/minecraft/world/entity/animal/happyghast/HappyGhast;snapTo(DDDFF)V"
 	))
-	void spawnGhastling(HappyGhast instance, double x, double y, double z, float yRot, float xRot, @Local(name = "spawnAt") Vec3 spawnAt) {
-		instance.snapTo(new Vec4(x, y, z, ((Vec4) spawnAt).w), yRot, xRot);
+	void spawnGhastling_snapTo(
+		HappyGhast instance, double x, double y, double z, float yRot, float xRot,
+		@Local(name = "spawnAt") Vec3 spawnAt,
+		@Share("wRot") LocalFloatRef wRot
+	) {
+		((Entity4) instance).snapTo(new Vec4(x, y, z, ((Vec4) spawnAt).w), yRot, xRot, wRot.get(), 0);
 	}
 
 	@Inject(method = "animateTick", at = @At("HEAD"))

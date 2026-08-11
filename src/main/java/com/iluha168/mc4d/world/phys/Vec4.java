@@ -1,7 +1,6 @@
 package com.iluha168.mc4d.world.phys;
 
 import com.iluha168.mc4d.core.Direction4;
-import com.iluha168.mc4d.core.Position4;
 import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.util.Err4;
 import com.mojang.serialization.Codec;
@@ -12,7 +11,6 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.Util;
-import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NonNull;
 
@@ -26,14 +24,14 @@ import static com.iluha168.mc4d.math.MathHelpers.det3;
  * Any operation on Vec4 returns a Vec4: Vec3 + Vec4 = Vec3; Vec4 + Vec3 = Vec4.
  * Callers should be oblivious that they work with 4D vectors.
  */
-public class Vec4 extends Vec3 implements Position4 {
+public class Vec4 extends Vec3 {
 	public static final Codec<Vec4> CODEC = Codec.DOUBLE
 		.listOf()
 		.comapFlatMap(
 			input -> Util
 				.fixedSize(input, 4)
 				.map(doubles -> new Vec4(doubles.getFirst(), doubles.get(1), doubles.get(2), doubles.get(3))),
-			pos -> List.of(pos.x(), pos.y(), pos.z(), pos.w())
+			pos -> List.of(pos.x, pos.y, pos.z, pos.w)
 		);
 
 	public static final StreamCodec<ByteBuf, Vec4> STREAM_CODEC = new StreamCodec<>() {
@@ -44,18 +42,14 @@ public class Vec4 extends Vec3 implements Position4 {
 
 		@Override
 		public void encode(ByteBuf output, Vec4 value) {
-			output.writeDouble(value.x());
-			output.writeDouble(value.y());
-			output.writeDouble(value.z());
-			output.writeDouble(value.w());
+			output.writeDouble(value.x);
+			output.writeDouble(value.y);
+			output.writeDouble(value.z);
+			output.writeDouble(value.w);
 		}
 	};
 
 	public static final Vec4 ZERO = new Vec4(0.0, 0.0, 0.0, 0.0);
-	public static final Vec4 X_AXIS = new Vec4(1.0, 0.0, 0.0, 0.0);
-	public static final Vec4 Y_AXIS = new Vec4(0.0, 1.0, 0.0, 0.0);
-	public static final Vec4 Z_AXIS = new Vec4(0.0, 0.0, 1.0, 0.0);
-	public static final Vec4 W_AXIS = new Vec4(0.0, 0.0, 0.0, 1.0);
 
 	public final double w;
 
@@ -72,17 +66,9 @@ public class Vec4 extends Vec3 implements Position4 {
 		this(vec.getX(), vec.getY(), vec.getZ(), Vec4i.getW(vec));
 	}
 
-	/**
-	 * Backwards compatibility helper. Adds 4th coordinate to a 3D/4D vector, if it does not have one.
-	 */
-	public static Vec4 of(Vec3 vec, double w) {
-		if (vec instanceof Vec4 vec4) return vec4;
-		return new Vec4(vec.x, vec.y, vec.z, w);
-	}
-
 	@Override
 	public @NonNull Vec4 vectorTo(Vec3 vec) {
-		return new Vec4(vec.x - this.x, vec.y - this.y, vec.z - this.z, ((Position4) vec).w() - this.w);
+		return new Vec4(vec.x - this.x, vec.y - this.y, vec.z - this.z, ((Vec4) vec).w - this.w);
 	}
 
 	@Override
@@ -93,7 +79,7 @@ public class Vec4 extends Vec3 implements Position4 {
 
 	@Override
 	public double dot(Vec3 vec) {
-		return this.x * vec.x + this.y * vec.y + this.z * vec.z + this.w * ((Position4) vec).w();
+		return this.x * vec.x + this.y * vec.y + this.z * vec.z + this.w * ((Vec4) vec).w;
 	}
 
 	@Override
@@ -119,7 +105,7 @@ public class Vec4 extends Vec3 implements Position4 {
 
 	@Override
 	public @NonNull Vec4 subtract(Vec3 vec) {
-		return this.subtract(vec.x, vec.y, vec.z, ((Position4) vec).w());
+		return this.subtract(vec.x, vec.y, vec.z, ((Vec4) vec).w);
 	}
 
 	@Override
@@ -132,7 +118,7 @@ public class Vec4 extends Vec3 implements Position4 {
 	public @NonNull Vec4 subtract(double x, double y, double z) {
 		if (x == 0 && z == 0) {
 			// Call site intends to modify only the Y axis
-			// Do not rely on this hack while writing mixins - redirect the calls anyway, this is planned for removal
+			// Do not rely on this hack while writing mixins - redirect the calls anyway
 			return this.subtract(x, y, z, z);
 		}
 		throw Err4.arguments3("Vec4#subtract");
@@ -149,7 +135,7 @@ public class Vec4 extends Vec3 implements Position4 {
 
 	@Override
 	public @NonNull Vec4 add(Vec3 vec) {
-		return this.add(vec.x, vec.y, vec.z, ((Position4) vec).w());
+		return this.add(vec.x, vec.y, vec.z, ((Vec4) vec).w);
 	}
 
 	@Override
@@ -157,7 +143,7 @@ public class Vec4 extends Vec3 implements Position4 {
 	public @NonNull Vec4 add(double x, double y, double z) {
 		if (x == 0 && z == 0) {
 			// Call site intends to modify only the Y axis
-			// Do not rely on this hack while writing mixins - redirect the calls anyway, this is planned for removal
+			// Do not rely on this hack while writing mixins - redirect the calls anyway
 			return this.add(x, y, z, z);
 		}
 		throw Err4.arguments3("Vec4#add");
@@ -169,7 +155,7 @@ public class Vec4 extends Vec3 implements Position4 {
 
 	@Override
 	public boolean closerThan(net.minecraft.core.Position pos, double distance) {
-		return this.distanceToSqr(pos.x(), pos.y(), pos.z(), ((Position4) pos).w()) < distance * distance;
+		return this.distanceToSqr(pos.x(), pos.y(), pos.z(), ((Vec4) pos).w) < distance * distance;
 	}
 
 	@Override
@@ -182,7 +168,7 @@ public class Vec4 extends Vec3 implements Position4 {
 		double xd = vec.x - this.x;
 		double yd = vec.y - this.y;
 		double zd = vec.z - this.z;
-		double wd = ((Position4) vec).w() - this.w;
+		double wd = ((Vec4) vec).w - this.w;
 		return xd * xd + yd * yd + zd * zd + wd * wd;
 	}
 
@@ -205,7 +191,7 @@ public class Vec4 extends Vec3 implements Position4 {
 		double dx = vec.x() - this.x;
 		double dy = vec.y() - this.y;
 		double dz = vec.z() - this.z;
-		double dw = ((Position4) vec).w() - this.w;
+		double dw = ((Vec4) vec).w - this.w;
 		return Mth.lengthSquared(dx, dz, dw) < Mth.square(distanceXZW) && Math.abs(dy) < distanceY;
 	}
 
@@ -221,7 +207,7 @@ public class Vec4 extends Vec3 implements Position4 {
 
 	@Override
 	public @NonNull Vec4 multiply(Vec3 scale) {
-		return this.multiply(scale.x, scale.y, scale.z, ((Position4) scale).w());
+		return this.multiply(scale.x, scale.y, scale.z, ((Vec4) scale).w);
 	}
 
 	@Override
@@ -283,13 +269,13 @@ public class Vec4 extends Vec3 implements Position4 {
 	public boolean equals(@NonNull Object o) {
 		if (this == o) {
 			return true;
-		} else if (!(o instanceof Vec3 vec3)) {
+		} else if (!(o instanceof Vec4 vec4)) {
 			return false;
 		} else {
-			return Double.compare(vec3.x, this.x) == 0
-				&& Double.compare(vec3.y, this.y) == 0
-				&& Double.compare(vec3.z, this.z) == 0
-				&& Double.compare(((Position4) vec3).w(), this.w) == 0;
+			return Double.compare(vec4.x, this.x) == 0
+				&& Double.compare(vec4.y, this.y) == 0
+				&& Double.compare(vec4.z, this.z) == 0
+				&& Double.compare(vec4.w, this.w) == 0;
 		}
 	}
 
@@ -312,31 +298,109 @@ public class Vec4 extends Vec3 implements Position4 {
 			Mth.lerp(alpha, this.x, vec.x),
 			Mth.lerp(alpha, this.y, vec.y),
 			Mth.lerp(alpha, this.z, vec.z),
-			Mth.lerp(alpha, this.w, ((Position4) vec).w())
+			Mth.lerp(alpha, this.w, ((Vec4) vec).w)
 		);
 	}
 
-	@Override
-	public @NonNull Vec4 xRot(float radians) { // We are assuming rotation around XW.
-		return Vec4.of(super.xRot(radians), this.w);
+	/**
+	 * Rotates the plane spanned by the two given axes.
+	 */
+	private @NonNull Vec4 rotate(Direction.@NonNull Axis axis1, Direction.@NonNull Axis axis2, float radians) {
+		final float cos = Mth.cos(radians);
+		final float sin = Mth.sin(radians);
+		final double va = this.get(axis1);
+		final double vb = this.get(axis2);
+		return this
+			.with(axis1, va * cos + vb * sin)
+			.with(axis2, vb * cos - va * sin);
 	}
 
+	/** Rotates the YZ plane (around the XW plane). */
 	@Override
-	public @NonNull Vec4 yRot(float radians) { // We are assuming rotation around YW.
-		return Vec4.of(super.yRot(radians), this.w);
+	public @NonNull Vec4 xRot(float radians) {
+		return this.rotate(Direction.Axis.Y, Direction.Axis.Z, radians);
+	}
+	/** Rotates the XW plane (around the YZ plane). */
+	public @NonNull Vec4 yzRot(float radians) {
+		return this.rotate(Direction.Axis.X, Direction4.Axis.W, radians);
+	}
+	/** Rotates the XZ plane (around the YW plane). */
+	@Override
+	public @NonNull Vec4 yRot(float radians) {
+		return this.rotate(Direction.Axis.X, Direction.Axis.Z, radians);
+	}
+	/** Rotates the YW plane (around the XZ plane). */
+	public @NonNull Vec4 xzRot(float radians) {
+		return this.rotate(Direction.Axis.Y, Direction4.Axis.W, radians);
+	}
+	/** Rotates the XY plane (around the ZW plane). */
+	@Override
+	public @NonNull Vec4 zRot(float radians) {
+		return this.rotate(Direction.Axis.X, Direction.Axis.Y, radians);
+	}
+	/** Rotates the ZW plane (around the XY plane). */
+	public @NonNull Vec4 xyRot(float radians) {
+		return this.rotate(Direction.Axis.Z, Direction4.Axis.W, radians);
 	}
 
+	/** Rotates the XZ plane (around the YW plane). */
 	@Override
-	public @NonNull Vec4 zRot(float radians) { // We are assuming rotation around ZW.
-		return Vec4.of(super.zRot(radians), this.w);
+	public @NonNull Vec4 rotateClockwise90() {
+		return new Vec4(-this.z, this.y, this.x, this.w);
 	}
 
-	@Override
-	public @NonNull Vec4 rotateClockwise90() { // We are assuming rotation around YW.
-		return Vec4.of(super.rotateClockwise90(), this.w);
+	/** Alternatively called "forwards" or "look direction". */
+	public static @NonNull Vec4 directionFromRotation(@NonNull RotationVec rotation) {
+		return directionFromRotation(rotation.x, rotation.y, rotation.w);
 	}
 
-	// do not touch `rotation` for now
+	/** Alternatively called "forwards" or "look direction". */
+	public static @NonNull Vec4 directionFromRotation(float rotX, float rotY, float rotW) {
+		final float yCos = Mth.cos(-rotY * Mth.DEG_TO_RAD - Mth.PI);
+		final float ySin = Mth.sin(-rotY * Mth.DEG_TO_RAD - Mth.PI);
+		final float xCos = -Mth.cos(-rotX * Mth.DEG_TO_RAD);
+		final float xSin = Mth.sin(-rotX * Mth.DEG_TO_RAD);
+		final float wCos = Mth.cos(rotW * Mth.DEG_TO_RAD);
+		final float wSin = Mth.sin(rotW * Mth.DEG_TO_RAD);
+		//noinspection SuspiciousNameCombination
+		return new Vec4(ySin * xCos * wCos, xSin, yCos * xCos * wCos, -wSin * xCos);
+	}
+
+	/** {@return where "left" is in world coordinates} */
+	public static @NonNull Vec4 leftFromRotation(@NonNull RotationVec rotation) {
+		final float vr = rotation.v * Mth.DEG_TO_RAD;
+		final Vec4 leftAtVRot0 = directionFromRotation(new RotationVec(0.0F, rotation.y - 90.0F, 0.0F, 0.0F));
+		final Vec4 anthAtVRot0 = anthFromRotationAtVRot0(rotation);
+		return        leftAtVRot0.scale(Mth.cos(vr))
+			.subtract(anthAtVRot0.scale(Mth.sin(vr)));
+	}
+
+	/** {@return where "anth" is in world coordinates} */
+	public static @NonNull Vec4 anthFromRotation(@NonNull RotationVec rotation) {
+		final float vr = rotation.v * Mth.DEG_TO_RAD;
+		final Vec4 leftAtVRot0 = directionFromRotation(new RotationVec(0.0F, rotation.y - 90.0F, 0.0F, 0.0F));
+		final Vec4 anthAtVRot0 = anthFromRotationAtVRot0(rotation);
+		return leftAtVRot0.scale(Mth.sin(vr)).add(anthAtVRot0.scale(Mth.cos(vr)));
+	}
+
+	private static @NonNull Vec4 anthFromRotationAtVRot0(@NonNull RotationVec rotation) {
+		final float yr = rotation.y * Mth.DEG_TO_RAD;
+		final float wr = rotation.w * Mth.DEG_TO_RAD;
+		final float wSin = Mth.sin(wr);
+		return new Vec4(Mth.sin(yr) * wSin, 0.0, -Mth.cos(yr) * wSin, Mth.cos(wr));
+	}
+
+	/**
+	 * Best-effort inverse of {@link #directionFromRotation}.
+	 * Does not work at the poles, and for non-unit vectors. Also, vRot cannot be determined only from the look direction.
+	 */
+	@Override
+	public @NonNull RotationVec rotation() {
+		final float yaw = (float) Math.atan2(-this.x, this.z) * Mth.RAD_TO_DEG;
+		final float pitch = (float) Math.asin(-this.y / this.length()) * Mth.RAD_TO_DEG;
+		final float wRot = (float) Math.atan2(this.w, Math.sqrt(this.x * this.x + this.z * this.z)) * Mth.RAD_TO_DEG;
+		return new RotationVec(pitch, yaw, wRot, 0);
+	}
 
 	@Override
 	public @NonNull Vec4 align(@NonNull EnumSet<Direction.Axis> axes) {
@@ -372,38 +436,55 @@ public class Vec4 extends Vec3 implements Position4 {
 		);
 	}
 
-	@Override
-	@Deprecated // Just access w directly
-	public final double w() {
-		return this.w;
-	}
-
 	// do not remove `toVector3f`, it is used in rendering
 
 	// `projectedOn`, surprisingly, does not need an override
 
-	@SuppressWarnings("SuspiciousNameCombination")
-	public static @NonNull Vec4 applyLocalCoordinatesToRotation(Vec2 rotation, Vec4 direction) {
-		float yCos = Mth.cos((rotation.y + 90.0F) * (float) (Math.PI / 180.0));
-		float ySin = Mth.sin((rotation.y + 90.0F) * (float) (Math.PI / 180.0));
-		float xCos = Mth.cos(-rotation.x * (float) (Math.PI / 180.0));
-		float xSin = Mth.sin(-rotation.x * (float) (Math.PI / 180.0));
-		float xCosUp = Mth.cos((-rotation.x + 90.0F) * (float) (Math.PI / 180.0));
-		float xSinUp = Mth.sin((-rotation.x + 90.0F) * (float) (Math.PI / 180.0));
-		Vec3 forwards = new Vec3(yCos * xCos, xSin, ySin * xCos);
-		Vec3 up = new Vec3(yCos * xCosUp, xSinUp, ySin * xCosUp);
-		Vec3 left = forwards.cross(up).scale(-1.0);
-		double xa = forwards.x * direction.z + up.x * direction.y + left.x * direction.x;
-		double ya = forwards.y * direction.z + up.y * direction.y + left.y * direction.x;
-		double za = forwards.z * direction.z + up.z * direction.y + left.z * direction.x;
-		return new Vec4(xa, ya, za, direction.w); // Literally what am I supposed to do? The rotation happens in 3D.
+	/**
+	 * Converts direction vector from an entity's local frame into world coordinates.
+	 * Inverse of {@link #applyRotationToWorldCoordinates}.
+	 * @param rotation the local frame.
+	 * @param direction [forwards; up; left; anth].
+	 */
+	public static @NonNull Vec4 applyLocalCoordinatesToRotation(@NonNull RotationVec rotation, @NonNull Vec4 direction) {
+		final Vec4 forwards = directionFromRotation(rotation);
+		final Vec4 up = directionFromRotation(new RotationVec(rotation.x - 90.0F, rotation.y, rotation.w, rotation.v));
+		final Vec4 left = leftFromRotation(rotation);
+		final Vec4 anth = anthFromRotation(rotation);
+		return   left    .scale(direction.x)
+			.add(up      .scale(direction.y))
+			.add(forwards.scale(direction.z))
+			.add(anth    .scale(direction.w));
 	}
 
+	/**
+	 * Converts a world vector to a vector in an entity's local frame.
+	 * Inverse of {@link #applyLocalCoordinatesToRotation}.
+	 */
+	public static @NonNull Vec4 applyRotationToWorldCoordinates(@NonNull RotationVec rotation, @NonNull Vec4 world) {
+		final Vec4 forwards = directionFromRotation(rotation);
+		final Vec4 up = directionFromRotation(new RotationVec(rotation.x - 90.0F, rotation.y, rotation.w, rotation.v));
+		final Vec4 left = leftFromRotation(rotation);
+		final Vec4 anth = anthFromRotation(rotation);
+		return new Vec4(
+			world.dot(left),
+			world.dot(up),
+			world.dot(forwards),
+			world.dot(anth)
+		);
+	}
+
+	/**
+	 * Why remove this method?
+	 * To add in the local coordinates space, we need to know the local coordinate frame, obviously.
+	 * To get that, we need to know all 4 rotations, vRot included.
+	 * vRot does not affect the look direction, therefore, vRot cannot be determined from look direction.
+	 * But direction is all we get in this signature.
+	 */
 	@Override
+	@Deprecated
 	public @NonNull Vec3 addLocalCoordinates(@NonNull Vec3 direction) {
-		return direction instanceof Vec4 direction4
-			? Vec4.applyLocalCoordinatesToRotation(this.rotation(), direction4)
-		    : super.addLocalCoordinates(direction);
+		throw Err4.rotation("Vec4#applyLocalCoordinatesToRotation");
 	}
 
 	@Override

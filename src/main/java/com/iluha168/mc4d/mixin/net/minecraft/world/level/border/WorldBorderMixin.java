@@ -118,7 +118,7 @@ class WorldBorderMixin extends SavedData implements WorldBorder4 {
 	@Overwrite
 	@Deprecated
 	private boolean isWithinBounds(double minX, double minZ, double maxX, double maxZ) {
-		throw Err4.arguments2("WorldBorder4#isWithinBounds");
+		throw Err4.arguments2("WorldBorder4#isWithinBounds4");
 	}
 	@Override
 	public boolean isWithinBounds4(double minX, double minZ, double minW, double maxX, double maxZ, double maxW) {
@@ -128,7 +128,7 @@ class WorldBorderMixin extends SavedData implements WorldBorder4 {
 	@Overwrite
 	@Deprecated
 	public boolean isWithinBounds(double x, double z) {
-		throw Err4.arguments2("WorldBorder4#isWithinBounds");
+		throw Err4.arguments2("WorldBorder4#isWithinBounds4");
 	}
 	@Override
 	public boolean isWithinBounds4(double x, double z, double w) {
@@ -138,7 +138,7 @@ class WorldBorderMixin extends SavedData implements WorldBorder4 {
 	@Overwrite
 	@Deprecated
 	public boolean isWithinBounds(double x, double z, double margin) {
-		throw Err4.arguments2("WorldBorder4#isWithinBounds");
+		throw Err4.arguments2("WorldBorder4#isWithinBounds4");
 	}
 	@Override
 	public boolean isWithinBounds4(double x, double z, double w, double margin) {
@@ -160,7 +160,7 @@ class WorldBorderMixin extends SavedData implements WorldBorder4 {
 	))
 	BlockPos clampToBounds_vec(WorldBorder instance, double x, double y, double z, @Local(argsOnly = true, name = "position") Vec3 position) {
 		if (!(position instanceof Vec4 position4)) throw Err4.container3();
-		return ((WorldBorder4) instance).clampToBounds(x, y, z, position4.w());
+		return ((WorldBorder4) instance).clampToBounds(x, y, z, position4.w);
 	}
 	
 	@Overwrite

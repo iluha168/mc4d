@@ -2,7 +2,6 @@ package com.iluha168.mc4d.mixin.net.minecraft.world.level;
 
 import com.iluha168.mc4d.core.BlockPos4;
 import com.iluha168.mc4d.core.Direction4;
-import com.iluha168.mc4d.core.Position4;
 import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.phys.AABB4;
@@ -34,14 +33,14 @@ public interface BlockGetterMixin {
 		target = "Lnet/minecraft/core/Direction;getApproximateNearest(DDD)Lnet/minecraft/core/Direction;"
 	))
 	private static Direction isBlockInLine$0(double dx, double dy, double dz, @Local(name = "delta") Vec3 delta) {
-		return Direction4.getApproximateNearest(dx, dy, dz, ((Position4) delta).w());
+		return Direction4.getApproximateNearest(dx, dy, dz, ((Vec4) delta).w);
 	}
 	@Redirect(method = "lambda$isBlockInLine$1", at = @At(
 		value = "INVOKE",
 		target = "Lnet/minecraft/core/Direction;getApproximateNearest(DDD)Lnet/minecraft/core/Direction;"
 	))
 	private static Direction isBlockInLine$1(double dx, double dy, double dz, @Local(name = "delta") Vec3 delta) {
-		return Direction4.getApproximateNearest(dx, dy, dz, ((Position4) delta).w());
+		return Direction4.getApproximateNearest(dx, dy, dz, ((Vec4) delta).w);
 	}
 
 	@Redirect(method = "lambda$clip$1", at = @At(
@@ -49,7 +48,7 @@ public interface BlockGetterMixin {
 		target = "Lnet/minecraft/core/Direction;getApproximateNearest(DDD)Lnet/minecraft/core/Direction;"
 	))
 	private static Direction clip(double dx, double dy, double dz, @Local(name = "delta") Vec3 delta) {
-		return Direction4.getApproximateNearest(dx, dy, dz, ((Position4) delta).w());
+		return Direction4.getApproximateNearest(dx, dy, dz, ((Vec4) delta).w);
 	}
 
 	/**
@@ -184,10 +183,10 @@ public interface BlockGetterMixin {
 		Vec3i cornerDir = getFurthestCorner(deltaMove);
 		Vec4 toCenter = aabbAtTarget.getCenter();
 		Vec4 toCorner = new Vec4(
-			toCenter.x() + boxSizeX * 0.5 * cornerDir.getX(),
-			toCenter.y() + boxSizeY * 0.5 * cornerDir.getY(),
-			toCenter.z() + boxSizeZ * 0.5 * cornerDir.getZ(),
-			toCenter.w() + boxSizeW * 0.5 * Vec4i.getW(cornerDir)
+			toCenter.x + boxSizeX * 0.5 * cornerDir.getX(),
+			toCenter.y + boxSizeY * 0.5 * cornerDir.getY(),
+			toCenter.z + boxSizeZ * 0.5 * cornerDir.getZ(),
+			toCenter.w + boxSizeW * 0.5 * Vec4i.getW(cornerDir)
 		);
 		Vec4 fromCorner = toCorner.subtract(deltaMove);
 
@@ -308,6 +307,11 @@ public interface BlockGetterMixin {
 		return iterations;
 	}
 
+	@Overwrite
+	@Deprecated
+	private static Vec3i getFurthestCorner(Vec3 direction) {
+		return getFurthestCorner((Vec4) direction);
+	}
 	@SuppressWarnings("SuspiciousNameCombination")
 	@Unique
 	private static Vec3i getFurthestCorner(Vec4 direction) {

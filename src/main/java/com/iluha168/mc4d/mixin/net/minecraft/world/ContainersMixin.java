@@ -58,6 +58,6 @@ class ContainersMixin implements Containers4 {
 	@Overwrite
 	@Deprecated
 	public static void dropItemStack(Level level, double x, double y, double z, ItemStack itemStack) {
-		throw Err4.arguments3("Container4#dropItemStack");
+		throw Err4.arguments3("Containers4#dropItemStack");
 	}
 }

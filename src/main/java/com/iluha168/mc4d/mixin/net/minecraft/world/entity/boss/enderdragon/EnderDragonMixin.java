@@ -50,4 +50,6 @@ class EnderDragonMixin {
 	) {
 		((Entity4) this.subEntities[i]).setWOld(((Vec4) oldPos[i]).w);
 	}
+
+	// TODO everything
 }

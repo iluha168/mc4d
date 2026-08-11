@@ -26,7 +26,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 
 @Mixin(SharedSuggestionProvider.class)
-interface SharedSuggestionProviderMixin {
+interface SharedSuggestionProviderMixin extends SharedSuggestionProvider4 {
 	@Definition(id = "fullValue", local = @Local(type = String.class, name = "fullValue"))
 	@Definition(id = "coordinate", local = @Local(type = net.minecraft.commands.SharedSuggestionProvider.TextCoordinates.class, name = "coordinate"))
 	@Expression("fullValue = @(? + coordinate.?)")

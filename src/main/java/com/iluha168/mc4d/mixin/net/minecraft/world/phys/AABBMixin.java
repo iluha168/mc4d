@@ -1,11 +1,9 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.phys;
 
-import com.iluha168.mc4d.core.Position4;
 import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.level.levelgen.structure.BoundingBox4;
 import com.iluha168.mc4d.world.phys.AABB4;
-import com.iluha168.mc4d.world.phys.IAABB4;
 import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
@@ -27,20 +25,8 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import static com.iluha168.mc4d.world.phys.AABB4.EPSILON;
-
 @Mixin(AABB.class)
-public class AABBMixin implements IAABB4 {
-	@Override
-	public double minW() {
-		return 0;
-	}
-
-	@Override
-	public double maxW() {
-		return EPSILON;
-	}
-
+public class AABBMixin {
 	@Inject(method = "<init>(Lnet/minecraft/core/BlockPos;)V", at = @At("HEAD"))
 	private static void init_blockPos(BlockPos pos, CallbackInfo ci) {
 		throw Err4.return3("AABB4#new");
@@ -92,8 +78,7 @@ public class AABBMixin implements IAABB4 {
 		Iterable<AABB> aabBs, Vec3 from, Vec3 _to, BlockPos pos, CallbackInfoReturnable<BlockHitResult> cir,
 		@Share("dw") LocalDoubleRef dw
 	) {
-		// double dw = to.w - from.w;
-		dw.set(((Position4) _to).w() - ((Position4) from).w());
+		dw.set(((Vec4) _to).w - ((Vec4) from).w);
 	}
 
 	@Redirect(method = "clip(Ljava/lang/Iterable;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/phys/BlockHitResult;", at = @At(
@@ -104,10 +89,10 @@ public class AABBMixin implements IAABB4 {
 		AABB aabb, Vec3 from, double[] scaleReference, Direction direction,
 		double dx, double dy, double dz, @Share("dw") LocalDoubleRef dw
 	) {
-		IAABB4 aabb4 = (IAABB4) aabb;
+		final AABB4 aabb4 = (AABB4) aabb;
 		return AABB4.getDirection(
-			aabb.minX, aabb.minY, aabb.minZ, aabb4.minW(),
-			aabb.maxX, aabb.maxY, aabb.maxZ, aabb4.maxW(),
+			aabb.minX, aabb.minY, aabb.minZ, aabb4.minW,
+			aabb.maxX, aabb.maxY, aabb.maxZ, aabb4.maxW,
 			from,
 			scaleReference,
 			direction,

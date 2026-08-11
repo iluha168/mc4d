@@ -49,7 +49,7 @@ abstract class ParticleEngineMixin implements ParticleEngine4 {
 	@Overwrite
 	@Deprecated
 	private <T extends ParticleOptions> @Nullable Particle makeParticle(T options, double x, double y, double z, double xa, double ya, double za) {
-		throw Err4.arguments3("ParticleEngine4#makeParticle");
+		throw Err4.arguments3(null);
 	}
 	@Unique
 	private <T extends ParticleOptions> @Nullable Particle makeParticle(T options, double x, double y, double z, double w, double xa, double ya, double za, double wa) {

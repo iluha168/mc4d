@@ -16,7 +16,11 @@ class SummonCommandMixin {
 		value = "INVOKE",
 		target = "Lnet/minecraft/world/entity/Entity;snapTo(DDDFF)V"
 	))
-	private static void createEntity(Entity entity, double x, double y, double z, float yRot, float xRot, @Local(argsOnly = true, name = "pos") Vec3 pos) {
-		((Entity4) entity).snapTo(x, y, z, ((Vec4) pos).w, yRot, xRot);
+	private static void createEntity(
+		Entity entity, double x, double y, double z, float yRot, float xRot,
+		@Local(argsOnly = true, name = "pos") Vec3 pos
+	) {
+		Entity4 entity4 = (Entity4) entity;
+		entity4.snapTo(x, y, z, ((Vec4) pos).w, yRot, xRot, entity4.getWRot(), entity4.getVRot());
 	}
 }

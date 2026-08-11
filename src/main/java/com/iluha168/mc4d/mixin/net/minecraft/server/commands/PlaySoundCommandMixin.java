@@ -48,7 +48,7 @@ class PlaySoundCommandMixin {
 		target = "(Lnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;DDDFFJ)Lnet/minecraft/network/protocol/game/ClientboundSoundPacket;"
 	))
 	private static ClientboundSoundPacket playSound_packet(ClientboundSoundPacket original, @Local(name = "localPosition") Vec3 localPosition) {
-		((ClientboundSoundPacket4) original).setW(((Vec4) localPosition).w());
+		((ClientboundSoundPacket4) original).setW(((Vec4) localPosition).w);
 		return original;
 	}
 }

@@ -21,14 +21,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Constant;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Player.class)
 public abstract class PlayerMixin extends LivingEntityMixin {
@@ -75,11 +74,19 @@ public abstract class PlayerMixin extends LivingEntityMixin {
 		((Level4) level).playSound(except, x, y, z, this.getW(), sound, source, volume, pitch);
 	}
 
+	@Inject(method = "aiStep", at = @At(
+		value = "FIELD",
+		target = "Lnet/minecraft/world/entity/player/Player;yHeadRot:F",
+		opcode = Opcodes.PUTFIELD
+	))
+	void aiStep_wHeadRot(CallbackInfo ci) {
+		this.wHeadRot = this.getWRot();
+	}
 	@Redirect(method = "aiStep", at = @At(
 		value = "INVOKE",
 		target = "Lnet/minecraft/world/phys/AABB;inflate(DDD)Lnet/minecraft/world/phys/AABB;"
 	))
-	AABB pickupArea(AABB instance, double xAdd, double yAdd, double zAdd) {
+	AABB aiStep_pickupArea(AABB instance, double xAdd, double yAdd, double zAdd) {
 		assert xAdd == zAdd;
 		return ((AABB4) instance).inflate(xAdd, yAdd, zAdd, xAdd);
 	}
@@ -224,6 +231,8 @@ public abstract class PlayerMixin extends LivingEntityMixin {
 	}
 
 	// TODO getRopeHoldPosition
+	// TODO getHurtDir (yaw-only hurt direction, no W sibling; this is the field LivingEntity.getHurtDir stubs out)
+	// TODO animateHurt (stores that yaw into hurtDir; same screen-shake family as LivingEntity.indicateDamage)
 
 	@Redirect(method = "isWithinBlockInteractionRange", at = @At(
 		value = "NEW",

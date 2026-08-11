@@ -5,12 +5,9 @@ import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.phys.Vec4;
 import net.minecraft.network.protocol.game.VecDeltaCodec;
 import net.minecraft.world.phys.Vec3;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(VecDeltaCodec.class)
 class VecDeltaCodecMixin implements VecDeltaCodec4 {
@@ -25,15 +22,6 @@ class VecDeltaCodecMixin implements VecDeltaCodec4 {
 	@Shadow
 	static double decode(long v) {
 		throw new UnsupportedOperationException("Implemented via mixin");
-	}
-
-	@Redirect(method = "<init>", at = @At(
-		value = "FIELD",
-		target = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;",
-		opcode = Opcodes.GETSTATIC
-	))
-	Vec3 init() {
-		return Vec4.ZERO;
 	}
 
 	@Overwrite

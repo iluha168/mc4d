@@ -5,6 +5,8 @@ import com.iluha168.mc4d.server.MinecraftServer4;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.level.ChunkPos4;
 import com.iluha168.mc4d.world.level.Level4;
+import com.iluha168.mc4d.world.level.storage.LevelData4;
+import com.iluha168.mc4d.world.phys.RotationVec;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
@@ -13,7 +15,10 @@ import net.minecraft.server.level.ChunkMap;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
+import net.minecraft.world.level.storage.LevelData;
+import net.minecraft.world.phys.Vec2;
 import org.jspecify.annotations.Nullable;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -52,6 +57,13 @@ class MinecraftServerMixin implements MinecraftServer4 {
 
 	@Redirect(method = "setInitialSpawn", at = @At(
 		value = "INVOKE",
+		target = "Lnet/minecraft/world/level/storage/LevelData$RespawnData;of(Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/core/BlockPos;FF)Lnet/minecraft/world/level/storage/LevelData$RespawnData;"
+	))
+	private static LevelData.RespawnData setInitialSpawn_of(ResourceKey<Level> dimension, BlockPos pos, float yaw, float pitch) {
+		return LevelData4.RespawnData.of(dimension, pos, yaw, pitch, pitch, yaw);
+	}
+	@Redirect(method = "setInitialSpawn", at = @At(
+		value = "INVOKE",
 		target = "Lnet/minecraft/core/BlockPos;offset(III)Lnet/minecraft/core/BlockPos;"
 	))
 	private static BlockPos setInitialSpawn_offset(BlockPos worldPosition, int x, int y, int z) {
@@ -72,6 +84,17 @@ class MinecraftServerMixin implements MinecraftServer4 {
 	@ModifyConstant(method = "getAbsoluteMaxWorldSize", constant = @Constant(intValue = 29999984))
 	private static int getAbsoluteMaxWorldSize(int constant) {
 		return Level4.MAX_LEVEL_SIZE - 16;
+	}
+
+	// TODO everything else
+
+	@Redirect(method = "createCommandSourceStack", at = @At(
+		value = "FIELD",
+		target = "Lnet/minecraft/world/phys/Vec2;ZERO:Lnet/minecraft/world/phys/Vec2;",
+		opcode = Opcodes.GETSTATIC
+	))
+	private Vec2 createCommandSourceStack() {
+		return RotationVec.ZERO;
 	}
 
 	// TODO everything else

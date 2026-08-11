@@ -13,13 +13,12 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.ArrayUtils;
 import org.joml.Quaternionf;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
+
+import java.util.Arrays;
 
 @SuppressWarnings("AddedEnumConstantsNamePattern")
 @Mixin(Direction.class)
@@ -54,7 +53,11 @@ public enum DirectionMixin implements Direction4 {
 	// TODO orderedByNearest
 	// TODO makeDirectionArray
 	// TODO rotate
-	// TODO getYRot
+
+	@WrapMethod(method = "getYRot")
+	private static float getYRot(Direction direction, Operation<Float> original) {
+		return direction == Direction4.KATA || direction == Direction4.ANA ? 0 : original.call(direction);
+	}
 
 	@WrapMethod(method = "getRotation")
 	Quaternionf getRotation(Operation<Quaternionf> original) {
@@ -68,8 +71,22 @@ public enum DirectionMixin implements Direction4 {
 
 	@WrapMethod(method = "getClockWise()Lnet/minecraft/core/Direction;")
 	Direction getClockWiseYW(Operation<Direction> original) {
+		// TODO ban for getHorizontalPerpendiculars
 		Direction This = (Direction) (Object) this;
 		return This == Direction4.KATA || This == Direction4.ANA ? This : original.call();
+	}
+
+	@Unique
+	private static final Direction[][] HORIZONTAL_PERPENDICULARS = Arrays
+		.stream(Direction.values())
+		.map(direction -> Direction.Plane.HORIZONTAL.stream() // Must be horizontal
+			.filter(other -> other.getAxis() != direction.getAxis()) // Must be perpendicular
+			.toArray(Direction[]::new)
+		)
+		.toArray(Direction[][]::new);
+	@Override
+	public Direction[] getHorizontalPerpendiculars() {
+		return HORIZONTAL_PERPENDICULARS[this.ordinal()];
 	}
 
 	// TODO getClockWiseX
@@ -79,6 +96,7 @@ public enum DirectionMixin implements Direction4 {
 
 	@WrapMethod(method = "getCounterClockWise()Lnet/minecraft/core/Direction;")
 	Direction getCounterClockWiseYW(Operation<Direction> original) {
+		// TODO ban for getHorizontalPerpendiculars
 		Direction This = (Direction) (Object) this;
 		return This == Direction4.KATA || This == Direction4.ANA ? This : original.call();
 	}
@@ -89,12 +107,23 @@ public enum DirectionMixin implements Direction4 {
 	}
 
 	// TODO step
+	// TODO fromYRot (Direction4#fromYRotWRot)
 
 	@WrapMethod(method = "fromAxisAndDirection")
 	private static Direction fromAxisAndDirection4(Direction.Axis axis, Direction.AxisDirection direction, Operation<Direction> original) {
 		return axis == Direction4.Axis.W
 			? (direction == Direction.AxisDirection.POSITIVE ? Direction4.ANA : Direction4.KATA)
 			: original.call(axis, direction);
+	}
+
+	@WrapMethod(method = "toYRot")
+	float toYRot(Operation<Float> original) {
+		Direction This = (Direction) (Object) this;
+		return This == Direction4.KATA || This == Direction4.ANA ? 0 : original.call();
+	}
+	@Override
+	public float toWRot() {
+		return this.getStepW() * 90.0F;
 	}
 
 	// TODO getApproximateNearest

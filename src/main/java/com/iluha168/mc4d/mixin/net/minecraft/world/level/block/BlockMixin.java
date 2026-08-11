@@ -18,11 +18,13 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -31,6 +33,11 @@ import java.util.function.Supplier;
 
 @Mixin(Block.class)
 public class BlockMixin implements Block4 {
+	@Shadow
+	public BlockState defaultBlockState() {
+		throw new UnsupportedOperationException("Implemented via mixin");
+	}
+
 	@Redirect(method = "pushEntitiesUp", at = @At(
 		value = "INVOKE",
 		target = "Lnet/minecraft/world/phys/AABB;move(DDD)Lnet/minecraft/world/phys/AABB;"

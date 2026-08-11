@@ -20,11 +20,22 @@ import java.util.Set;
 public enum RelativeMixin implements Relative4 {
 	// In case of collisions, blame vanilla for not using `.ordinal()`!
 	W(9),
-	DELTA_W(10);
+	W_ROT(10),
+	V_ROT(11),
+	DELTA_W(12);
 
 	@Shadow
 	RelativeMixin(int bit) {}
 
+	@Definition(id = "ROTATION", field = "Lnet/minecraft/world/entity/Relative;ROTATION:Ljava/util/Set;")
+	@Expression("ROTATION = @(?)")
+	@ModifyExpressionValue(method = "<clinit>", at = @At("MIXINEXTRAS:EXPRESSION"))
+	private static Set<Relative> ROTATION(Set<Relative> original) {
+		Set<Relative> set = new HashSet<>(original);
+		set.add(Relative4.W_ROT);
+		set.add(Relative4.V_ROT);
+		return ImmutableSet.copyOf(set);
+	}
 	@Definition(id = "DELTA", field = "Lnet/minecraft/world/entity/Relative;DELTA:Ljava/util/Set;")
 	@Expression("DELTA = @(?)")
 	@ModifyExpressionValue(method = "<clinit>", at = @At("MIXINEXTRAS:EXPRESSION"))
@@ -35,11 +46,19 @@ public enum RelativeMixin implements Relative4 {
 	}
 
 	@Overwrite
+	@Deprecated
+	public static Set<Relative> rotation(boolean relativeYRot, boolean relativeXRot) {
+		throw Err4.rotation("Relative4#rotation");
+	}
+
+	@Overwrite
+	@Deprecated
 	public static Set<Relative> position(boolean relativeX, boolean relativeY, boolean relativeZ) {
 		throw Err4.arguments3("Relative4#position");
 	}
 
 	@Overwrite
+	@Deprecated
 	public static Set<Relative> direction(boolean relativeX, boolean relativeY, boolean relativeZ) {
 		throw Err4.arguments3("Relative4#direction");
 	}

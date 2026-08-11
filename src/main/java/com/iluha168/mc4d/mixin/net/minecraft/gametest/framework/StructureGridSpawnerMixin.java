@@ -32,7 +32,7 @@ class StructureGridSpawnerMixin {
 		target = "Lnet/minecraft/core/BlockPos$MutableBlockPos;move(III)Lnet/minecraft/core/BlockPos$MutableBlockPos;",
 		ordinal = 0
 	))
-	BlockPos.MutableBlockPos spawnStructure(BlockPos.MutableBlockPos instance, int x, int y, int z) {
+	BlockPos.MutableBlockPos spawnStructure_nextColumn(BlockPos.MutableBlockPos instance, int x, int y, int z) {
 		return ((BlockPos4.MutableBlockPos) instance).move(x, y, z, z);
 	}
 	@Redirect(method = "spawnStructure", at = @At(
@@ -42,5 +42,12 @@ class StructureGridSpawnerMixin {
 	))
 	BlockPos.MutableBlockPos spawnStructure_nextRow(BlockPos.MutableBlockPos instance, int x, int y, int z) {
 		return ((BlockPos4.MutableBlockPos) instance).move(x, y, z, x);
+	}
+	@Redirect(method = "spawnStructure", at = @At(
+		value = "NEW",
+		target = "(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/phys/AABB;"
+	))
+	AABB spawnStructure_rowBounds(BlockPos pos) {
+		return new AABB4(pos);
 	}
 }

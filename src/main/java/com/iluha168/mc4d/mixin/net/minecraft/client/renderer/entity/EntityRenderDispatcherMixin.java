@@ -4,8 +4,8 @@ import com.iluha168.mc4d.MC4DClient;
 import com.iluha168.mc4d.client.renderer.SubmitNodeStorage4;
 import com.iluha168.mc4d.client.renderer.entity.EntityRenderDispatcher4;
 import com.iluha168.mc4d.client.renderer.entity.EntityRenderer4;
-import com.iluha168.mc4d.core.Position4;
 import com.iluha168.mc4d.util.Err4;
+import com.iluha168.mc4d.world.phys.Vec4;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -50,8 +50,8 @@ class EntityRenderDispatcherMixin implements EntityRenderDispatcher4 {
 
 		if (Minecraft.getInstance().debugEntries.isCurrentlyEnabled(MC4DClient.NEIGHBOURING_SLICE_ENTITY_RENDERER)) {
 			final SubmitNodeStorage4 storage = (SubmitNodeStorage4) submitNodeCollector;
-			Position4 pos = (Position4) renderer.getRenderOffset(renderState);
-			final double relativeW = w + pos.w();
+			final Vec4 pos = (Vec4) renderer.getRenderOffset(renderState);
+			final double relativeW = w + pos.w;
 			final double sizeW = renderState.boundingBoxWidth * 0.5;
 			final int previousTintColor = storage.entityTintColor();
 			try {

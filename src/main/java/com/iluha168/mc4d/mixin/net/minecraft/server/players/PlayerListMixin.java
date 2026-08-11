@@ -1,11 +1,11 @@
 package com.iluha168.mc4d.mixin.net.minecraft.server.players;
 
-import com.iluha168.mc4d.core.Position4;
 import com.iluha168.mc4d.server.network.ServerGamePacketListenerImpl4;
 import com.iluha168.mc4d.server.players.PlayerList4;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.entity.Entity4;
 import com.iluha168.mc4d.world.level.border.BorderChangeListener4;
+import com.iluha168.mc4d.world.level.portal.TeleportTransition4;
 import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.network.protocol.Packet;
@@ -18,6 +18,7 @@ import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.border.WorldBorder;
+import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -47,9 +48,10 @@ public class PlayerListMixin implements PlayerList4 {
 		double x, double y, double z, float yRot, float xRot,
 		@Local(argsOnly = true, name = "player") ServerPlayer player
 	) {
+		Entity4 player4 = (Entity4) player;
 		((ServerGamePacketListenerImpl4) playerConnection).teleport(
-			new Vec4(x, y, z, ((Entity4) player).getW()),
-			yRot, xRot
+			new Vec4(x, y, z, player4.getW()),
+			yRot, xRot, player4.getWRot(), player4.getVRot()
 		);
 	}
 
@@ -82,9 +84,14 @@ public class PlayerListMixin implements PlayerList4 {
 		value = "INVOKE",
 		target = "Lnet/minecraft/server/level/ServerPlayer;snapTo(DDDFF)V"
 	))
-	void respawn(ServerPlayer player, double x, double y, double z, float yRot, float xRot, @Local(name = "pos") Vec3 pos) {
-		double w = ((Position4) pos).w();
-		player.snapTo(new Vec4(x, y, z, w), yRot, xRot);
+	void respawn(
+		ServerPlayer player, double x, double y, double z, float yRot, float xRot,
+		@Local(name = "pos") Vec3 pos,
+		@Local(name = "respawnInfo") TeleportTransition respawnInfo
+	) {
+		final TeleportTransition4 respawnInfo4 = TeleportTransition4.as(respawnInfo);
+		double w = ((Vec4) pos).w;
+		((Entity4) player).snapTo(new Vec4(x, y, z, w), yRot, xRot, respawnInfo4.wRot(), respawnInfo4.vRot());
 	}
 	// TODO respawn
 	// TODO respawn

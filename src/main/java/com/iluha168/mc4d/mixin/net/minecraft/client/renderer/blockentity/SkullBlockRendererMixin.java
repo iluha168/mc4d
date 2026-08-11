@@ -12,6 +12,9 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(SkullBlockRenderer.class)
 class SkullBlockRendererMixin {
+	// TODO createWallTransformation show getStepW and toWRot
+	// TODO createGroundTransformation show wRot
+
 	@Redirect(method = "getRenderBoundingBox(Lnet/minecraft/world/level/block/entity/SkullBlockEntity;)Lnet/minecraft/world/phys/AABB;", at = @At(
 		value = "NEW",
 		target = "(DDDDDD)Lnet/minecraft/world/phys/AABB;"

@@ -5,6 +5,7 @@ import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.entity.Entity4;
 import com.iluha168.mc4d.world.entity.item.ItemEntity4;
 import com.iluha168.mc4d.world.phys.AABB4;
+import com.iluha168.mc4d.world.phys.RotationVec;
 import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
@@ -24,6 +25,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ItemEntity.class)
 public class ItemEntityMixin extends EntityMixin implements ItemEntity4 {
 	@Unique	protected byte initIncomplete;
+
+	@Inject(method = "<init>(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/level/Level;)V", at = @At("TAIL"))
+	void init_setWRot(CallbackInfo ci) {
+		this.setWRot(RotationVec.randomWRotDeg(this.random));
+	}
 
 	@Redirect(method = "<init>(Lnet/minecraft/world/level/Level;DDDLnet/minecraft/world/item/ItemStack;)V", at = @At(
 		value = "INVOKE",
@@ -135,4 +141,6 @@ public class ItemEntityMixin extends EntityMixin implements ItemEntity4 {
 	AABB mergeWithNeighbours(AABB instance, double xAdd, double yAdd, double zAdd) {
 		return ((AABB4) instance).inflate(xAdd, yAdd, zAdd, zAdd);
 	}
+
+	// TODO getVisualRotationYInDegrees (yaw-only heading, no W sibling; see the note in EntityMixin)
 }

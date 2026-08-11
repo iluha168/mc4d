@@ -23,7 +23,6 @@ import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Unique;
@@ -132,24 +131,6 @@ class EntityFluidInteractionMixin {
 
 	@Mixin(targets = "net.minecraft.world.entity.EntityFluidInteraction$Tracker")
 	static class TrackerMixin {
-		@Redirect(method = "<init>", at = @At(
-			value = "FIELD",
-			target = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;",
-			opcode = Opcodes.GETSTATIC
-		))
-		Vec3 init() {
-			return Vec4.ZERO;
-		}
-
-		@Redirect(method = "reset", at = @At(
-			value = "FIELD",
-			target = "Lnet/minecraft/world/phys/Vec3;ZERO:Lnet/minecraft/world/phys/Vec3;",
-			opcode = Opcodes.GETSTATIC
-		))
-		Vec3 reset() {
-			return Vec4.ZERO;
-		}
-
 		@Definition(id = "abs", method = "Ljava/lang/Math;abs(D)D")
 		@Definition(id = "z", field = "Lnet/minecraft/world/phys/Vec3;z:D")
 		@Expression("abs(?.z) < 0.003")

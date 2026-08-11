@@ -5,7 +5,10 @@ import com.iluha168.mc4d.core.BlockPos4;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.entity.Entity4;
 import com.iluha168.mc4d.world.entity.Relative4;
+import com.iluha168.mc4d.world.phys.RotationVec;
 import com.iluha168.mc4d.world.phys.Vec4;
+import com.llamalad7.mixinextras.expression.Definition;
+import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
@@ -21,6 +24,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.Relative;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.*;
@@ -39,28 +43,50 @@ class TeleportCommandMixin {
 		CommandSourceStack source, Entity victim, ServerLevel level, double x, double y, double z, Set<Relative> relatives, float yRot, float xRot, @Nullable LookAt lookAt,
 		@Local(argsOnly = true, name = "destination") Entity destination
 	) throws CommandSyntaxException {
+		final Entity4 destination4 = (Entity4) destination;
 		performTeleport(
 			source, victim, level,
-			x, y, z, ((Entity4) destination).getW(),
-			relatives, yRot, xRot, lookAt
+			x, y, z, destination4.getW(),
+			relatives, yRot, xRot, destination4.getWRot(), destination4.getVRot(), lookAt
 		);
 	}
 
-	@Redirect(method = "teleportToPos", at = @At(
-		value = "INVOKE",
-		target = "Lnet/minecraft/server/commands/TeleportCommand;performTeleport(Lnet/minecraft/commands/CommandSourceStack;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/server/level/ServerLevel;DDDLjava/util/Set;FFLnet/minecraft/server/commands/LookAt;)V"
-	))
-	private static void teleportToPos(
+	@Definition(id = "performTeleport", method = "Lnet/minecraft/server/commands/TeleportCommand;performTeleport(Lnet/minecraft/commands/CommandSourceStack;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/server/level/ServerLevel;DDDLjava/util/Set;FFLnet/minecraft/server/commands/LookAt;)V")
+	@Definition(id = "getXRot", method = "Lnet/minecraft/world/entity/Entity;getXRot()F")
+	@Expression("performTeleport(?, ?, ?, ?, ?, ?, ?, ?, ?.getXRot(), ?)")
+	@Redirect(method = "teleportToPos", at = @At("MIXINEXTRAS:EXPRESSION"))
+	private static void teleportToPos_withoutRot(
 		CommandSourceStack source, Entity victim, ServerLevel level, double x, double y, double z, Set<Relative> relatives, float yRot, float xRot, @Nullable LookAt lookAt,
 		@Local(name = "pos") Vec3 pos
 	) throws CommandSyntaxException {
+		Entity4 victim4 = (Entity4) victim;
 		performTeleport(
 			source, victim, level,
 			x, y, z, ((Vec4) pos).w,
-			relatives, yRot, xRot, lookAt
+			relatives,
+			yRot, xRot, victim4.getWRot(), victim4.getVRot(),
+			lookAt
 		);
-		// TODO sendSuccess translations
 	}
+	@Definition(id = "performTeleport", method = "Lnet/minecraft/server/commands/TeleportCommand;performTeleport(Lnet/minecraft/commands/CommandSourceStack;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/server/level/ServerLevel;DDDLjava/util/Set;FFLnet/minecraft/server/commands/LookAt;)V")
+	@Definition(id = "x", field = "Lnet/minecraft/world/phys/Vec2;x:F")
+	@Expression("performTeleport(?, ?, ?, ?, ?, ?, ?, ?, ?.x, ?)")
+	@Redirect(method = "teleportToPos", at = @At("MIXINEXTRAS:EXPRESSION"))
+	private static void teleportToPos(
+		CommandSourceStack source, Entity victim, ServerLevel level, double x, double y, double z, Set<Relative> relatives, float yRot, float xRot, @Nullable LookAt lookAt,
+		@Local(name = "pos") Vec3 pos,
+		@Local(name = "rot") Vec2 rot
+	) throws CommandSyntaxException {
+		RotationVec rot4 = (RotationVec) rot;
+		performTeleport(
+			source, victim, level,
+			x, y, z, ((Vec4) pos).w,
+			relatives,
+			yRot, xRot, rot4.w, rot4.v,
+			lookAt
+		);
+	}
+	// TODO teleportToPos sendSuccess translations
 
 	@Shadow
 	@Final
@@ -87,6 +113,16 @@ class TeleportCommandMixin {
 	) {
 		final boolean relativeW = ((Coordinates4) destination).isWRelative();
 		return Relative4.position(relativeX, relativeY, relativeZ, relativeW);
+	}
+	@Redirect(method = "getRelatives", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Relative;rotation(ZZ)Ljava/util/Set;"
+	))
+	private static Set<Relative> getRelatives_rotation(
+		boolean relativeYRot, boolean relativeXRot,
+		@Local(argsOnly = true, name = "rotation") Coordinates rotation
+	) {
+		return Relative4.rotation(relativeYRot, relativeXRot, rotation.isZRelative(), ((Coordinates4) rotation).isWRelative());
 	}
 
 	@Overwrite
@@ -117,6 +153,8 @@ class TeleportCommandMixin {
 		Set<Relative> relatives,
 		float yRot,
 		float xRot,
+		float wRot,
+		float vRot,
 		@Nullable LookAt lookAt
 	) throws CommandSyntaxException {
 		// TODO neo forge event support?
@@ -132,9 +170,13 @@ class TeleportCommandMixin {
 		double relativeOrAbsoluteW = relatives.contains(Relative4.W) ? w - victim4.getW() : w;
 		float relativeOrAbsoluteYRot = relatives.contains(Relative.Y_ROT) ? yRot - victim.getYRot() : yRot;
 		float relativeOrAbsoluteXRot = relatives.contains(Relative.X_ROT) ? xRot - victim.getXRot() : xRot;
+		float relativeOrAbsoluteWRot = relatives.contains(Relative4.W_ROT) ? wRot - victim4.getWRot() : wRot;
+		float relativeOrAbsoluteVRot = relatives.contains(Relative4.V_ROT) ? vRot - victim4.getVRot() : vRot;
 		float newYRot = Mth.wrapDegrees(relativeOrAbsoluteYRot);
 		float newXRot = Mth.wrapDegrees(relativeOrAbsoluteXRot);
-		if (victim4.teleportTo(level, relativeOrAbsoluteX, relativeOrAbsoluteY, relativeOrAbsoluteZ, relativeOrAbsoluteW, relatives, newYRot, newXRot, true)) {
+		float newWRot = Mth.wrapDegrees(relativeOrAbsoluteWRot);
+		float newVRot = Mth.wrapDegrees(relativeOrAbsoluteVRot);
+		if (victim4.teleportTo(level, relativeOrAbsoluteX, relativeOrAbsoluteY, relativeOrAbsoluteZ, relativeOrAbsoluteW, relatives, newYRot, newXRot, newWRot, newVRot, true)) {
 			if (lookAt != null) {
 				lookAt.perform(source, victim);
 			}

@@ -32,6 +32,8 @@ abstract class QuadParticleRenderStateMixin implements QuadParticleRenderState4 
 	protected abstract void renderVertex(VertexConsumer builder, Quaternionf rotation, float x, float y, float z, float nx, float ny, float scale, float u, float v, int color, int lightCoords);
 
 	@Unique private boolean enableNeighbouringSliceRenderer;
+	/** How many quads were actually written to the renderer. */
+	@Unique private int renderedParticleCount;
 
 	@Overwrite
 	@Deprecated
@@ -49,13 +51,21 @@ abstract class QuadParticleRenderStateMixin implements QuadParticleRenderState4 
 		value = "INVOKE",
 		target = "Lnet/minecraft/client/renderer/state/level/QuadParticleRenderState$Storage;forEachParticle(Lnet/minecraft/client/renderer/state/level/QuadParticleRenderState$ParticleConsumer;)V"
 	))
-	void prepare(QuadParticleRenderState.Storage storage, QuadParticleRenderState.ParticleConsumer consumer, @Local(name = "bufferBuilder") BufferBuilder bufferBuilder) {
+	void prepare_forEachParticle(QuadParticleRenderState.Storage storage, QuadParticleRenderState.ParticleConsumer consumer, @Local(name = "bufferBuilder") BufferBuilder bufferBuilder) {
 		this.enableNeighbouringSliceRenderer = Minecraft.getInstance().debugEntries.isCurrentlyEnabled(MC4DClient.NEIGHBOURING_SLICE_PARTICLE_RENDERER);
+		this.renderedParticleCount = 0;
 		((QuadParticleRenderState4.Storage) storage).forEachParticle(
 			(x, y, z, w, xRot, yRot, zRot, wRot, scale, u0, u1, v0, v1, color, lightCoords) -> this.renderRotatedQuad(
 				bufferBuilder, x, y, z, w, xRot, yRot, zRot, wRot, scale, u0, u1, v0, v1, color, lightCoords
 			)
 		);
+	}
+	@Redirect(method = "prepare", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/client/renderer/state/level/QuadParticleRenderState$Storage;count()I"
+	))
+	int prepare_count(QuadParticleRenderState.Storage storage) {
+		return this.renderedParticleCount;
 	}
 
 	@Overwrite
@@ -67,21 +77,19 @@ abstract class QuadParticleRenderStateMixin implements QuadParticleRenderState4 
 	protected void renderRotatedQuad(VertexConsumer builder, float x, float y, float z, float w, float xRot, float yRot, float zRot, float wRot, float scale, float u0, float u1, float v0, float v1, int color, int lightCoords) {
 		// In this method x, y, z, w are relative to the camera (it is at w=0).
 		if (this.enableNeighbouringSliceRenderer) {
-			if (Math.abs(w) > scale + 1) {
-				// Do not render the particle when it is outside camera's 3D slice.
-				scale = 0.0F;
-			} else {
-				color = ARGB.alphaBlend(color, MC4DClient.getTintColor(w / scale));
-			}
+			// Do not render the particle when it is outside camera's 3D slice.
+			if (Math.abs(w) > scale + 1) return;
+			color = ARGB.alphaBlend(color, MC4DClient.getTintColor(w / scale));
 		} else if (Math.abs(w) > scale) {
 			// Do not render the particle when it is outside camera's 3D slice.
-			scale = 0.0F;
+			return;
 		}
 		Quaternionf rotation = new Quaternionf(xRot, yRot, zRot, wRot);
 		this.renderVertex(builder, rotation, x, y, z, 1.0F, -1.0F, scale, u1, v1, color, lightCoords);
 		this.renderVertex(builder, rotation, x, y, z, 1.0F, 1.0F, scale, u1, v0, color, lightCoords);
 		this.renderVertex(builder, rotation, x, y, z, -1.0F, 1.0F, scale, u0, v0, color, lightCoords);
 		this.renderVertex(builder, rotation, x, y, z, -1.0F, -1.0F, scale, u0, v1, color, lightCoords);
+		this.renderedParticleCount++;
 	}
 
 	@Mixin(QuadParticleRenderState.Storage.class)

@@ -1,7 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.core.dispenser;
 
 import com.iluha168.mc4d.core.Direction4;
-import com.iluha168.mc4d.core.Position4;
 import com.iluha168.mc4d.world.entity.item.ItemEntity4;
 import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -26,7 +25,7 @@ class DefaultDispenseItemBehaviorMixin {
 		Level level, double x, double y, double z, ItemStack itemStack,
 		@Local(argsOnly = true, name = "position") Position position
 	) {
-		return ItemEntity4.from(level, x, y, z, ((Position4) position).w(), itemStack);
+		return ItemEntity4.from(level, x, y, z, ((Vec4) position).w, itemStack);
 	}
 	@Redirect(method = "spawnItem", at = @At(
 		value = "INVOKE",

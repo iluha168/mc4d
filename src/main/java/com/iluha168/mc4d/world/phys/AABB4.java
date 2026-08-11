@@ -1,7 +1,6 @@
 package com.iluha168.mc4d.world.phys;
 
 import com.iluha168.mc4d.core.Direction4;
-import com.iluha168.mc4d.core.Position4;
 import com.iluha168.mc4d.core.Vec4i;
 import com.iluha168.mc4d.util.Err4;
 import net.minecraft.core.BlockPos;
@@ -21,7 +20,7 @@ import java.util.Optional;
  * Any operation on AABB4 returns an AABB4: AABB + AABB4 = AABB; AABB4 + AABB = AABB4.
  * Callers should be oblivious that they work with 4D boxes.
  */
-public class AABB4 extends AABB implements IAABB4 {
+public class AABB4 extends AABB {
 	public static final double EPSILON = 1.0E-7;
 	public static final AABB4 INFINITE = new AABB4(
 		Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY,
@@ -53,15 +52,6 @@ public class AABB4 extends AABB implements IAABB4 {
 			begin.x, begin.y, begin.z, begin.w,
 			end.x, end.y, end.z, end.w
 		);
-	}
-
-	@Override
-	public double minW() {
-		return this.minW;
-	}
-	@Override
-	public double maxW() {
-		return this.maxW;
 	}
 
 	@Override
@@ -115,15 +105,15 @@ public class AABB4 extends AABB implements IAABB4 {
 	@Override
 	public boolean equals(@NonNull Object o) {
 		return this == o || (
-			o instanceof AABB aabb
+			o instanceof AABB4 aabb
 			&& Double.compare(aabb.minX, this.minX) == 0
 			&& Double.compare(aabb.minY, this.minY) == 0
 			&& Double.compare(aabb.minZ, this.minZ) == 0
-			&& Double.compare(((IAABB4) aabb).minW(), this.minW) == 0
+			&& Double.compare(aabb.minW, this.minW) == 0
 			&& Double.compare(aabb.maxX, this.maxX) == 0
 			&& Double.compare(aabb.maxY, this.maxY) == 0
 			&& Double.compare(aabb.maxZ, this.maxZ) == 0
-			&& Double.compare(((IAABB4) aabb).maxW(), this.maxW) == 0
+			&& Double.compare(aabb.maxW, this.maxW) == 0
 		);
 	}
 
@@ -181,7 +171,7 @@ public class AABB4 extends AABB implements IAABB4 {
 
 	@Override
 	public @NonNull AABB4 expandTowards(Vec3 delta) {
-		return this.expandTowards(delta.x, delta.y, delta.z, ((Position4) delta).w());
+		return this.expandTowards(delta.x, delta.y, delta.z, ((Vec4) delta).w);
 	}
 
 	@Override
@@ -260,11 +250,11 @@ public class AABB4 extends AABB implements IAABB4 {
 		double minX = Math.max(this.minX, other.minX);
 		double minY = Math.max(this.minY, other.minY);
 		double minZ = Math.max(this.minZ, other.minZ);
-		double minW = Math.max(this.minW, ((IAABB4) other).minW());
+		double minW = Math.max(this.minW, ((AABB4) other).minW);
 		double maxX = Math.min(this.maxX, other.maxX);
 		double maxY = Math.min(this.maxY, other.maxY);
 		double maxZ = Math.min(this.maxZ, other.maxZ);
-		double maxW = Math.min(this.maxW, ((IAABB4) other).maxW());
+		double maxW = Math.min(this.maxW, ((AABB4) other).maxW);
 		return new AABB4(minX, minY, minZ, minW, maxX, maxY, maxZ, maxW);
 	}
 
@@ -273,11 +263,11 @@ public class AABB4 extends AABB implements IAABB4 {
 		double minX = Math.min(this.minX, other.minX);
 		double minY = Math.min(this.minY, other.minY);
 		double minZ = Math.min(this.minZ, other.minZ);
-		double minW = Math.min(this.minW, ((IAABB4) other).minW());
+		double minW = Math.min(this.minW, ((AABB4) other).minW);
 		double maxX = Math.max(this.maxX, other.maxX);
 		double maxY = Math.max(this.maxY, other.maxY);
 		double maxZ = Math.max(this.maxZ, other.maxZ);
-		double maxW = Math.max(this.maxW, ((IAABB4) other).maxW());
+		double maxW = Math.max(this.maxW, ((AABB4) other).maxW);
 		return new AABB4(minX, minY, minZ, minW, maxX, maxY, maxZ, maxW);
 	}
 
@@ -308,7 +298,7 @@ public class AABB4 extends AABB implements IAABB4 {
 
 	@Override
 	public @NonNull AABB4 move(Vec3 pos) {
-		return this.move(pos.x, pos.y, pos.z, ((Position4) pos).w());
+		return this.move(pos.x, pos.y, pos.z, ((Vec4) pos).w);
 	}
 
 	@Override
@@ -318,10 +308,10 @@ public class AABB4 extends AABB implements IAABB4 {
 	}
 
 	public boolean intersects(AABB aabb) {
-		IAABB4 aabb4 = (IAABB4) aabb;
+		final AABB4 aabb4 = (AABB4) aabb;
 		return this.intersects(
-			aabb.minX, aabb.minY, aabb.minZ, aabb4.minW(),
-			aabb.maxX, aabb.maxY, aabb.maxZ, aabb4.maxW()
+			aabb.minX, aabb.minY, aabb.minZ, aabb4.minW,
+			aabb.maxX, aabb.maxY, aabb.maxZ, aabb4.maxW
 		);
 	}
 
@@ -341,11 +331,11 @@ public class AABB4 extends AABB implements IAABB4 {
 			Math.min(min.x, max.x),
 			Math.min(min.y, max.y),
 			Math.min(min.z, max.z),
-			Math.min(((Position4) min).w(), ((Position4) max).w()),
+			Math.min(((Vec4) min).w, ((Vec4) max).w),
 			Math.max(min.x, max.x),
 			Math.max(min.y, max.y),
 			Math.max(min.z, max.z),
-			Math.max(((Position4) min).w(), ((Position4) max).w())
+			Math.max(((Vec4) min).w, ((Vec4) max).w)
 		);
 	}
 
@@ -359,7 +349,7 @@ public class AABB4 extends AABB implements IAABB4 {
 
 	@Override
 	public boolean contains(Vec3 vec) {
-		return this.contains(vec.x, vec.y, vec.z, ((Position4) vec).w());
+		return this.contains(vec.x, vec.y, vec.z, ((Vec4) vec).w);
 	}
 
 	@Override
@@ -415,7 +405,7 @@ public class AABB4 extends AABB implements IAABB4 {
 		double dx = to.x - from.x;
 		double dy = to.y - from.y;
 		double dz = to.z - from.z;
-		double dw = ((Position4) to).w() - ((Position4) from).w();
+		double dw = ((Vec4) to).w - ((Vec4) from).w;
 		Direction direction = getDirection(minX, minY, minZ, minW, maxX, maxY, maxZ, maxW, from, scaleReference, null, dx, dy, dz, dw);
 		if (direction == null) {
 			return Optional.empty();
@@ -442,7 +432,7 @@ public class AABB4 extends AABB implements IAABB4 {
 		double dz,
 		double dw
 	) {
-		final double fromW = ((Position4) from).w();
+		final double fromW = ((Vec4) from).w;
 		if (dx > EPSILON) {
 			direction = clipPoint(scaleReference, direction, dx, dy, dz, dw, minX, minY, maxY, minZ, maxZ, minW, maxW, Direction.WEST, from.x, from.y, from.z, fromW);
 		} else if (dx < -EPSILON) {
@@ -532,7 +522,7 @@ public class AABB4 extends AABB implements IAABB4 {
 		double dx = Math.max(Math.max(this.minX - point.x, point.x - this.maxX), 0.0);
 		double dy = Math.max(Math.max(this.minY - point.y, point.y - this.maxY), 0.0);
 		double dz = Math.max(Math.max(this.minZ - point.z, point.z - this.maxZ), 0.0);
-		double pointW = ((Position4) point).w();
+		double pointW = ((Vec4) point).w;
 		double dw = Math.max(Math.max(this.minW - pointW , pointW  - this.maxW), 0.0);
 		return dx * dx + dy * dy + dz * dz + dw * dw;
 	}
@@ -542,8 +532,8 @@ public class AABB4 extends AABB implements IAABB4 {
 		double dx = Math.max(Math.max(this.minX - boundingBox.maxX, boundingBox.minX - this.maxX), 0.0);
 		double dy = Math.max(Math.max(this.minY - boundingBox.maxY, boundingBox.minY - this.maxY), 0.0);
 		double dz = Math.max(Math.max(this.minZ - boundingBox.maxZ, boundingBox.minZ - this.maxZ), 0.0);
-		IAABB4 bounding4 = (IAABB4) boundingBox;
-		double dw = Math.max(Math.max(this.minW - bounding4.maxW(), bounding4.minW() - this.maxW), 0.0);
+		final AABB4 bounding4 = (AABB4) boundingBox;
+		double dw = Math.max(Math.max(this.minW - bounding4.maxW, bounding4.minW - this.maxW), 0.0);
 		return dx * dx + dy * dy + dz * dz + dw * dw;
 	}
 

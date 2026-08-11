@@ -1,6 +1,8 @@
 package com.iluha168.mc4d;
 
+import com.iluha168.mc4d.world.phys.Vec4;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.neoforged.api.distmarker.Dist;
@@ -28,15 +30,20 @@ public class MC4DClient {
         );
     }
 
+    /** @return camera's absolute position along the W axis. */
+    public static double cameraW() {
+        return ((Vec4) Minecraft.getInstance().gameRenderer.getMainCamera().position()).w;
+    }
+
     public static final Identifier NEIGHBOURING_SLICE_BLOCK_RENDERER = Identifier.fromNamespaceAndPath(MC4D.MODID, "neighbouring_slice_block_renderer");
     /** Use this to see the target block outline cleanly. Useful for debugging voxel shapes. */
     public static final Identifier NO_BLOCK_MODEL_RENDERER = Identifier.fromNamespaceAndPath(MC4D.MODID, "no_block_model_renderer");
     public static final Identifier NEIGHBOURING_SLICE_PARTICLE_RENDERER = Identifier.fromNamespaceAndPath(MC4D.MODID, "neighbouring_slice_particle_renderer");
     public static final Identifier NEIGHBOURING_SLICE_ENTITY_RENDERER = Identifier.fromNamespaceAndPath(MC4D.MODID, "neighbouring_slice_entity_renderer");
 
-    public static final KeyMapping keyAna = new KeyMapping("key.ana", -1, KeyMapping.Category.MOVEMENT);
-    public static final KeyMapping keyKata = new KeyMapping("key.kata", -1, KeyMapping.Category.MOVEMENT);
-    public static final KeyMapping keyCameraOffset = new KeyMapping("key.camera_offset", -1, KeyMapping.Category.GAMEPLAY);
+    public static final KeyMapping keyAna = new KeyMapping("key."+MC4D.MODID+".ana", -1, KeyMapping.Category.MOVEMENT);
+    public static final KeyMapping keyKata = new KeyMapping("key."+MC4D.MODID+".kata", -1, KeyMapping.Category.MOVEMENT);
+    public static final KeyMapping keyMouseAlternativeLook = new KeyMapping("key."+MC4D.MODID+".mouse_alternative_look", -1, KeyMapping.Category.MOVEMENT);
 
     public MC4DClient() {
     }
@@ -45,6 +52,6 @@ public class MC4DClient {
     private static void registerBindings(RegisterKeyMappingsEvent event) {
         event.register(keyAna);
         event.register(keyKata);
-        event.register(keyCameraOffset);
+        event.register(keyMouseAlternativeLook);
     }
 }

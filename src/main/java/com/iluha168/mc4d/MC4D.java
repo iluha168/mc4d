@@ -1,6 +1,8 @@
 package com.iluha168.mc4d;
 
+import com.iluha168.mc4d.gametest.framework.StatesTestFunctions;
 import com.mojang.logging.LogUtils;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import org.slf4j.Logger;
 
@@ -12,6 +14,19 @@ public class MC4D {
     // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public MC4D() {
+    public MC4D(IEventBus modBus) {
+        StatesTestFunctions.DEFERRED_REGISTER.register(modBus);
+    }
+
+    /**
+     * wRot of the 3D slice the client renders and aims within.
+     * Movement keybinds and block/entity selection are taken relative to this orientation, and the server uses the same value when predicting them.
+     */
+    public static float getCameraSliceWRot() {
+        return 0.0F;
+    }
+    /** vRot counterpart of {@link #getCameraSliceWRot}. */
+    public static float getCameraSliceVRot() {
+        return 0.0F;
     }
 }
