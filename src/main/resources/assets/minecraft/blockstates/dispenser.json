@@ -1,0 +1,32 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "minecraft:block/dispenser_vertical",
+      "x": 180
+    },
+    "facing=east": {
+      "model": "minecraft:block/dispenser",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "minecraft:block/dispenser"
+    },
+    "facing=south": {
+      "model": "minecraft:block/dispenser",
+      "y": 180
+    },
+    "facing=up": {
+      "model": "minecraft:block/dispenser_vertical"
+    },
+    "facing=west": {
+      "model": "minecraft:block/dispenser",
+      "y": 270
+    },
+    "facing=ana": {
+      "model": "mc4d:block/furnace/furnace_w"
+    },
+    "facing=kata": {
+      "model": "mc4d:block/furnace/furnace_w"
+    }
+  }
+}
