@@ -1,0 +1,87 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "minecraft:block/hopper",
+      "w" : {
+        "0;2": "mc4d:block/hopper/hopper_w_offset_rim",
+        "2;4": "mc4d:block/hopper/hopper_w_offset_base",
+        "4;6": "mc4d:block/hopper/hopper_w_offset_middle",
+        "6;10": "minecraft:block/hopper",
+        "10;12": "mc4d:block/hopper/hopper_w_offset_middle",
+        "12;14": "mc4d:block/hopper/hopper_w_offset_base",
+        "14;16": "mc4d:block/hopper/hopper_w_offset_rim"
+      }
+    },
+    "facing=east": {
+      "model": "minecraft:block/hopper_side",
+      "w" : {
+        "0;2": "mc4d:block/hopper/hopper_w_offset_rim",
+        "2;4": "mc4d:block/hopper/hopper_w_offset_base",
+        "4;6": "mc4d:block/hopper/hopper_w_offset_middle",
+        "6;10": "minecraft:block/hopper_side",
+        "10;12": "mc4d:block/hopper/hopper_w_offset_middle",
+        "12;14": "mc4d:block/hopper/hopper_w_offset_base",
+        "14;16": "mc4d:block/hopper/hopper_w_offset_rim"
+      },
+      "y": 90
+    },
+    "facing=north": {
+      "model": "minecraft:block/hopper_side",
+      "w" : {
+        "0;2": "mc4d:block/hopper/hopper_w_offset_rim",
+        "2;4": "mc4d:block/hopper/hopper_w_offset_base",
+        "4;6": "mc4d:block/hopper/hopper_w_offset_middle",
+        "6;10": "minecraft:block/hopper_side",
+        "10;12": "mc4d:block/hopper/hopper_w_offset_middle",
+        "12;14": "mc4d:block/hopper/hopper_w_offset_base",
+        "14;16": "mc4d:block/hopper/hopper_w_offset_rim"
+      }
+    },
+    "facing=south": {
+      "model": "minecraft:block/hopper_side",
+      "w" : {
+        "0;2": "mc4d:block/hopper/hopper_w_offset_rim",
+        "2;4": "mc4d:block/hopper/hopper_w_offset_base",
+        "4;6": "mc4d:block/hopper/hopper_w_offset_middle",
+        "6;10": "minecraft:block/hopper_side",
+        "10;12": "mc4d:block/hopper/hopper_w_offset_middle",
+        "12;14": "mc4d:block/hopper/hopper_w_offset_base",
+        "14;16": "mc4d:block/hopper/hopper_w_offset_rim"
+      },
+      "y": 180
+    },
+    "facing=west": {
+      "model": "minecraft:block/hopper_side",
+      "w" : {
+        "0;2": "mc4d:block/hopper/hopper_w_offset_rim",
+        "2;4": "mc4d:block/hopper/hopper_w_offset_base",
+        "4;6": "mc4d:block/hopper/hopper_w_offset_middle",
+        "6;10": "minecraft:block/hopper_side",
+        "10;12": "mc4d:block/hopper/hopper_w_offset_middle",
+        "12;14": "mc4d:block/hopper/hopper_w_offset_base",
+        "14;16": "mc4d:block/hopper/hopper_w_offset_rim"
+      },
+      "y": 270
+    },
+    "facing=ana": {
+      "model" : "mc4d:block/hopper/hopper_w_offset_middle",
+      "w" : {
+        "0;2": "mc4d:block/hopper/hopper_w_offset_rim",
+        "2;4": "mc4d:block/hopper/hopper_w_offset_base",
+        "4;12": "mc4d:block/hopper/hopper_w_offset_middle",
+        "12;14": "mc4d:block/hopper/hopper_w_base",
+        "14;16": "mc4d:block/hopper/hopper_w_rim"
+      }
+    },
+    "facing=kata": {
+      "model" : "mc4d:block/hopper/hopper_w_offset_middle",
+      "w" : {
+        "0;2": "mc4d:block/hopper/hopper_w_rim",
+        "2;4": "mc4d:block/hopper/hopper_w_base",
+        "4;12": "mc4d:block/hopper/hopper_w_offset_middle",
+        "12;14": "mc4d:block/hopper/hopper_w_offset_base",
+        "14;16": "mc4d:block/hopper/hopper_w_offset_rim"
+      }
+    }
+  }
+}

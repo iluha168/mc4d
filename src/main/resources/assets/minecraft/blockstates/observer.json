@@ -1,0 +1,70 @@
+{
+  "variants": {
+    "facing=down,powered=false": {
+      "model": "minecraft:block/observer",
+      "x": 90
+    },
+    "facing=down,powered=true": {
+      "model": "minecraft:block/observer_on",
+      "x": 90
+    },
+    "facing=east,powered=false": {
+      "model": "minecraft:block/observer",
+      "y": 90
+    },
+    "facing=east,powered=true": {
+      "model": "minecraft:block/observer_on",
+      "y": 90
+    },
+    "facing=north,powered=false": {
+      "model": "minecraft:block/observer"
+    },
+    "facing=north,powered=true": {
+      "model": "minecraft:block/observer_on"
+    },
+    "facing=south,powered=false": {
+      "model": "minecraft:block/observer",
+      "y": 180
+    },
+    "facing=south,powered=true": {
+      "model": "minecraft:block/observer_on",
+      "y": 180
+    },
+    "facing=up,powered=false": {
+      "model": "minecraft:block/observer",
+      "x": 270
+    },
+    "facing=up,powered=true": {
+      "model": "minecraft:block/observer_on",
+      "x": 270
+    },
+    "facing=west,powered=false": {
+      "model": "minecraft:block/observer",
+      "y": 270
+    },
+    "facing=west,powered=true": {
+      "model": "minecraft:block/observer_on",
+      "y": 270
+    },
+    "facing=ana": {
+      "model": "mc4d:block/observer/observer_w_middle",
+      "w": {
+        "0;2": "mc4d:block/observer/observer_w_ends",
+        "2;6": "mc4d:block/observer/observer_w_tip",
+        "6;10": "mc4d:block/observer/observer_w_middle",
+        "10;14": "mc4d:block/observer/observer_w_base",
+        "14;16": "mc4d:block/observer/observer_w_ends"
+      }
+    },
+    "facing=kata": {
+      "model": "mc4d:block/observer/observer_w_middle",
+      "w": {
+        "0;2": "mc4d:block/observer/observer_w_ends",
+        "2;6": "mc4d:block/observer/observer_w_base",
+        "6;10": "mc4d:block/observer/observer_w_middle",
+        "10;14": "mc4d:block/observer/observer_w_tip",
+        "14;16": "mc4d:block/observer/observer_w_ends"
+      }
+    }
+  }
+}
