@@ -4,5 +4,9 @@ package com.iluha168.mc4d.client.particle;
  * Implemented by {@link net.minecraft.client.particle.BaseAshSmokeParticle}.
  */
 public interface BaseAshSmokeParticle4 {
-	void init_finish(double w, float dirW, double wa);
+	void init_finish(
+		double w,
+		float dirX, float dirY, float dirZ, float dirW,
+		double xa, double ya, double za, double wa
+	);
 }

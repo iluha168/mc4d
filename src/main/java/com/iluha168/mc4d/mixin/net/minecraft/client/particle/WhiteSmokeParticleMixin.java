@@ -19,7 +19,7 @@ abstract class WhiteSmokeParticleMixin extends BaseAshSmokeParticleMixin {
 		public @Nullable Particle createParticle(SimpleParticleType options, ClientLevel level, double x, double y, double z, double w, double xAux, double yAux, double zAux, double wAux, RandomSource random) {
 			Particle particle = this.createParticle(options, level, x, y, z, xAux, yAux, zAux, random);
 			//noinspection DataFlowIssue
-			((BaseAshSmokeParticle4) particle).init_finish(w, 0.1F, wAux);
+			((BaseAshSmokeParticle4) particle).init_finish(w, 0.1F, 0.1F, 0.1F, 0.1F, xAux, yAux, zAux, wAux);
 			return particle;
 		}
 	}

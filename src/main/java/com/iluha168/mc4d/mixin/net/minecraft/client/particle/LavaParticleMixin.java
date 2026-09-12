@@ -24,16 +24,21 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 abstract class LavaParticleMixin extends SingleQuadParticleMixin {
 	@Redirect(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/client/particle/LavaParticle;xd:D", opcode = Opcodes.PUTFIELD))
 	void init_postpone_xd(LavaParticle instance, double value) {}
-	@Redirect(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/client/particle/LavaParticle;yd:D", opcode = Opcodes.PUTFIELD))
+	@Redirect(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/client/particle/LavaParticle;yd:D", opcode = Opcodes.PUTFIELD, ordinal = 0))
 	void init_postpone_yd(LavaParticle instance, double value) {}
 	@Redirect(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/client/particle/LavaParticle;zd:D", opcode = Opcodes.PUTFIELD))
 	void init_postpone_zd(LavaParticle instance, double value) {}
+	@Redirect(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/client/particle/LavaParticle;yd:D", opcode = Opcodes.PUTFIELD, ordinal = 1))
+	void init_postpone_ydLaunch(LavaParticle instance, double value) {
+		this.wd = value; // Yeah, makes no sense, I am just using this field as a quick stash.
+	}
 
 	@Override
-	public void init_finish(double w, double wa) {
-		super.init_finish(w, 0.0);
+	public void init_finish(double w, double xa, double ya, double za, double wa) {
+		final double ydLaunch = this.wd; // Un-stashing.
+		super.init_finish(w, 0.0, 0.0, 0.0, 0.0);
 		this.xd *= 0.8F;
-		this.yd *= 0.8F;
+		this.yd = ydLaunch;
 		this.zd *= 0.8F;
 		this.wd *= 0.8F;
 	}
@@ -62,7 +67,7 @@ abstract class LavaParticleMixin extends SingleQuadParticleMixin {
 		@Override
 		public @Nullable Particle createParticle(SimpleParticleType options, ClientLevel level, double x, double y, double z, double w, double xAux, double yAux, double zAux, double wAux, RandomSource random) {
 			LavaParticle particle = new LavaParticle(level, x, y, z, this.sprite.get(random));
-			((Particle4) particle).init_finish(w, 0.0);
+			((Particle4) particle).init_finish(w, 0.0, 0.0, 0.0, 0.0);
 			return particle;
 		}
 	}

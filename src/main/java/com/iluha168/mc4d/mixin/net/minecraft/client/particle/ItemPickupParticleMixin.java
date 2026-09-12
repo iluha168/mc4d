@@ -41,7 +41,7 @@ abstract class ItemPickupParticleMixin extends ParticleMixin implements ItemPick
 		shift = At.Shift.AFTER
 	))
 	private void init(ClientLevel level, EntityRenderState itemEntity, Entity target, Vec3 movement, CallbackInfo ci) {
-		init_finish(((EntityRenderState4) itemEntity).w(), ((Vec4) movement).w);
+		init_finish(((EntityRenderState4) itemEntity).w(), movement.x, movement.y, movement.z, ((Vec4) movement).w);
 	}
 
 	@Inject(method = "updatePosition", at = @At("TAIL"))

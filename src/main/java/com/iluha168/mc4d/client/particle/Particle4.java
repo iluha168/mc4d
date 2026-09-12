@@ -9,7 +9,7 @@ public interface Particle4 {
 	@InternalApi
 	void init_finish(double w);
 	@InternalApi
-	void init_finish(double w, double wa);
+	void init_finish(double w, double xa, double ya, double za, double wa);
 
 	double wo();
 	double w();

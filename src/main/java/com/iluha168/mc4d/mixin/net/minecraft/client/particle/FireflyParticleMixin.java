@@ -25,8 +25,8 @@ abstract class FireflyParticleMixin extends SingleQuadParticleMixin {
 	@Redirect(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/client/particle/FireflyParticle;zd:D", opcode = Opcodes.PUTFIELD))
 	void init_postpone_zd(FireflyParticle instance, double value) {}
 	@Override
-	public void init_finish(double w, double wa) {
-		super.init_finish(w, wa);
+	public void init_finish(double w, double xa, double ya, double za, double wa) {
+		super.init_finish(w, xa, ya, za, wa);
 		this.yd *= 0.8F;
 		this.xd *= 0.8F;
 		this.zd *= 0.8F;
@@ -54,7 +54,12 @@ abstract class FireflyParticleMixin extends SingleQuadParticleMixin {
 		public @Nullable Particle createParticle(SimpleParticleType options, ClientLevel level, double x, double y, double z, double w, double xAux, double yAux, double zAux, double wAux, RandomSource random) {
 			Particle particle = this.createParticle(options, level, x, y, z, xAux, yAux, zAux, random);
 			//noinspection DataFlowIssue
-			((Particle4) particle).init_finish(w, 0.5 - random.nextDouble());
+			((Particle4) particle).init_finish(w,
+				0.5 - random.nextDouble(),
+				random.nextBoolean() ? yAux : -yAux,
+				0.5 - random.nextDouble(),
+				0.5 - random.nextDouble()
+			);
 			return particle;
 		}
 	}

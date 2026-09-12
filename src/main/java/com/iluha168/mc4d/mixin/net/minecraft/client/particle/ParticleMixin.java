@@ -17,6 +17,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -32,13 +33,13 @@ abstract class ParticleMixin implements Particle4 {
 	protected float bbWidth;
 
 	@Shadow
-	protected double xo;
+	public double xo;
 
 	@Shadow
-	protected double yo;
+	public double yo;
 
 	@Shadow
-	protected double zo;
+	public double zo;
 
 	@Shadow
 	@Final
@@ -105,7 +106,6 @@ abstract class ParticleMixin implements Particle4 {
 	private static AABB INITIAL_AABB(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
 		return new AABB4(minX, minY, minZ, 0, maxX, maxY, maxZ, 0);
 	}
-
 	@Definition(id = "MAXIMUM_COLLISION_VELOCITY_SQUARED", field = "Lnet/minecraft/client/particle/Particle;MAXIMUM_COLLISION_VELOCITY_SQUARED:D")
 	@Expression("MAXIMUM_COLLISION_VELOCITY_SQUARED = @(?)")
 	@Redirect(method = "<clinit>", at = @At("MIXINEXTRAS:EXPRESSION"))
@@ -160,18 +160,27 @@ abstract class ParticleMixin implements Particle4 {
 		}
 	}
 
+	@Redirect(method = "<init>(Lnet/minecraft/client/multiplayer/ClientLevel;DDDDDD)V", at = @At(value = "FIELD", target = "Lnet/minecraft/client/particle/Particle;xd:D", opcode = Opcodes.PUTFIELD))
+	void init_postpone_xd(Particle instance, double value) {}
+	@Redirect(method = "<init>(Lnet/minecraft/client/multiplayer/ClientLevel;DDDDDD)V", at = @At(value = "FIELD", target = "Lnet/minecraft/client/particle/Particle;yd:D", opcode = Opcodes.PUTFIELD))
+	void init_postpone_yd(Particle instance, double value) {}
+	@Redirect(method = "<init>(Lnet/minecraft/client/multiplayer/ClientLevel;DDDDDD)V", at = @At(value = "FIELD", target = "Lnet/minecraft/client/particle/Particle;zd:D", opcode = Opcodes.PUTFIELD))
+	void init_postpone_zd(Particle instance, double value) {}
 	@Inject(method = "<init>(Lnet/minecraft/client/multiplayer/ClientLevel;DDDDDD)V", at = @At("TAIL"))
 	void init_withInitialVelocity_incompleteByDefault(ClientLevel level, double x, double y, double z, double xa, double ya, double za, CallbackInfo ci) {
 		this.initIncomplete = 2;
 	}
 	@Override
-	public void init_finish(double w, double wa) {
+	public void init_finish(double w, double xa, double ya, double za, double wa) {
 		if (this.initIncomplete != 2) {
 			throw new IllegalStateException("Programmer error: wrong Particle4#init_finish called. This Particle has been created without initial velocity.");
 		}
 		try {
 			this.initIncomplete = 1;
 			this.init_finish(w); // this(level, x, y, z, w);
+			this.xd = xa + (this.random.nextFloat() * 2.0F - 1.0F) * 0.4F;
+			this.yd = ya + (this.random.nextFloat() * 2.0F - 1.0F) * 0.4F;
+			this.zd = za + (this.random.nextFloat() * 2.0F - 1.0F) * 0.4F;
 			this.wd = wa + (this.random.nextFloat() * 2.0F - 1.0F) * 0.4F;
 			final double speed = (this.random.nextFloat() + this.random.nextFloat() + 1.0F) * 0.15F;
 			final double dd = 1 / Math.sqrt(this.xd * this.xd + this.yd * this.yd + this.zd * this.zd + this.wd * this.wd);
@@ -284,7 +293,6 @@ abstract class ParticleMixin implements Particle4 {
 	@Overwrite
 	@Deprecated
 	public void move(double xa, double ya, double za) {
-		// TODO ban overrides of this too
 		throw Err4.arguments3("Particle4#move");
 	}
 	@Override

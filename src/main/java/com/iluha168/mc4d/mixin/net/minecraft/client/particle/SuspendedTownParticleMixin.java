@@ -31,8 +31,8 @@ abstract class SuspendedTownParticleMixin extends SingleQuadParticleMixin {
 	void init_postpone_zd(SuspendedTownParticle instance, double value) {}
 
 	@Override
-	public void init_finish(double w, double wa) {
-		super.init_finish(w, wa);
+	public void init_finish(double w, double xa, double ya, double za, double wa) {
+		super.init_finish(w, xa, ya, za, wa);
 		this.xd *= 0.02F;
 		this.yd *= 0.02F;
 		this.zd *= 0.02F;
@@ -78,7 +78,7 @@ abstract class SuspendedTownParticleMixin extends SingleQuadParticleMixin {
 		public @Nullable Particle createParticle(SimpleParticleType options, ClientLevel level, double x, double y, double z, double w, double xAux, double yAux, double zAux, double wAux, RandomSource random) {
 			Particle particle = this.createParticle(options, level, x, y, z, xAux, yAux, zAux, random);
 			//noinspection DataFlowIssue
-			((Particle4) particle).init_finish(w, wAux);
+			((Particle4) particle).init_finish(w, xAux, yAux, zAux, wAux);
 			return particle;
 		}
 	}

@@ -26,7 +26,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(BubbleParticle.class)
 abstract class BubbleParticleMixin extends SingleQuadParticleMixin {
 	@Override
-	public void init_finish(double w, double wa) {
+	public void init_finish(double w, double xa, double ya, double za, double wa) {
 		super.init_finish(w);
 		this.wd = wa * 0.2F + (this.random.nextFloat() * 2.0F - 1.0F) * 0.02F;
 	}
@@ -70,7 +70,7 @@ abstract class BubbleParticleMixin extends SingleQuadParticleMixin {
 		@Override
 		public @Nullable Particle createParticle(SimpleParticleType options, ClientLevel level, double x, double y, double z, double w, double xAux, double yAux, double zAux, double wAux, RandomSource random) {
 			BubbleParticle particle = new BubbleParticle(level, x, y, z, xAux, yAux, zAux, this.sprite.get(random));
-			((Particle4) particle).init_finish(w, wAux);
+			((Particle4) particle).init_finish(w, xAux, yAux, zAux, wAux);
 			return particle;
 		}
 	}

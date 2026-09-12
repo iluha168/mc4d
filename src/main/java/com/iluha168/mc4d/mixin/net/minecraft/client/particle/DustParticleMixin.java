@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(DustParticle.class)
-class DustParticleMixin {
+abstract class DustParticleMixin extends DustParticleBaseMixin {
 	@Mixin(DustParticle.Provider.class)
 	static class ProviderMixin implements ParticleProvider4<DustParticleOptions> {
 		@Shadow
@@ -34,7 +34,7 @@ class DustParticleMixin {
 		public @Nullable Particle createParticle(DustParticleOptions options, ClientLevel level, double x, double y, double z, double w, double xAux, double yAux, double zAux, double wAux, RandomSource random) {
 			DustParticle particle = new DustParticle(level, x, y, z, xAux, yAux, zAux, options, this.sprites);
 			//noinspection DataFlowIssue
-			((Particle4) particle).init_finish(w, wAux);
+			((Particle4) particle).init_finish(w, xAux, yAux, zAux, wAux);
 			return particle;
 		}
 	}

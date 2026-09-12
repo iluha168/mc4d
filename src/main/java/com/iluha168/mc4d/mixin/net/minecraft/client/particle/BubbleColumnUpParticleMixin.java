@@ -22,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(BubbleColumnUpParticle.class)
 abstract class BubbleColumnUpParticleMixin extends SingleQuadParticleMixin {
 	@Override
-	public void init_finish(double w, double wa) {
+	public void init_finish(double w, double xa, double ya, double za, double wa) {
 		super.init_finish(w);
 		this.wd = wa * 0.2F + (this.random.nextFloat() * 2.0F - 1.0F) * 0.02F;
 	}
@@ -51,7 +51,7 @@ abstract class BubbleColumnUpParticleMixin extends SingleQuadParticleMixin {
 		@Override
 		public @Nullable Particle createParticle(SimpleParticleType options, ClientLevel level, double x, double y, double z, double w, double xAux, double yAux, double zAux, double wAux, RandomSource random) {
 			final BubbleColumnUpParticle particle = new BubbleColumnUpParticle(level, x, y, z, xAux, yAux, zAux, this.sprite.get(random));
-			((Particle4) particle).init_finish(w, wAux);
+			((Particle4) particle).init_finish(w, xAux, yAux, zAux, wAux);
 			return particle;
 		}
 	}

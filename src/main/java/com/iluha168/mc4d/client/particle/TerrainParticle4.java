@@ -29,7 +29,7 @@ public interface TerrainParticle4 {
 		BlockState blockState, BlockPos pos
 	) {
 		TerrainParticle particle = new TerrainParticle(level, x, y, z, xa, ya, za, blockState, pos);
-		((Particle4) particle).init_finish(w, wa);
+		((Particle4) particle).init_finish(w, xa, ya, za, wa);
 		return particle;
 	}
 

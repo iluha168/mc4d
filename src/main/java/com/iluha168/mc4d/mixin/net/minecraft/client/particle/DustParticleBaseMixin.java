@@ -16,8 +16,8 @@ abstract class DustParticleBaseMixin extends SingleQuadParticleMixin {
 	void init_postpone_zd(DustParticleBase<?> instance, double value) {}
 
 	@Override
-	public void init_finish(double w, double wa) {
-		super.init_finish(w, wa);
+	public void init_finish(double w, double xa, double ya, double za, double wa) {
+		super.init_finish(w, xa, ya, za, wa);
 		this.xd *= 0.1F;
 		this.yd *= 0.1F;
 		this.zd *= 0.1F;

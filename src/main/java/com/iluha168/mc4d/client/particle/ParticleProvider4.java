@@ -8,9 +8,8 @@ import net.minecraft.util.RandomSource;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Implemented by the same class that implement {@link ParticleProvider},
+ * Implemented by the same classes that implement {@link ParticleProvider}.
  */
-// TODO actually implement by all classes
 public interface ParticleProvider4<T extends ParticleOptions> {
 	@Nullable Particle createParticle(
 		T options, ClientLevel level,

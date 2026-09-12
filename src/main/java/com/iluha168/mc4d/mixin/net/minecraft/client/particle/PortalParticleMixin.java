@@ -4,8 +4,6 @@ import com.iluha168.mc4d.client.particle.Particle4;
 import com.iluha168.mc4d.client.particle.ParticleProvider4;
 import com.iluha168.mc4d.util.Err4;
 import com.iluha168.mc4d.world.phys.AABB4;
-import com.llamalad7.mixinextras.expression.Definition;
-import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
@@ -14,6 +12,7 @@ import net.minecraft.client.particle.PortalParticle;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.RandomSource;
 import org.jspecify.annotations.Nullable;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Unique;
@@ -27,11 +26,14 @@ abstract class PortalParticleMixin extends SingleQuadParticleMixin {
 	@Unique private double wStart;
 
 	@Override
-	public void init_finish(double w, double wa) {
+	public void init_finish(double w) {
+		throw new IllegalStateException("Programmer error: use Particle4#init_finish.");
+	}
+	@Override
+	public void init_finish(double w, double xd, double yd, double zd, double wd) {
 		super.init_finish(w);
-		this.wd = wa;
-		this.w = w;
-		this.wStart = this.w;
+		this.wd = wd;
+		this.wStart = w;
 	}
 
 	@SuppressWarnings({"RedundantMethodOverride", "deprecation"})
@@ -46,9 +48,11 @@ abstract class PortalParticleMixin extends SingleQuadParticleMixin {
 		this.setLocationFromBoundingbox();
 	}
 
-	@Definition(id = "zo", field = "Lnet/minecraft/client/particle/PortalParticle;zo:D")
-	@Expression("this.zo = @(?)")
-	@Inject(method = "tick", at = @At("MIXINEXTRAS:EXPRESSION"))
+	@Inject(method = "tick", at = @At(
+		value = "FIELD",
+		target = "Lnet/minecraft/client/particle/PortalParticle;zo:D",
+		opcode = Opcodes.PUTFIELD
+	))
 	void tick_wo(CallbackInfo ci) {
 		this.wo = this.w();
 	}
@@ -65,9 +69,9 @@ abstract class PortalParticleMixin extends SingleQuadParticleMixin {
 	abstract static class ProviderMixin implements ParticleProvider<SimpleParticleType>, ParticleProvider4<SimpleParticleType> {
 		@Override
 		public @Nullable Particle createParticle(SimpleParticleType options, ClientLevel level, double x, double y, double z, double w, double xAux, double yAux, double zAux, double wAux, RandomSource random) {
-			Particle particle = this.createParticle(options, level, x, y, z, xAux, yAux, zAux, random);
+			final Particle particle = this.createParticle(options, level, x, y, z, xAux, yAux, zAux, random);
 			//noinspection DataFlowIssue
-			((Particle4) particle).init_finish(w, wAux);
+			((Particle4) particle).init_finish(w, xAux, yAux, zAux, wAux);
 			return particle;
 		}
 	}

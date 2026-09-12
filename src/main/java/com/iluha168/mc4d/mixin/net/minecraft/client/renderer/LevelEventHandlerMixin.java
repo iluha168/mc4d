@@ -54,6 +54,22 @@ class LevelEventHandlerMixin {
 	) {
 		((LevelAccessor4) instance).addParticle(particle, x, y, z, Vec4i.getW(pos) + random.nextDouble(), xd, yd, zd, zd);
 	}
+	@Definition(id = "addParticle", method = "Lnet/minecraft/client/multiplayer/ClientLevel;addParticle(Lnet/minecraft/core/particles/ParticleOptions;DDDDDD)V")
+	@Definition(id = "SMOKE", field = "Lnet/minecraft/core/particles/ParticleTypes;SMOKE:Lnet/minecraft/core/particles/SimpleParticleType;")
+	@Definition(id = "x", local = @Local(type = double.class, name = "x"))
+	@Expression("?.addParticle(SMOKE, x, ?, ?, ?, ?, ?)")
+	@Redirect(method = "levelEvent", at = @At("MIXINEXTRAS:EXPRESSION"))
+	void levelEvent_1502_1503(
+		ClientLevel instance, ParticleOptions particle, double x, double y, double z, double xd, double yd, double zd,
+		@Local(argsOnly = true, name = "eventType") int eventType,
+		@Local(argsOnly = true, name = "pos") BlockPos pos,
+		@Local(name = "random") RandomSource random
+	) {
+		final double w = eventType == 1502
+			? Vec4i.getW(pos) + random.nextDouble() * 0.6 + 0.2 // REDSTONE_TORCH_BURNOUT
+			: Vec4i.getW(pos) + (5.0 + random.nextDouble() * 6.0) / 16.0; // END_PORTAL_FRAME_FILL
+		((LevelAccessor4) instance).addParticle(particle, x, y, z, w, xd, yd, zd, zd);
+	}
 
 	// TODO levelEvent
 

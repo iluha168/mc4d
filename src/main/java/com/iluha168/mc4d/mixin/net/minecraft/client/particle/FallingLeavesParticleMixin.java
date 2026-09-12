@@ -15,6 +15,7 @@ import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.particles.ColorParticleOption;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -33,13 +34,48 @@ abstract class FallingLeavesParticleMixin extends SingleQuadParticleMixin {
 	private float windBig;
 
 	@Unique private double waFlowScale;
-	@Unique private double swirlPeriod2;
+	// Normal perpendicular vectors U and V that define the random leaves spin plane.
+	@Unique private double spinUx, spinUz, spinUw, spinVz, spinVw; // Vx == 0
 
+	@ModifyExpressionValue(method = "<init>", at = @At(
+		value = "INVOKE",
+		target = "Ljava/lang/Math;cos(D)D"
+	))
+	double init_xaFlowScale(double original, @Share("zaFlowDirection") LocalDoubleRef zaFlowDirection) {
+		// In 4D, the 60deg arc (2D spherical cap) becomes a spherical cap of a 3D sphere.
+		final double halfConeRad = Math.toRadians(60d / 2d);
+		// Yeah, wind direction is biased like that, spawn a million particles in vanilla, and you will see this cone.
+		final double circleCos = 1d - this.random.nextDouble() * (1d - Math.cos(halfConeRad));
+		final double circleSin = Math.sqrt(1d - circleCos * circleCos);
+		final double roll = this.random.nextDouble() * Mth.TWO_PI;
+		final double inPlane = circleSin * Math.cos(roll);
+		final double axisCos = Math.cos(halfConeRad);
+		final double axisSin = Math.sin(halfConeRad);
+
+		this.waFlowScale = circleSin * Math.sin(roll) * this.windBig;
+		zaFlowDirection.set(circleCos * axisSin + inPlane * axisCos);
+		return              circleCos * axisCos - inPlane * axisSin;
+	}
+	@ModifyExpressionValue(method = "<init>", at = @At(
+		value = "INVOKE",
+		target = "Ljava/lang/Math;sin(D)D"
+	))
+	double init_zaFlowScale(double original, @Share("zaFlowDirection") LocalDoubleRef zaFlowDirection) {
+		return zaFlowDirection.get();
+	}
 	@Inject(method = "<init>", at = @At("TAIL"))
-	void init(ClientLevel level, double x, double y, double z, TextureAtlasSprite sprite, float fallAcceleration, float sideAcceleration, boolean swirl, boolean flowAway, float scale, float startVelocity, CallbackInfo ci) {
-		final float particleRandom2 = this.random.nextFloat();
-		this.waFlowScale = Math.cos(Math.toRadians(particleRandom2 * 60.0F)) * this.windBig;
-		this.swirlPeriod2 = Math.toRadians(1000.0F + particleRandom2 * 3000.0F);
+	void init_swirlPlane(ClientLevel level, double x, double y, double z, TextureAtlasSprite sprite, float fallAcceleration, float sideAcceleration, boolean swirl, boolean flowAway, float scale, float startVelocity, CallbackInfo ci) {
+		// Choosing a random 2D plane in the horizontal 3D plane.
+		final double circleCos = this.random.nextDouble() * 2.0 - 1.0;
+		final double circleSin = Math.sqrt(1.0 - circleCos * circleCos);
+		final double roll = this.random.nextDouble() * Mth.TWO_PI;
+		final double rollCos = Math.cos(roll);
+		final double rollSin = Math.sin(roll);
+		this.spinUx = circleSin;
+		this.spinUz = -circleCos * rollCos;
+		this.spinUw = -circleCos * rollSin;
+		this.spinVz = rollSin;
+		this.spinVw = -rollCos;
 	}
 
 	@Definition(id = "zo", field = "Lnet/minecraft/client/particle/FallingLeavesParticle;zo:D")
@@ -54,21 +90,35 @@ abstract class FallingLeavesParticleMixin extends SingleQuadParticleMixin {
 	void tick_wa(CallbackInfo ci, @Share("wa") LocalDoubleRef wa) {
 		wa.set(0.0);
 	}
-	@Inject(method = "tick", at = @At(
-		value = "INVOKE",
-		target = "Ljava/lang/Math;pow(DD)D",
-		ordinal = 0
-	))
-	void tick_flowAway(CallbackInfo ci, @Share("wa") LocalDoubleRef wa, @Local(name = "relativeAge") float relativeAge) {
-		wa.set(wa.get() + this.waFlowScale * Math.pow(relativeAge, 1.25));
+	@Definition(id = "zaFlowScale", field = "Lnet/minecraft/client/particle/FallingLeavesParticle;zaFlowScale:D")
+	@Definition(id = "pow", method = "Ljava/lang/Math;pow(DD)D")
+	@Expression("this.zaFlowScale * @(pow(?, ?))")
+	@ModifyExpressionValue(method = "tick", at = @At("MIXINEXTRAS:EXPRESSION"))
+	double tick_flowAway(double speed, @Share("wa") LocalDoubleRef wa) {
+		wa.set(wa.get() + this.waFlowScale * speed);
+		return speed;
 	}
-	@Inject(method = "tick", at = @At(
+	@ModifyExpressionValue(method = "tick", at = @At(
 		value = "INVOKE",
-		target = "Ljava/lang/Math;cos(D)D",
-		ordinal = 0
+		target = "Ljava/lang/Math;cos(D)D"
 	))
-	void tick_swirl(CallbackInfo ci, @Share("wa") LocalDoubleRef wa, @Local(name = "relativeAge") float relativeAge) {
-		wa.set(wa.get() + relativeAge * Math.cos(relativeAge * this.swirlPeriod2) * this.windBig);
+	double tick_swirlX(double swirlCos, @Share("swirlCos") LocalDoubleRef swirlCosRef) {
+		swirlCosRef.set(swirlCos);
+		return swirlCos * this.spinUx;
+	}
+	@ModifyExpressionValue(method = "tick", at = @At(
+		value = "INVOKE",
+		target = "Ljava/lang/Math;sin(D)D"
+	))
+	double tick_swirlZ(
+		double original,
+		@Share("swirlCos") LocalDoubleRef swirlCosRef,
+		@Share("wa") LocalDoubleRef wa,
+		@Local(name = "relativeAge") float relativeAge
+	) {
+		final double swirlCos = swirlCosRef.get();
+		wa.set(wa.get() + relativeAge * (swirlCos * this.spinUw + original * this.spinVw) * this.windBig);
+		return swirlCos * this.spinUz + original * this.spinVz;
 	}
 	@Redirect(method = "tick", at = @At(
 		value = "INVOKE",

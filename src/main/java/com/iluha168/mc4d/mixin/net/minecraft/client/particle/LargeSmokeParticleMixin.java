@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(LargeSmokeParticle.class)
-class LargeSmokeParticleMixin extends SmokeParticleMixin {
+abstract class LargeSmokeParticleMixin extends SmokeParticleMixin {
 	@Mixin(LargeSmokeParticle.Provider.class)
 	static class ProviderMixin implements ParticleProvider4<SimpleParticleType> {
 		@Shadow
@@ -33,8 +33,7 @@ class LargeSmokeParticleMixin extends SmokeParticleMixin {
 		@Override
 		public @Nullable Particle createParticle(SimpleParticleType options, ClientLevel level, double x, double y, double z, double w, double xAux, double yAux, double zAux, double wAux, RandomSource random) {
 			LargeSmokeParticle particle = new LargeSmokeParticle(level, x, y, z, xAux, yAux, zAux, this.sprites);
-			//noinspection DataFlowIssue
-			((BaseAshSmokeParticle4) particle).init_finish(w, 0.1F, wAux);
+			((BaseAshSmokeParticle4) particle).init_finish(w, 0.1F, 0.1F, 0.1F, 0.1F, xAux, yAux, zAux, wAux);
 			return particle;
 		}
 	}

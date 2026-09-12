@@ -19,14 +19,18 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.network.protocol.game.ClientboundPlayerLookAtPacket;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Relative;
 import net.minecraft.world.entity.player.Input;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -36,6 +40,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.Set;
+
 @Mixin(ServerPlayer.class)
 abstract class ServerPlayerMixin extends PlayerMixin {
 	@Shadow
@@ -43,6 +49,9 @@ abstract class ServerPlayerMixin extends PlayerMixin {
 
 	@Shadow
 	private Input lastClientInput;
+
+	@Shadow
+	private @Nullable Entity camera;
 
 	@Redirect(method = "<init>", at = @At(
 		value = "INVOKE",
@@ -54,7 +63,16 @@ abstract class ServerPlayerMixin extends PlayerMixin {
 
 	// TODO readAdditionalSaveData
 	// TODO addAdditionalSaveData
-	// TODO tick_absSnapTo
+
+	@Redirect(method = "tick", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/server/level/ServerPlayer;absSnapTo(DDDFF)V"
+	))
+	void tick(ServerPlayer instance, double x, double y, double z, float yRot, float xRot, @Local(name = "camera") Entity camera) {
+		final Entity4 camera4 = (Entity4) camera;
+		((Entity4) instance).absSnapTo(x, y, z, camera4.getW(), yRot, xRot, camera4.getWRot(), camera4.getVRot());
+	}
+
 	// TODO playShoulderEntityAmbientSound
 	// TODO respawnEntityOnShoulder
 	// TODO tellNeutralMobsThatIDied
@@ -110,7 +128,16 @@ abstract class ServerPlayerMixin extends PlayerMixin {
 	// TODO teleportRelative
 	// TODO teleportTo
 	// TODO snapTo
-	// TODO setCamera
+
+	@Redirect(method = "setCamera", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/server/level/ServerPlayer;teleportTo(Lnet/minecraft/server/level/ServerLevel;DDDLjava/util/Set;FFZ)Z"
+	))
+	boolean setCamera(ServerPlayer instance, ServerLevel level, double x, double y, double z, Set<Relative> relatives, float newYRot, float newXRot, boolean resetCamera) {
+		//noinspection DataFlowIssue
+		return ((Entity4) instance).teleportTo(level, x, y, z, ((Entity4) this.camera).getW(), relatives, newYRot, newXRot, this.getWRot(), this.getVRot(), resetCamera);
+	}
+
 	// TODO indicateDamage
 	// TODO startRiding
 

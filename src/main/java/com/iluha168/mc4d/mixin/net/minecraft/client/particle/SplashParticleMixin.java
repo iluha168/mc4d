@@ -1,7 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.particle;
 
+import com.iluha168.mc4d.client.particle.Particle4;
 import com.iluha168.mc4d.client.particle.ParticleProvider4;
-import com.iluha168.mc4d.client.particle.SplashParticle4;
 import com.iluha168.mc4d.util.Err4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
@@ -21,24 +21,15 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(SplashParticle.class)
-abstract class SplashParticleMixin extends WaterDropParticleMixin implements SplashParticle4 {
+abstract class SplashParticleMixin extends WaterDropParticleMixin {
 	@Override
 	public void init_finish(double w, double xa, double ya, double za, double wa) {
-		if (this.initIncomplete != 3) {
-			throw new IllegalStateException("Programmer error: use init_finish of this SplashParticle's subclass?");
-		}
-		try {
-			this.initIncomplete = 2;
-			super.init_finish(w, wa);
-			if (ya == 0.0 && (xa != 0.0 || za != 0.0 || wa != 0.0)) {
-				this.xd = xa;
-				this.yd = 0.1;
-				this.zd = za;
-				this.wd = wa;
-			}
-		} catch (Throwable e) {
-			this.initIncomplete = 3;
-			throw e;
+		super.init_finish(w, 0.0, 0.0, 0.0, 0.0);
+		if (ya == 0.0 && (xa != 0.0 || za != 0.0 || wa != 0.0)) {
+			this.xd = xa;
+			this.yd = 0.1;
+			this.zd = za;
+			this.wd = wa;
 		}
 	}
 
@@ -46,7 +37,6 @@ abstract class SplashParticleMixin extends WaterDropParticleMixin implements Spl
 	@Expression("ya == 0.0")
 	@ModifyExpressionValue(method = "<init>", at = @At("MIXINEXTRAS:EXPRESSION"))
 	boolean init(boolean original) {
-		this.initIncomplete = 3;
 		return false;
 	}
 
@@ -66,7 +56,7 @@ abstract class SplashParticleMixin extends WaterDropParticleMixin implements Spl
 		@Override
 		public @Nullable Particle createParticle(SimpleParticleType options, ClientLevel level, double x, double y, double z, double w, double xAux, double yAux, double zAux, double wAux, RandomSource random) {
 			SplashParticle particle = new SplashParticle(level, x, y, z, xAux, yAux, zAux, this.sprite.get(random));
-			((SplashParticle4) particle).init_finish(w, xAux, yAux, zAux, wAux);
+			((Particle4) particle).init_finish(w, xAux, yAux, zAux, wAux);
 			return particle;
 		}
 	}

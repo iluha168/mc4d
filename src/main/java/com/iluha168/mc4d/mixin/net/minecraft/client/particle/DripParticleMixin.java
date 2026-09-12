@@ -65,6 +65,7 @@ abstract class DripParticleMixin extends SingleQuadParticleMixin {
 		void preMoveUpdate(ClientLevel instance, ParticleOptions particle, double x, double y, double z, double xd, double yd, double zd) {
 			((LevelAccessor4) instance).addParticle(particle, x, y, z, this.w(), xd, yd, zd, this.wd);
 		}
+
 		@Inject(method = "postMoveUpdate", at = @At("HEAD"))
 		void postMoveUpdate(CallbackInfo ci) {
 			this.wd = this.wd() * 0.02;

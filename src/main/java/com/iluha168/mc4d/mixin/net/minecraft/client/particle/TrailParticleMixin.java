@@ -53,7 +53,7 @@ abstract class TrailParticleMixin extends SingleQuadParticleMixin {
 			RandomSource random
 		) {
 			final Particle particle = this.createParticle(options, level, x, y, z, xAux, yAux, zAux, random);
-			((Particle4) particle).init_finish(w, wAux);
+			((Particle4) particle).init_finish(w, xAux, yAux, zAux, wAux);
 			return particle;
 		}
 	}
