@@ -50,9 +50,9 @@ abstract class EntityRendererMixin<T extends Entity, S extends EntityRenderState
 		value = "INVOKE",
 		target = "Lnet/minecraft/core/BlockPos$MutableBlockPos;set(III)Lnet/minecraft/core/BlockPos$MutableBlockPos;"
 	))
-	BlockPos.MutableBlockPos extractShadow(BlockPos.MutableBlockPos instance, int x, int y, int z) {
-		// TODO use actual W value for 4D renderer
-		return ((BlockPos4.MutableBlockPos) instance).set(x, y, z, 0);
+	BlockPos.MutableBlockPos extractShadow(BlockPos.MutableBlockPos instance, int x, int y, int z, @Local(argsOnly = true, name = "state") S state) {
+		// TODO extract a spherical shadow when 4D renderer
+		return ((BlockPos4.MutableBlockPos) instance).set(x, y, z, Mth.floor(((EntityRenderState4) state).w()));
 	}
 
 	// TODO everything else
