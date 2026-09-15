@@ -27,7 +27,9 @@ The order matters. In overlapping ranges, the topmost line wins.
 The `"model"` field is ignored by MC4D when `"w"` is present, but it is required. You can technically put anything here.
 Vanilla 3D Minecraft will read `"model"` instead though, so resource pack makers can support both versions.
 
-Look for "3D-only model" or "Missing model for variant" in client logs to find models to work on. The models must match the hitbox!
+Look for "3D-only model" or "Missing model for variant" in client logs to find models to work on.
+- The models must match the hitbox exactly, if the vanilla model does so too.
+- Texture density must stay the same as vanilla, no squishing, crop texture if needed.
 > [!TIP]
 > 
 > Use the "no_block_model_renderer" debug option (F3+F6).
