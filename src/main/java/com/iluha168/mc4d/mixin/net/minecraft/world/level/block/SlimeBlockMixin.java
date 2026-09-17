@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.block;
 
-import com.iluha168.mc4d.world.phys.Vec4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.Vec4;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.SlimeBlock;

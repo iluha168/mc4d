@@ -1,9 +1,9 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.chunk;
 
+import com.iluha168.mc4d.api.net.minecraft.world.level.biome.BiomeResolver4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.chunk.LevelChunkSection4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.chunk.PalettedContainer4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.level.biome.BiomeResolver4;
-import com.iluha168.mc4d.world.level.chunk.LevelChunkSection4;
-import com.iluha168.mc4d.world.level.chunk.PalettedContainer4;
 import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeResolver;

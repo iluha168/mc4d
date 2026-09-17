@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.server.level;
 
-import com.iluha168.mc4d.core.SectionPos4;
+import com.iluha168.mc4d.api.net.minecraft.core.SectionPos4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;

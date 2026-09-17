@@ -1,8 +1,8 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.attribute;
 
-import com.iluha168.mc4d.world.attribute.GaussianSampler4;
-import com.iluha168.mc4d.world.level.biome.BiomeManager4;
-import com.iluha168.mc4d.world.phys.Vec4;
+import com.iluha168.mc4d.api.net.minecraft.world.attribute.GaussianSampler4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.biome.BiomeManager4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.Vec4;
 import net.minecraft.core.Holder;
 import net.minecraft.world.attribute.EnvironmentAttributeProbe;
 import net.minecraft.world.attribute.GaussianSampler;

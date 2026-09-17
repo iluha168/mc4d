@@ -1,8 +1,8 @@
 package com.iluha168.mc4d.mixin.net.minecraft.server.network.config;
 
-import com.iluha168.mc4d.world.entity.Entity4;
-import com.iluha168.mc4d.world.level.storage.LevelData4;
-import com.iluha168.mc4d.world.phys.RotationVec;
+import com.iluha168.mc4d.api.net.minecraft.world.entity.Entity4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.storage.LevelData4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.RotationVec;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.config.PrepareSpawnTask;

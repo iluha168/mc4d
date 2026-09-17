@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.net.neoforged.neoforge.transfer.item;
 
-import com.iluha168.mc4d.net.neoforged.neoforge.transfer.item.VanillaInventoryCodeHooks4;
+import com.iluha168.mc4d.api.net.neoforged.neoforge.transfer.item.VanillaInventoryCodeHooks4;
 import com.iluha168.mc4d.util.Err4;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;

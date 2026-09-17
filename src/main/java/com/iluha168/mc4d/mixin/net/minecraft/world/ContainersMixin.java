@@ -1,9 +1,9 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world;
 
-import com.iluha168.mc4d.core.Vec4i;
+import com.iluha168.mc4d.api.net.minecraft.core.Vec4i;
+import com.iluha168.mc4d.api.net.minecraft.world.Containers4;
+import com.iluha168.mc4d.api.net.minecraft.world.entity.Entity4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.Containers4;
-import com.iluha168.mc4d.world.entity.Entity4;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Container;

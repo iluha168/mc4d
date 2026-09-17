@@ -1,11 +1,11 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.renderer;
 
-import com.iluha168.mc4d.core.BlockPos4;
-import com.iluha168.mc4d.core.Direction4;
-import com.iluha168.mc4d.core.SectionPos4;
-import com.iluha168.mc4d.core.Vec4i;
-import com.iluha168.mc4d.server.level.ChunkTrackingView4;
-import com.iluha168.mc4d.world.level.ChunkPos4;
+import com.iluha168.mc4d.api.net.minecraft.core.BlockPos4;
+import com.iluha168.mc4d.api.net.minecraft.core.Direction4;
+import com.iluha168.mc4d.api.net.minecraft.core.SectionPos4;
+import com.iluha168.mc4d.api.net.minecraft.core.Vec4i;
+import com.iluha168.mc4d.api.net.minecraft.server.level.ChunkTrackingView4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.ChunkPos4;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.renderer.SectionOcclusionGraph;
 import net.minecraft.core.BlockPos;

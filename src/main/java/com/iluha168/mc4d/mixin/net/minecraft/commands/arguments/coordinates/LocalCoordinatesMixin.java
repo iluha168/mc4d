@@ -1,10 +1,10 @@
 package com.iluha168.mc4d.mixin.net.minecraft.commands.arguments.coordinates;
 
-import com.iluha168.mc4d.commands.arguments.coordinates.Coordinates4;
-import com.iluha168.mc4d.commands.arguments.coordinates.LocalCoordinates4;
+import com.iluha168.mc4d.api.net.minecraft.commands.arguments.coordinates.Coordinates4;
+import com.iluha168.mc4d.api.net.minecraft.commands.arguments.coordinates.LocalCoordinates4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.RotationVec;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.Vec4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.phys.RotationVec;
-import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.brigadier.StringReader;

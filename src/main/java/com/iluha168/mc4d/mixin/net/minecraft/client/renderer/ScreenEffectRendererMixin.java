@@ -1,7 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.renderer;
 
-import com.iluha168.mc4d.core.BlockPos4;
-import com.iluha168.mc4d.world.entity.Entity4;
+import com.iluha168.mc4d.api.net.minecraft.core.BlockPos4;
+import com.iluha168.mc4d.api.net.minecraft.world.entity.Entity4;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ScreenEffectRenderer;

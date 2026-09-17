@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.renderer.block.dispatch;
 
-import com.iluha168.mc4d.client.renderer.block.dispatch.Variant4;
+import com.iluha168.mc4d.api.net.minecraft.client.renderer.block.dispatch.Variant4;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelDispatcher;
 import net.minecraft.client.renderer.block.dispatch.multipart.Selector;

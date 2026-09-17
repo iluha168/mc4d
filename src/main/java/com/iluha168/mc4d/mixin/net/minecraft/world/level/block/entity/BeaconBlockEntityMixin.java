@@ -1,10 +1,10 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.block.entity;
 
-import com.iluha168.mc4d.core.BlockPos4;
-import com.iluha168.mc4d.core.Vec4i;
+import com.iluha168.mc4d.api.net.minecraft.core.BlockPos4;
+import com.iluha168.mc4d.api.net.minecraft.core.Vec4i;
+import com.iluha168.mc4d.api.net.minecraft.world.level.LevelReader4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.AABB4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.level.LevelReader4;
-import com.iluha168.mc4d.world.phys.AABB4;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;

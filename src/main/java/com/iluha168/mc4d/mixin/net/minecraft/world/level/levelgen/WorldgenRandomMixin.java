@@ -1,7 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.levelgen;
 
+import com.iluha168.mc4d.api.net.minecraft.world.level.levelgen.WorldgenRandom4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.level.levelgen.WorldgenRandom4;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.levelgen.LegacyRandomSource;
 import net.minecraft.world.level.levelgen.WorldgenRandom;

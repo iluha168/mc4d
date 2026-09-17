@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.renderer.entity.state;
 
-import com.iluha168.mc4d.client.renderer.entity.state.EntityRenderState4;
+import com.iluha168.mc4d.api.net.minecraft.client.renderer.entity.state.EntityRenderState4;
 import com.iluha168.mc4d.util.Err4;
 import com.llamalad7.mixinextras.lib.apache.commons.ArrayUtils;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;

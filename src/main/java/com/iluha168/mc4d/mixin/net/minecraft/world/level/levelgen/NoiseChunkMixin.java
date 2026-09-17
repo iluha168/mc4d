@@ -1,12 +1,12 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.levelgen;
 
+import com.iluha168.mc4d.api.net.minecraft.server.level.ColumnPos4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.ChunkPos4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.levelgen.DensityFunction4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.levelgen.NoiseChunk4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.levelgen.blending.Blender4;
 import com.iluha168.mc4d.math.MathHelpers;
-import com.iluha168.mc4d.server.level.ColumnPos4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.level.ChunkPos4;
-import com.iluha168.mc4d.world.level.levelgen.DensityFunction4;
-import com.iluha168.mc4d.world.level.levelgen.NoiseChunk4;
-import com.iluha168.mc4d.world.level.levelgen.blending.Blender4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;

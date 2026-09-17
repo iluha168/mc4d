@@ -1,7 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.chunk.storage;
 
+import com.iluha168.mc4d.api.net.minecraft.world.level.ChunkPos4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.level.ChunkPos4;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;

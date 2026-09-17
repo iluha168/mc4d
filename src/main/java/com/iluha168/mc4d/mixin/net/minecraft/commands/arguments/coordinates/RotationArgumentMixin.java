@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.commands.arguments.coordinates;
 
-import com.iluha168.mc4d.commands.arguments.coordinates.WorldCoordinates4;
+import com.iluha168.mc4d.api.net.minecraft.commands.arguments.coordinates.WorldCoordinates4;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.brigadier.StringReader;

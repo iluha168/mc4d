@@ -1,7 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.gametest.framework;
 
-import com.iluha168.mc4d.core.BlockPos4;
-import com.iluha168.mc4d.world.phys.AABB4;
+import com.iluha168.mc4d.api.net.minecraft.core.BlockPos4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.AABB4;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.StructureGridSpawner;
 import net.minecraft.world.phys.AABB;

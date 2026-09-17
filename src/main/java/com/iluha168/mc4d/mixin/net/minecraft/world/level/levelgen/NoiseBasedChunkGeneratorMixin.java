@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.levelgen;
 
-import com.iluha168.mc4d.world.level.levelgen.NoiseBasedChunkGenerator4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator4;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import org.spongepowered.asm.mixin.Mixin;
 

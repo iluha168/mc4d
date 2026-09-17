@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.commands;
 
-import com.iluha168.mc4d.world.phys.RotationVec;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.RotationVec;
 import net.minecraft.commands.Commands;
 import net.minecraft.world.phys.Vec2;
 import org.objectweb.asm.Opcodes;

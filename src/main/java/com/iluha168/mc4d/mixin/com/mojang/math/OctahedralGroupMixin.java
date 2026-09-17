@@ -1,8 +1,8 @@
 package com.iluha168.mc4d.mixin.com.mojang.math;
 
-import com.iluha168.mc4d.core.Direction4;
-import com.iluha168.mc4d.math.OctahedralGroup4;
-import com.iluha168.mc4d.math.SymmetricGroup4;
+import com.iluha168.mc4d.api.com.mojang.math.OctahedralGroup4;
+import com.iluha168.mc4d.api.com.mojang.math.SymmetricGroup4;
+import com.iluha168.mc4d.api.net.minecraft.core.Direction4;
 import com.iluha168.mc4d.util.Err4;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;

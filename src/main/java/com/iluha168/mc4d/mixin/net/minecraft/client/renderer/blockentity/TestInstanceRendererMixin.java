@@ -1,7 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.renderer.blockentity;
 
-import com.iluha168.mc4d.world.phys.AABB4;
-import com.iluha168.mc4d.world.phys.Vec4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.AABB4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.Vec4;
 import net.minecraft.client.renderer.blockentity.TestInstanceRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;

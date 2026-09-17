@@ -1,7 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client;
 
 import com.iluha168.mc4d.MC4DClient;
-import com.iluha168.mc4d.client.player.LocalPlayer4;
+import com.iluha168.mc4d.api.net.minecraft.client.player.LocalPlayer4;
 import net.minecraft.client.MouseHandler;
 import net.minecraft.client.player.LocalPlayer;
 import org.spongepowered.asm.mixin.Mixin;

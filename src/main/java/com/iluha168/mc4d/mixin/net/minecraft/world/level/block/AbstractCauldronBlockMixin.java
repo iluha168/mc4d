@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.block;
 
-import com.iluha168.mc4d.world.level.block.Block4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.block.Block4;
 import net.minecraft.world.level.block.AbstractCauldronBlock;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;

@@ -1,8 +1,8 @@
 package com.iluha168.mc4d.mixin.net.minecraft.util;
 
-import com.iluha168.mc4d.core.Vec4i;
+import com.iluha168.mc4d.api.net.minecraft.core.Vec4i;
+import com.iluha168.mc4d.api.net.minecraft.util.Mth4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.util.Mth4;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.Vec3i;
 import net.minecraft.util.Mth;

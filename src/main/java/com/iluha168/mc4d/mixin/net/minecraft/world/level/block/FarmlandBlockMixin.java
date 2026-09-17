@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.block;
 
-import com.iluha168.mc4d.core.BlockPos4;
+import com.iluha168.mc4d.api.net.minecraft.core.BlockPos4;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.FarmlandBlock;
 import org.spongepowered.asm.mixin.Mixin;

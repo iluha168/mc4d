@@ -1,8 +1,8 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.gui.components;
 
-import com.iluha168.mc4d.server.level.ServerChunkCache4;
-import com.iluha168.mc4d.world.level.ChunkPos4;
-import com.iluha168.mc4d.world.level.LevelReader4;
+import com.iluha168.mc4d.api.net.minecraft.server.level.ServerChunkCache4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.ChunkPos4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.LevelReader4;
 import net.minecraft.client.gui.components.DebugScreenOverlay;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.server.level.ChunkResult;

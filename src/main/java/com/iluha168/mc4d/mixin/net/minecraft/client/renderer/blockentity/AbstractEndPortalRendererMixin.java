@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.renderer.blockentity;
 
-import com.iluha168.mc4d.core.Direction4;
+import com.iluha168.mc4d.api.net.minecraft.core.Direction4;
 import net.minecraft.client.renderer.blockentity.AbstractEndPortalRenderer;
 import net.minecraft.core.Direction;
 import org.joml.Vector3fc;

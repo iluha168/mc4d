@@ -1,10 +1,10 @@
 package com.iluha168.mc4d.mixin.net.minecraft.core;
 
 import com.google.common.collect.ImmutableList;
-import com.iluha168.mc4d.core.Direction4;
-import com.iluha168.mc4d.core.Vec4i;
+import com.iluha168.mc4d.api.net.minecraft.core.Direction4;
+import com.iluha168.mc4d.api.net.minecraft.core.Vec4i;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.Vec4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.sugar.Local;

@@ -1,12 +1,12 @@
 package com.iluha168.mc4d.mixin.net.minecraft.server.level;
 
-import com.iluha168.mc4d.core.Vec4i;
+import com.iluha168.mc4d.api.net.minecraft.core.Vec4i;
+import com.iluha168.mc4d.api.net.minecraft.util.StaticCache3D;
+import com.iluha168.mc4d.api.net.minecraft.world.level.ChunkPos4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.LevelAccessor4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.LevelReader4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.chunk.ChunkAccess4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.util.StaticCache3D;
-import com.iluha168.mc4d.world.level.ChunkPos4;
-import com.iluha168.mc4d.world.level.LevelAccessor4;
-import com.iluha168.mc4d.world.level.LevelReader4;
-import com.iluha168.mc4d.world.level.chunk.ChunkAccess4;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.CrashReport;
 import net.minecraft.CrashReportCategory;

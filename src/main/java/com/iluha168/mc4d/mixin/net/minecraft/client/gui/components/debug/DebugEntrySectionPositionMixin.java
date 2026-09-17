@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.gui.components.debug;
 
-import com.iluha168.mc4d.core.Vec4i;
+import com.iluha168.mc4d.api.net.minecraft.core.Vec4i;
 import com.llamalad7.mixinextras.lib.apache.commons.ArrayUtils;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.gui.components.debug.DebugEntrySectionPosition;

@@ -1,10 +1,10 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.renderer.chunk;
 
-import com.iluha168.mc4d.client.renderer.chunk.CompiledSectionMesh4;
-import com.iluha168.mc4d.client.renderer.chunk.RenderSectionRegion4;
-import com.iluha168.mc4d.core.Vec4i;
+import com.iluha168.mc4d.api.net.minecraft.client.renderer.chunk.CompiledSectionMesh4;
+import com.iluha168.mc4d.api.net.minecraft.client.renderer.chunk.RenderSectionRegion4;
+import com.iluha168.mc4d.api.net.minecraft.core.Vec4i;
+import com.iluha168.mc4d.api.net.minecraft.world.level.ChunkPos4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.level.ChunkPos4;
 import com.llamalad7.mixinextras.sugar.Local;
 import it.unimi.dsi.fastutil.floats.FloatArrayList;
 import it.unimi.dsi.fastutil.floats.FloatOpenHashSet;

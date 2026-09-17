@@ -1,7 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.block.state.properties;
 
-import com.iluha168.mc4d.core.Direction4;
-import com.iluha168.mc4d.world.level.block.state.properties.BlockStateProperties4;
+import com.iluha168.mc4d.api.net.minecraft.core.Direction4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.block.state.properties.BlockStateProperties4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.lib.apache.commons.ArrayUtils;

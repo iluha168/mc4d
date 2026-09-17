@@ -1,8 +1,8 @@
 package com.iluha168.mc4d.mixin.net.minecraft.network.protocol.game;
 
-import com.iluha168.mc4d.network.protocol.game.VecDeltaCodec4;
+import com.iluha168.mc4d.api.net.minecraft.network.protocol.game.VecDeltaCodec4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.Vec4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.phys.Vec4;
 import net.minecraft.network.protocol.game.VecDeltaCodec;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;

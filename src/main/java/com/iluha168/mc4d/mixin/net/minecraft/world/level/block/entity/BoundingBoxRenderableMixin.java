@@ -1,7 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.block.entity;
 
+import com.iluha168.mc4d.api.net.minecraft.world.level.block.entity.BoundingBoxRenderable4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.level.block.entity.BoundingBoxRenderable4;
 import net.minecraft.world.level.block.entity.BoundingBoxRenderable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;

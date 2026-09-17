@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.net.neoforged.neoforge.common.extensions;
 
-import com.iluha168.mc4d.core.BlockPos4;
+import com.iluha168.mc4d.api.net.minecraft.core.BlockPos4;
 import net.minecraft.core.BlockPos;
 import net.neoforged.neoforge.common.extensions.ILevelReaderExtension;
 import org.spongepowered.asm.mixin.Mixin;

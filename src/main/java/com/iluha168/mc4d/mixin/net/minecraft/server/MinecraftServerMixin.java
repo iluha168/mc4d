@@ -1,12 +1,12 @@
 package com.iluha168.mc4d.mixin.net.minecraft.server;
 
-import com.iluha168.mc4d.core.BlockPos4;
-import com.iluha168.mc4d.server.MinecraftServer4;
+import com.iluha168.mc4d.api.net.minecraft.core.BlockPos4;
+import com.iluha168.mc4d.api.net.minecraft.server.MinecraftServer4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.ChunkPos4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.Level4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.storage.LevelData4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.RotationVec;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.level.ChunkPos4;
-import com.iluha168.mc4d.world.level.Level4;
-import com.iluha168.mc4d.world.level.storage.LevelData4;
-import com.iluha168.mc4d.world.phys.RotationVec;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;

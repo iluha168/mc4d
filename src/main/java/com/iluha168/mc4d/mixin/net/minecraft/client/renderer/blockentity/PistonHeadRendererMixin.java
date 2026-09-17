@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.renderer.blockentity;
 
-import com.iluha168.mc4d.world.phys.AABB4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.AABB4;
 import net.minecraft.client.renderer.blockentity.PistonHeadRenderer;
 import net.minecraft.world.phys.AABB;
 import org.objectweb.asm.Opcodes;

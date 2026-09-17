@@ -1,7 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.levelgen.structure.placement;
 
+import com.iluha168.mc4d.api.net.minecraft.world.level.ChunkPos4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.level.ChunkPos4;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.ChunkGeneratorStructureState;
 import net.minecraft.world.level.levelgen.structure.placement.ConcentricRingsStructurePlacement;

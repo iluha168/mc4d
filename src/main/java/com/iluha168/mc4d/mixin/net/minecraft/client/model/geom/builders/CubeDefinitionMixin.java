@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.model.geom.builders;
 
-import com.iluha168.mc4d.core.Direction4;
+import com.iluha168.mc4d.api.net.minecraft.core.Direction4;
 import net.minecraft.client.model.geom.builders.CubeDefinition;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.core.Direction;

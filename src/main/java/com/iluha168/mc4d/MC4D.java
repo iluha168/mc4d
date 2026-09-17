@@ -1,6 +1,6 @@
 package com.iluha168.mc4d;
 
-import com.iluha168.mc4d.gametest.framework.StatesTestFunctions;
+import com.iluha168.mc4d.api.net.minecraft.gametest.framework.StatesTestFunctions;
 import com.mojang.logging.LogUtils;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;

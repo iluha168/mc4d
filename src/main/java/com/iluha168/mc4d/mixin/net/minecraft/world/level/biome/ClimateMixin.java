@@ -1,10 +1,10 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.biome;
 
-import com.iluha168.mc4d.core.BlockPos4;
-import com.iluha168.mc4d.core.Vec4i;
+import com.iluha168.mc4d.api.net.minecraft.core.BlockPos4;
+import com.iluha168.mc4d.api.net.minecraft.core.Vec4i;
+import com.iluha168.mc4d.api.net.minecraft.world.level.biome.Climate4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.levelgen.DensityFunction4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.level.biome.Climate4;
-import com.iluha168.mc4d.world.level.levelgen.DensityFunction4;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.QuartPos;
 import net.minecraft.util.Mth;

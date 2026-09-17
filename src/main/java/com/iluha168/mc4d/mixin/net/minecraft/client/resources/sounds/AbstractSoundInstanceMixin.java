@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.resources.sounds;
 
-import com.iluha168.mc4d.client.resources.sounds.SoundInstance4;
+import com.iluha168.mc4d.api.net.minecraft.client.resources.sounds.SoundInstance4;
 import com.iluha168.mc4d.util.Err4;
 import net.minecraft.client.resources.sounds.AbstractSoundInstance;
 import net.minecraft.resources.Identifier;

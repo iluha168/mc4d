@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.renderer;
 
-import com.iluha168.mc4d.client.renderer.SubmitNodeStorage4;
+import com.iluha168.mc4d.api.net.minecraft.client.renderer.SubmitNodeStorage4;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;

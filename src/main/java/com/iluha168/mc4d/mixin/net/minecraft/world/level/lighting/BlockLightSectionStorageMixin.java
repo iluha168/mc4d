@@ -1,7 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.lighting;
 
-import com.iluha168.mc4d.core.BlockPos4;
-import com.iluha168.mc4d.world.level.chunk.DataLayer4;
+import com.iluha168.mc4d.api.net.minecraft.core.BlockPos4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.chunk.DataLayer4;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.SectionPos;
 import net.minecraft.world.level.chunk.DataLayer;

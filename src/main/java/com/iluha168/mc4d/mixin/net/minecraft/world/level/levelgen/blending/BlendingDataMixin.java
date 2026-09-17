@@ -1,9 +1,9 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.levelgen.blending;
 
-import com.iluha168.mc4d.core.BlockPos4;
+import com.iluha168.mc4d.api.net.minecraft.core.BlockPos4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.chunk.ChunkAccess4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.levelgen.blending.BlendingData4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.level.chunk.ChunkAccess4;
-import com.iluha168.mc4d.world.level.levelgen.blending.BlendingData4;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.*;
 import net.minecraft.server.level.WorldGenRegion;

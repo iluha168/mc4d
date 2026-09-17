@@ -1,7 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.server.commands;
 
-import com.iluha168.mc4d.world.level.storage.LevelData4;
-import com.iluha168.mc4d.world.phys.RotationVec;
+import com.iluha168.mc4d.api.net.minecraft.world.level.storage.LevelData4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.RotationVec;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalFloatRef;

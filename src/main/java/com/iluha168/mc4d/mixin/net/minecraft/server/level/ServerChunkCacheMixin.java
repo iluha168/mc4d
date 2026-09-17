@@ -1,10 +1,10 @@
 package com.iluha168.mc4d.mixin.net.minecraft.server.level;
 
-import com.iluha168.mc4d.core.Vec4i;
+import com.iluha168.mc4d.api.net.minecraft.core.Vec4i;
+import com.iluha168.mc4d.api.net.minecraft.server.level.ServerChunkCache4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.ChunkPos4;
 import com.iluha168.mc4d.mixin.net.minecraft.world.level.chunk.ChunkSourceMixin;
-import com.iluha168.mc4d.server.level.ServerChunkCache4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.level.ChunkPos4;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;

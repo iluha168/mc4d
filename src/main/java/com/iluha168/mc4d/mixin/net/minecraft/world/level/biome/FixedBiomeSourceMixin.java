@@ -1,9 +1,9 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.biome;
 
 import com.google.common.collect.Sets;
-import com.iluha168.mc4d.core.BlockPos4;
+import com.iluha168.mc4d.api.net.minecraft.core.BlockPos4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.biome.BiomeSource4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.level.biome.BiomeSource4;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;

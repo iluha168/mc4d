@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.server.commands;
 
-import com.iluha168.mc4d.world.level.Level4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.Level4;
 import net.minecraft.server.commands.ForceLoadCommand;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.Constant;

@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.block.entity;
 
-import com.iluha168.mc4d.world.phys.AABB4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.AABB4;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BellBlockEntity;
 import net.minecraft.world.phys.AABB;

@@ -1,7 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.network.protocol.game;
 
-import com.iluha168.mc4d.network.protocol.game.ClientboundLevelChunkWithLightPacket4;
-import com.iluha168.mc4d.world.level.ChunkPos4;
+import com.iluha168.mc4d.api.net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.ChunkPos4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;

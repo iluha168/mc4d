@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.com.mojang.blaze3d.audio;
 
-import com.iluha168.mc4d.com.mojang.blaze3d.audio.SoundBuffer4;
+import com.iluha168.mc4d.api.com.mojang.blaze3d.audio.SoundBuffer4;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;

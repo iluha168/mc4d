@@ -1,12 +1,12 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.chunk;
 
-import com.iluha168.mc4d.core.BlockPos4;
+import com.iluha168.mc4d.api.net.minecraft.core.BlockPos4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.ChunkPos4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.biome.BiomeResolver4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.chunk.ChunkAccess4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.chunk.LevelChunkSection4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.levelgen.Heightmap4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.level.ChunkPos4;
-import com.iluha168.mc4d.world.level.biome.BiomeResolver4;
-import com.iluha168.mc4d.world.level.chunk.ChunkAccess4;
-import com.iluha168.mc4d.world.level.chunk.LevelChunkSection4;
-import com.iluha168.mc4d.world.level.levelgen.Heightmap4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;

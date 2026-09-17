@@ -1,10 +1,10 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.renderer.chunk;
 
 import com.iluha168.mc4d.MC4DClient;
-import com.iluha168.mc4d.client.renderer.chunk.CompiledSectionMesh4;
-import com.iluha168.mc4d.client.renderer.chunk.RenderSectionRegion4;
-import com.iluha168.mc4d.client.renderer.chunk.SectionCompiler4;
-import com.iluha168.mc4d.core.BlockPos4;
+import com.iluha168.mc4d.api.net.minecraft.client.renderer.chunk.CompiledSectionMesh4;
+import com.iluha168.mc4d.api.net.minecraft.client.renderer.chunk.RenderSectionRegion4;
+import com.iluha168.mc4d.api.net.minecraft.client.renderer.chunk.SectionCompiler4;
+import com.iluha168.mc4d.api.net.minecraft.core.BlockPos4;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;

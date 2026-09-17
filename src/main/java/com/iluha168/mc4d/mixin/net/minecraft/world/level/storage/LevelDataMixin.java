@@ -1,7 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.storage;
 
+import com.iluha168.mc4d.api.net.minecraft.world.level.storage.LevelData4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.level.storage.LevelData4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;

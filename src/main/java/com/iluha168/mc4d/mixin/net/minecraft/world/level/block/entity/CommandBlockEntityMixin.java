@@ -1,7 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.block.entity;
 
-import com.iluha168.mc4d.core.Direction4;
-import com.iluha168.mc4d.world.phys.RotationVec;
+import com.iluha168.mc4d.api.net.minecraft.core.Direction4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.RotationVec;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.CommandBlockEntity;

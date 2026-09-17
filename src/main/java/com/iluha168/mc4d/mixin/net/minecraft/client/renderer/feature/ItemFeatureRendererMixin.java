@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.renderer.feature;
 
-import com.iluha168.mc4d.client.renderer.SubmitNodeStorage4;
+import com.iluha168.mc4d.api.net.minecraft.client.renderer.SubmitNodeStorage4;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.QuadInstance;
 import net.minecraft.client.renderer.SubmitNodeStorage;

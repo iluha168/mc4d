@@ -1,7 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.network.protocol.game;
 
-import com.iluha168.mc4d.network.protocol.game.ClientboundInitializeBorderPacket4;
-import com.iluha168.mc4d.world.level.border.WorldBorder4;
+import com.iluha168.mc4d.api.net.minecraft.network.protocol.game.ClientboundInitializeBorderPacket4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.border.WorldBorder4;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundInitializeBorderPacket;
 import net.minecraft.world.level.border.WorldBorder;

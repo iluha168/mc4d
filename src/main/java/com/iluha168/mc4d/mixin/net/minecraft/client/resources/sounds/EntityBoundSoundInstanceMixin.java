@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.resources.sounds;
 
-import com.iluha168.mc4d.world.entity.Entity4;
+import com.iluha168.mc4d.api.net.minecraft.world.entity.Entity4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import net.minecraft.client.resources.sounds.EntityBoundSoundInstance;

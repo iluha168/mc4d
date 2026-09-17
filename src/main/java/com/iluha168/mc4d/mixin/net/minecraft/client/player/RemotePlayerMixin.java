@@ -1,8 +1,8 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.player;
 
+import com.iluha168.mc4d.api.net.minecraft.world.entity.LivingEntity4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.Vec4;
 import com.iluha168.mc4d.mixin.net.minecraft.world.entity.LivingEntityMixin;
-import com.iluha168.mc4d.world.entity.LivingEntity4;
-import com.iluha168.mc4d.world.phys.Vec4;
 import net.minecraft.client.player.RemotePlayer;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;

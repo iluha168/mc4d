@@ -1,8 +1,8 @@
 package com.iluha168.mc4d.mixin.net.minecraft.network.protocol.game;
 
-import com.iluha168.mc4d.network.protocol.game.ServerboundMovePlayerPacket4;
+import com.iluha168.mc4d.api.net.minecraft.network.protocol.game.ServerboundMovePlayerPacket4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.Vec4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.network.FriendlyByteBuf;

@@ -1,8 +1,8 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level;
 
+import com.iluha168.mc4d.api.net.minecraft.world.entity.Entity4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.EntityGetter4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.entity.Entity4;
-import com.iluha168.mc4d.world.level.EntityGetter4;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;

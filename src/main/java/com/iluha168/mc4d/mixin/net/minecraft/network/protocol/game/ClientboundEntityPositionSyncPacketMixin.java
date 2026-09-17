@@ -1,7 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.network.protocol.game;
 
-import com.iluha168.mc4d.world.entity.Entity4;
-import com.iluha168.mc4d.world.entity.PositionMoveRotation4;
+import com.iluha168.mc4d.api.net.minecraft.world.entity.Entity4;
+import com.iluha168.mc4d.api.net.minecraft.world.entity.PositionMoveRotation4;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.network.protocol.game.ClientboundEntityPositionSyncPacket;

@@ -1,11 +1,11 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.lighting;
 
-import com.iluha168.mc4d.core.SectionPos4;
-import com.iluha168.mc4d.core.Vec4i;
+import com.iluha168.mc4d.api.net.minecraft.core.SectionPos4;
+import com.iluha168.mc4d.api.net.minecraft.core.Vec4i;
+import com.iluha168.mc4d.api.net.minecraft.world.level.ChunkPos4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.chunk.ChunkSource4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.lighting.LightEngine4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.level.ChunkPos4;
-import com.iluha168.mc4d.world.level.chunk.ChunkSource4;
-import com.iluha168.mc4d.world.level.lighting.LightEngine4;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;

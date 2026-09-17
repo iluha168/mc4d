@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.com.mojang.blaze3d.audio;
 
-import com.iluha168.mc4d.com.mojang.blaze3d.audio.Library4;
+import com.iluha168.mc4d.api.com.mojang.blaze3d.audio.Library4;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mojang.blaze3d.audio.Library;
 import org.lwjgl.openal.ALCapabilities;

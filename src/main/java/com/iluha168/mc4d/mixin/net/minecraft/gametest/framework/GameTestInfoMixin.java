@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.gametest.framework;
 
-import com.iluha168.mc4d.core.Vec4i;
+import com.iluha168.mc4d.api.net.minecraft.core.Vec4i;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.core.Vec3i;
 import net.minecraft.gametest.framework.GameTestInfo;

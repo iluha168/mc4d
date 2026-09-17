@@ -1,7 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.server.commands;
 
-import com.iluha168.mc4d.server.level.ServerLevel4;
-import com.iluha168.mc4d.world.phys.Vec4;
+import com.iluha168.mc4d.api.net.minecraft.server.level.ServerLevel4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.Vec4;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.server.commands.ParticleCommand;

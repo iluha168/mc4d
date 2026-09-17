@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.resources.model.cuboid;
 
-import com.iluha168.mc4d.core.Direction4;
+import com.iluha168.mc4d.api.net.minecraft.core.Direction4;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.resources.model.cuboid.CuboidFace;
 import net.minecraft.client.resources.model.cuboid.MissingCuboidModel;

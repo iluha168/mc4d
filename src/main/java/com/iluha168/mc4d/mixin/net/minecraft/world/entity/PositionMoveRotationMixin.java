@@ -1,13 +1,13 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.entity;
 
+import com.iluha168.mc4d.api.net.minecraft.world.entity.Entity4;
+import com.iluha168.mc4d.api.net.minecraft.world.entity.InterpolationHandler4;
+import com.iluha168.mc4d.api.net.minecraft.world.entity.PositionMoveRotation4;
+import com.iluha168.mc4d.api.net.minecraft.world.entity.Relative4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.portal.TeleportTransition4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.RotationVec;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.Vec4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.entity.Entity4;
-import com.iluha168.mc4d.world.entity.InterpolationHandler4;
-import com.iluha168.mc4d.world.entity.PositionMoveRotation4;
-import com.iluha168.mc4d.world.entity.Relative4;
-import com.iluha168.mc4d.world.level.portal.TeleportTransition4;
-import com.iluha168.mc4d.world.phys.RotationVec;
-import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;

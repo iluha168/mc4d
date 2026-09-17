@@ -1,10 +1,10 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.particle;
 
-import com.iluha168.mc4d.client.particle.ItemPickupParticle4;
-import com.iluha168.mc4d.client.particle.ItemPickupParticleGroup4;
-import com.iluha168.mc4d.client.renderer.entity.EntityRenderDispatcher4;
-import com.iluha168.mc4d.client.renderer.entity.state.EntityRenderState4;
-import com.iluha168.mc4d.world.phys.Vec4;
+import com.iluha168.mc4d.api.net.minecraft.client.particle.ItemPickupParticle4;
+import com.iluha168.mc4d.api.net.minecraft.client.particle.ItemPickupParticleGroup4;
+import com.iluha168.mc4d.api.net.minecraft.client.renderer.entity.EntityRenderDispatcher4;
+import com.iluha168.mc4d.api.net.minecraft.client.renderer.entity.state.EntityRenderState4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.Vec4;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.PoseStack;

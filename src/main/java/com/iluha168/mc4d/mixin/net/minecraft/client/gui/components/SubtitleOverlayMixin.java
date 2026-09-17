@@ -1,8 +1,8 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.gui.components;
 
 import com.iluha168.mc4d.MC4DClient;
-import com.iluha168.mc4d.client.resources.sounds.SoundInstance4;
-import com.iluha168.mc4d.world.phys.Vec4;
+import com.iluha168.mc4d.api.net.minecraft.client.resources.sounds.SoundInstance4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.Vec4;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;

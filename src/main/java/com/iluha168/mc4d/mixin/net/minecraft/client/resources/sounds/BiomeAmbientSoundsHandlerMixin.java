@@ -1,9 +1,9 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.resources.sounds;
 
-import com.iluha168.mc4d.client.resources.sounds.SimpleSoundInstance4;
-import com.iluha168.mc4d.core.BlockPos4;
-import com.iluha168.mc4d.core.Vec4i;
-import com.iluha168.mc4d.world.entity.Entity4;
+import com.iluha168.mc4d.api.net.minecraft.client.resources.sounds.SimpleSoundInstance4;
+import com.iluha168.mc4d.api.net.minecraft.core.BlockPos4;
+import com.iluha168.mc4d.api.net.minecraft.core.Vec4i;
+import com.iluha168.mc4d.api.net.minecraft.world.entity.Entity4;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalDoubleRef;

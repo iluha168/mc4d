@@ -1,7 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.item;
 
 import com.iluha168.mc4d.MC4D;
-import com.iluha168.mc4d.world.entity.Entity4;
+import com.iluha168.mc4d.api.net.minecraft.world.entity.Entity4;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.phys.Vec3;

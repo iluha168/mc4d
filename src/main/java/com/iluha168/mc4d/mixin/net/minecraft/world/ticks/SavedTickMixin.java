@@ -1,7 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.ticks;
 
-import com.iluha168.mc4d.core.BlockPos4;
-import com.iluha168.mc4d.core.Vec4i;
+import com.iluha168.mc4d.api.net.minecraft.core.BlockPos4;
+import com.iluha168.mc4d.api.net.minecraft.core.Vec4i;
 import com.mojang.datafixers.kinds.App;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;

@@ -1,7 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.core;
 
-import com.iluha168.mc4d.core.AxisCycle4;
-import com.iluha168.mc4d.core.Direction4;
+import com.iluha168.mc4d.api.net.minecraft.core.AxisCycle4;
+import com.iluha168.mc4d.api.net.minecraft.core.Direction4;
 import com.iluha168.mc4d.util.Err4;
 import net.minecraft.core.AxisCycle;
 import net.minecraft.core.Direction;

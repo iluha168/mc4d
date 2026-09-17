@@ -1,7 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.renderer.block.dispatch;
 
-import com.iluha168.mc4d.client.renderer.block.dispatch.Variant4;
-import com.iluha168.mc4d.client.renderer.block.dispatch.WRangeVariant;
+import com.iluha168.mc4d.api.net.minecraft.client.renderer.block.dispatch.Variant4;
+import com.iluha168.mc4d.api.net.minecraft.client.renderer.block.dispatch.WRangeVariant;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;

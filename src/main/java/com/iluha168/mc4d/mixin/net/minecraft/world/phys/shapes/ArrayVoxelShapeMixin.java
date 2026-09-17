@@ -1,7 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.phys.shapes;
 
+import com.iluha168.mc4d.api.net.minecraft.world.phys.shapes.ArrayVoxelShape4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.phys.shapes.ArrayVoxelShape4;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
 import net.minecraft.world.phys.shapes.ArrayVoxelShape;
 import net.minecraft.world.phys.shapes.DiscreteVoxelShape;

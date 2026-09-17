@@ -1,8 +1,8 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.entity.vehicle.minecart;
 
+import com.iluha168.mc4d.api.net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.Vec4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.entity.vehicle.minecart.NewMinecartBehavior4;
-import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mojang.datafixers.util.Function5;
 import io.netty.buffer.ByteBuf;

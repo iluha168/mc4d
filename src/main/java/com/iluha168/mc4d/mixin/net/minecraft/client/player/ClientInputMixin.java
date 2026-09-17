@@ -1,7 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.player;
 
-import com.iluha168.mc4d.world.entity.player.Input4;
-import com.iluha168.mc4d.world.phys.HorizontalVec;
+import com.iluha168.mc4d.api.net.minecraft.world.entity.player.Input4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.HorizontalVec;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;

@@ -1,7 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.gametest.framework;
 
-import com.iluha168.mc4d.server.level.ServerLevel4;
-import com.iluha168.mc4d.world.level.ChunkPos4;
+import com.iluha168.mc4d.api.net.minecraft.server.level.ServerLevel4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.ChunkPos4;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.server.level.ServerLevel;
 import org.spongepowered.asm.mixin.Mixin;

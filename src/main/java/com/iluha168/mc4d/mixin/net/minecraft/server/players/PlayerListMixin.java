@@ -1,12 +1,12 @@
 package com.iluha168.mc4d.mixin.net.minecraft.server.players;
 
-import com.iluha168.mc4d.server.network.ServerGamePacketListenerImpl4;
-import com.iluha168.mc4d.server.players.PlayerList4;
+import com.iluha168.mc4d.api.net.minecraft.server.network.ServerGamePacketListenerImpl4;
+import com.iluha168.mc4d.api.net.minecraft.server.players.PlayerList4;
+import com.iluha168.mc4d.api.net.minecraft.world.entity.Entity4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.border.BorderChangeListener4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.portal.TeleportTransition4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.Vec4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.entity.Entity4;
-import com.iluha168.mc4d.world.level.border.BorderChangeListener4;
-import com.iluha168.mc4d.world.level.portal.TeleportTransition4;
-import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundSetBorderCenterPacket;

@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.particle;
 
-import com.iluha168.mc4d.client.particle.BaseAshSmokeParticle4;
+import com.iluha168.mc4d.api.net.minecraft.client.particle.BaseAshSmokeParticle4;
 import net.minecraft.client.particle.BaseAshSmokeParticle;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;

@@ -1,10 +1,10 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.entity.item;
 
-import com.iluha168.mc4d.core.Vec4i;
+import com.iluha168.mc4d.api.net.minecraft.core.Vec4i;
+import com.iluha168.mc4d.api.net.minecraft.network.protocol.game.ClientboundAddEntityPacket4;
+import com.iluha168.mc4d.api.net.minecraft.world.entity.item.FallingBlockEntity4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.Vec4;
 import com.iluha168.mc4d.mixin.net.minecraft.world.entity.EntityMixin;
-import com.iluha168.mc4d.network.protocol.game.ClientboundAddEntityPacket4;
-import com.iluha168.mc4d.world.entity.item.FallingBlockEntity4;
-import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;

@@ -1,8 +1,8 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.biome;
 
+import com.iluha168.mc4d.api.net.minecraft.world.level.biome.BiomeSpecialEffects4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.levelgen.synth.PerlinSimplexNoise4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.level.biome.BiomeSpecialEffects4;
-import com.iluha168.mc4d.world.level.levelgen.synth.PerlinSimplexNoise4;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;

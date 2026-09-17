@@ -1,7 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.phys.shapes;
 
+import com.iluha168.mc4d.api.net.minecraft.world.phys.shapes.DiscreteVoxelShape4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.phys.shapes.DiscreteVoxelShape4;
 import net.minecraft.world.phys.shapes.DiscreteVoxelShape;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

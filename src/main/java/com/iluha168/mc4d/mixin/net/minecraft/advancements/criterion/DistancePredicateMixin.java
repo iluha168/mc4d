@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.advancements.criterion;
 
-import com.iluha168.mc4d.advancements.criterion.DistancePredicate4;
+import com.iluha168.mc4d.api.net.minecraft.advancements.criterion.DistancePredicate4;
 import com.iluha168.mc4d.util.Err4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;

@@ -1,7 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.redstone;
 
+import com.iluha168.mc4d.api.net.minecraft.world.level.redstone.Orientation4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.level.redstone.Orientation4;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.level.redstone.Orientation;

@@ -1,7 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.chunk.status;
 
-import com.iluha168.mc4d.util.StaticCache3D;
-import com.iluha168.mc4d.world.level.ChunkPos4;
+import com.iluha168.mc4d.api.net.minecraft.util.StaticCache3D;
+import com.iluha168.mc4d.api.net.minecraft.world.level.ChunkPos4;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.util.StaticCache2D;
 import net.minecraft.world.level.ChunkPos;

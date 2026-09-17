@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.gui.screens;
 
-import com.iluha168.mc4d.server.MinecraftServer4;
+import com.iluha168.mc4d.api.net.minecraft.server.MinecraftServer4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;

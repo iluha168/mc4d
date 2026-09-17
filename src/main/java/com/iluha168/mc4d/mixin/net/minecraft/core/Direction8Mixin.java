@@ -1,8 +1,8 @@
 package com.iluha168.mc4d.mixin.net.minecraft.core;
 
-import com.iluha168.mc4d.core.Direction18;
-import com.iluha168.mc4d.core.Direction4;
-import com.iluha168.mc4d.core.Vec4i;
+import com.iluha168.mc4d.api.net.minecraft.core.Direction18;
+import com.iluha168.mc4d.api.net.minecraft.core.Direction4;
+import com.iluha168.mc4d.api.net.minecraft.core.Vec4i;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.Direction;

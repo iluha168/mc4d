@@ -1,8 +1,8 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.chunk;
 
+import com.iluha168.mc4d.api.net.minecraft.world.level.chunk.PalettedContainer4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.chunk.Strategy4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.level.chunk.PalettedContainer4;
-import com.iluha168.mc4d.world.level.chunk.Strategy4;
 import net.minecraft.world.level.chunk.Strategy;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;

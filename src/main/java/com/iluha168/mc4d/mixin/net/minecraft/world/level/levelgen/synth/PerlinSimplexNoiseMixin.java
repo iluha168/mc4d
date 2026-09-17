@@ -1,8 +1,8 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.levelgen.synth;
 
+import com.iluha168.mc4d.api.net.minecraft.world.level.levelgen.synth.PerlinSimplexNoise4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.levelgen.synth.SimplexNoise4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.level.levelgen.synth.PerlinSimplexNoise4;
-import com.iluha168.mc4d.world.level.levelgen.synth.SimplexNoise4;
 import net.minecraft.world.level.levelgen.synth.PerlinSimplexNoise;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
 import org.spongepowered.asm.mixin.Final;

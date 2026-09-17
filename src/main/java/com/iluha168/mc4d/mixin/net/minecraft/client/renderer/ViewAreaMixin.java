@@ -1,7 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.renderer;
 
-import com.iluha168.mc4d.client.renderer.ViewArea4;
-import com.iluha168.mc4d.core.SectionPos4;
+import com.iluha168.mc4d.api.net.minecraft.client.renderer.ViewArea4;
+import com.iluha168.mc4d.api.net.minecraft.core.SectionPos4;
 import com.iluha168.mc4d.util.Err4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;

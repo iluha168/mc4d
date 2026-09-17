@@ -1,8 +1,8 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.levelgen;
 
+import com.iluha168.mc4d.api.net.minecraft.util.Mth4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.levelgen.PositionalRandomFactory4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.util.Mth4;
-import com.iluha168.mc4d.world.level.levelgen.PositionalRandomFactory4;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.levelgen.LegacyRandomSource;
 import org.spongepowered.asm.mixin.Final;

@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.network.protocol.game;
 
-import com.iluha168.mc4d.world.level.chunk.DataLayer4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.chunk.DataLayer4;
 import net.minecraft.network.protocol.game.ClientboundLightUpdatePacketData;
 import net.minecraft.world.level.chunk.DataLayer;
 import org.spongepowered.asm.mixin.Mixin;

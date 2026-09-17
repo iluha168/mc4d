@@ -1,9 +1,9 @@
 package com.iluha168.mc4d.mixin.net.neoforged.neoforge.model.data;
 
-import com.iluha168.mc4d.core.SectionPos4;
-import com.iluha168.mc4d.net.neoforged.neoforge.model.data.ModelDataManager4;
+import com.iluha168.mc4d.api.net.minecraft.core.SectionPos4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.ChunkPos4;
+import com.iluha168.mc4d.api.net.neoforged.neoforge.model.data.ModelDataManager4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.level.ChunkPos4;
 import com.llamalad7.mixinextras.sugar.Local;
 import it.unimi.dsi.fastutil.longs.Long2ObjectFunction;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;

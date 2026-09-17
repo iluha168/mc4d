@@ -1,7 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client;
 
-import com.iluha168.mc4d.client.multiplayer.ClientLevel4;
-import com.iluha168.mc4d.world.entity.Entity4;
+import com.iluha168.mc4d.api.net.minecraft.client.multiplayer.ClientLevel4;
+import com.iluha168.mc4d.api.net.minecraft.world.entity.Entity4;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;

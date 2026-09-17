@@ -1,11 +1,11 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.renderer.chunk;
 
-import com.iluha168.mc4d.client.renderer.chunk.SectionCompiler4;
-import com.iluha168.mc4d.core.BlockPos4;
-import com.iluha168.mc4d.core.SectionPos4;
-import com.iluha168.mc4d.world.level.LevelReader4;
-import com.iluha168.mc4d.world.phys.AABB4;
-import com.iluha168.mc4d.world.phys.Vec4;
+import com.iluha168.mc4d.api.net.minecraft.client.renderer.chunk.SectionCompiler4;
+import com.iluha168.mc4d.api.net.minecraft.core.BlockPos4;
+import com.iluha168.mc4d.api.net.minecraft.core.SectionPos4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.LevelReader4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.AABB4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.Vec4;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;

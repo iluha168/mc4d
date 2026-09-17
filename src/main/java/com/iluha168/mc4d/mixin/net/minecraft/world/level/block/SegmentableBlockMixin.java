@@ -1,8 +1,8 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.block;
 
-import com.iluha168.mc4d.core.Direction4;
-import com.iluha168.mc4d.world.level.block.Block4;
-import com.iluha168.mc4d.world.phys.Vec4;
+import com.iluha168.mc4d.api.net.minecraft.core.Direction4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.block.Block4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.Vec4;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.SegmentableBlock;
 import net.minecraft.world.level.block.state.BlockState;

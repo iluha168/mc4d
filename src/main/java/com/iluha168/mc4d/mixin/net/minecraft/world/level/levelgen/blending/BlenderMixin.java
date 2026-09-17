@@ -1,11 +1,11 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.levelgen.blending;
 
-import com.iluha168.mc4d.core.Direction18;
+import com.iluha168.mc4d.api.net.minecraft.core.Direction18;
+import com.iluha168.mc4d.api.net.minecraft.world.level.ChunkPos4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.LevelReader4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.levelgen.blending.Blender4;
 import com.iluha168.mc4d.math.MathHelpers;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.level.ChunkPos4;
-import com.iluha168.mc4d.world.level.LevelReader4;
-import com.iluha168.mc4d.world.level.levelgen.blending.Blender4;
 import com.llamalad7.mixinextras.sugar.Local;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.core.Direction8;

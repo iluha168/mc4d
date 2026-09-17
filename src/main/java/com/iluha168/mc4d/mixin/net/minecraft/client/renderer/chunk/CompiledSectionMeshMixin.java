@@ -1,7 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.renderer.chunk;
 
-import com.iluha168.mc4d.client.renderer.chunk.CompiledSectionMesh4;
-import com.iluha168.mc4d.client.renderer.chunk.SectionCompiler4;
+import com.iluha168.mc4d.api.net.minecraft.client.renderer.chunk.CompiledSectionMesh4;
+import com.iluha168.mc4d.api.net.minecraft.client.renderer.chunk.SectionCompiler4;
 import net.minecraft.client.renderer.chunk.CompiledSectionMesh;
 import net.minecraft.client.renderer.chunk.SectionCompiler;
 import net.minecraft.client.renderer.chunk.TranslucencyPointOfView;

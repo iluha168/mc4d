@@ -1,15 +1,15 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.phys.shapes;
 
 import com.google.common.collect.Maps;
-import com.iluha168.mc4d.core.Direction4;
-import com.iluha168.mc4d.math.OctahedralGroup4;
+import com.iluha168.mc4d.api.com.mojang.math.OctahedralGroup4;
+import com.iluha168.mc4d.api.net.minecraft.core.Direction4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.AABB4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.Vec4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.shapes.ArrayVoxelShape4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.shapes.BitSetDiscreteVoxelShape4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.shapes.DiscreteVoxelShape4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.shapes.Shapes4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.phys.AABB4;
-import com.iluha168.mc4d.world.phys.Vec4;
-import com.iluha168.mc4d.world.phys.shapes.ArrayVoxelShape4;
-import com.iluha168.mc4d.world.phys.shapes.BitSetDiscreteVoxelShape4;
-import com.iluha168.mc4d.world.phys.shapes.DiscreteVoxelShape4;
-import com.iluha168.mc4d.world.phys.shapes.Shapes4;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.math.OctahedralGroup;
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;

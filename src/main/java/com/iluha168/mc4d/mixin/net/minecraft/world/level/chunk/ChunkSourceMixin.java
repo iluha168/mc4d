@@ -1,7 +1,7 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.chunk;
 
+import com.iluha168.mc4d.api.net.minecraft.world.level.chunk.ChunkSource4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.level.chunk.ChunkSource4;
 import net.minecraft.world.level.chunk.ChunkSource;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LightChunk;

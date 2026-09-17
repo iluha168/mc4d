@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.network.protocol.game;
 
-import com.iluha168.mc4d.network.protocol.game.ClientboundSoundPacket4;
+import com.iluha168.mc4d.api.net.minecraft.network.protocol.game.ClientboundSoundPacket4;
 import com.iluha168.mc4d.util.Err4;
 import net.minecraft.core.Holder;
 import net.minecraft.network.RegistryFriendlyByteBuf;

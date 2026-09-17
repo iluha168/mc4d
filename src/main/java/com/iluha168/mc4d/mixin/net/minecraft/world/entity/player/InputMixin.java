@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.entity.player;
 
-import com.iluha168.mc4d.world.entity.player.Input4;
+import com.iluha168.mc4d.api.net.minecraft.world.entity.player.Input4;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.network.FriendlyByteBuf;

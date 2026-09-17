@@ -1,8 +1,8 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.levelgen;
 
+import com.iluha168.mc4d.api.net.minecraft.world.level.levelgen.DensityFunction4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.levelgen.synth.NormalNoise4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.level.levelgen.DensityFunction4;
-import com.iluha168.mc4d.world.level.levelgen.synth.NormalNoise4;
 import net.minecraft.world.level.levelgen.DensityFunction;
 import net.minecraft.world.level.levelgen.synth.NormalNoise;
 import org.jspecify.annotations.Nullable;

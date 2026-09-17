@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.renderer.block;
 
-import com.iluha168.mc4d.world.phys.shapes.Shapes4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.shapes.Shapes4;
 import net.minecraft.client.renderer.block.FluidRenderer;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.shapes.VoxelShape;

@@ -1,8 +1,8 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.levelgen.synth;
 
+import com.iluha168.mc4d.api.net.minecraft.world.level.levelgen.synth.ImprovedNoise4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.levelgen.synth.PerlinNoise4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.level.levelgen.synth.ImprovedNoise4;
-import com.iluha168.mc4d.world.level.levelgen.synth.PerlinNoise4;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
 import net.minecraft.world.level.levelgen.synth.ImprovedNoise;
 import net.minecraft.world.level.levelgen.synth.PerlinNoise;

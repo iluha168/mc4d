@@ -1,8 +1,8 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.portal;
 
+import com.iluha168.mc4d.api.net.minecraft.world.level.portal.TeleportTransition4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.storage.LevelData4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.level.portal.TeleportTransition4;
-import com.iluha168.mc4d.world.level.storage.LevelData4;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;

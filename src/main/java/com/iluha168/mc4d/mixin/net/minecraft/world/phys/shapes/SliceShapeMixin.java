@@ -1,8 +1,8 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.phys.shapes;
 
-import com.iluha168.mc4d.core.Direction4;
-import com.iluha168.mc4d.world.phys.shapes.DiscreteVoxelShape4;
-import com.iluha168.mc4d.world.phys.shapes.SubShape4;
+import com.iluha168.mc4d.api.net.minecraft.core.Direction4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.shapes.DiscreteVoxelShape4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.shapes.SubShape4;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.shapes.DiscreteVoxelShape;
 import net.minecraft.world.phys.shapes.SliceShape;

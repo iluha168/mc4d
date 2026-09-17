@@ -1,20 +1,20 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.player;
 
 import com.iluha168.mc4d.MC4D;
-import com.iluha168.mc4d.client.player.LocalPlayer4;
-import com.iluha168.mc4d.core.BlockPos4;
-import com.iluha168.mc4d.core.Direction4;
-import com.iluha168.mc4d.core.Vec4i;
+import com.iluha168.mc4d.api.net.minecraft.client.player.LocalPlayer4;
+import com.iluha168.mc4d.api.net.minecraft.core.BlockPos4;
+import com.iluha168.mc4d.api.net.minecraft.core.Direction4;
+import com.iluha168.mc4d.api.net.minecraft.core.Vec4i;
+import com.iluha168.mc4d.api.net.minecraft.network.protocol.game.ServerboundMovePlayerPacket4;
+import com.iluha168.mc4d.api.net.minecraft.world.entity.Entity4;
+import com.iluha168.mc4d.api.net.minecraft.world.entity.player.Input4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.Level4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.AABB4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.HorizontalVec;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.Vec4;
 import com.iluha168.mc4d.math.MathHelpers;
 import com.iluha168.mc4d.mixin.net.minecraft.world.entity.player.PlayerMixin;
-import com.iluha168.mc4d.network.protocol.game.ServerboundMovePlayerPacket4;
 import com.iluha168.mc4d.util.Err4;
-import com.iluha168.mc4d.world.entity.Entity4;
-import com.iluha168.mc4d.world.entity.player.Input4;
-import com.iluha168.mc4d.world.level.Level4;
-import com.iluha168.mc4d.world.phys.AABB4;
-import com.iluha168.mc4d.world.phys.HorizontalVec;
-import com.iluha168.mc4d.world.phys.Vec4;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
@@ -217,7 +217,7 @@ public abstract class LocalPlayerMixin extends PlayerMixin implements LocalPlaye
 		this.wwa = ((HorizontalVec) modifiedInput).z;
 	}
 
-	/** Mirrors {@link com.iluha168.mc4d.world.entity.Entity4#turn} */
+	/** Mirrors {@link com.iluha168.mc4d.api.net.minecraft.world.entity.Entity4#turn} */
 	@Override
 	public void turn_absolute(double xo, double yo, double wo, double vo) {
 		final float xDelta = (float) yo * 0.15F;

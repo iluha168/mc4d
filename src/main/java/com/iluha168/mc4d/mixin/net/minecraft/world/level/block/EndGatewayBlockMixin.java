@@ -1,8 +1,8 @@
 package com.iluha168.mc4d.mixin.net.minecraft.world.level.block;
 
-import com.iluha168.mc4d.core.Vec4i;
-import com.iluha168.mc4d.world.level.LevelAccessor4;
-import com.iluha168.mc4d.world.level.portal.TeleportTransition4;
+import com.iluha168.mc4d.api.net.minecraft.core.Vec4i;
+import com.iluha168.mc4d.api.net.minecraft.world.level.LevelAccessor4;
+import com.iluha168.mc4d.api.net.minecraft.world.level.portal.TeleportTransition4;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;

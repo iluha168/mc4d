@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.net.neoforged.neoforge.client.extensions;
 
-import com.iluha168.mc4d.world.phys.AABB4;
+import com.iluha168.mc4d.api.net.minecraft.world.phys.AABB4;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.client.extensions.IBlockEntityRendererExtension;

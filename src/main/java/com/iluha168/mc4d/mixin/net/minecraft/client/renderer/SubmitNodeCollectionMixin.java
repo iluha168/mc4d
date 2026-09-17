@@ -1,6 +1,6 @@
 package com.iluha168.mc4d.mixin.net.minecraft.client.renderer;
 
-import com.iluha168.mc4d.client.renderer.SubmitNodeStorage4;
+import com.iluha168.mc4d.api.net.minecraft.client.renderer.SubmitNodeStorage4;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.renderer.SubmitNodeCollection;
 import net.minecraft.client.renderer.SubmitNodeStorage;
