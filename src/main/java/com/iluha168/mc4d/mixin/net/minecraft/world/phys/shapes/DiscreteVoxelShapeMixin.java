@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class DiscreteVoxelShapeMixin {
 	@Inject(method = "<init>", at = @At("TAIL"))
 	void banBaseClass(int xSize, int ySize, int zSize, CallbackInfo ci) {
-		if (!((DiscreteVoxelShape) (Object) this instanceof DiscreteVoxelShape4 || DiscreteVoxelShape4.UNSAFE_DISABLE_3D_ERRORS)) {
+		if (!((DiscreteVoxelShape) (Object) this instanceof DiscreteVoxelShape4 || DiscreteVoxelShape4.__unsafe_3DErrorsDisabled())) {
 			throw Err4.arguments3("DiscreteVoxelShape4::new");
 		}
 	}

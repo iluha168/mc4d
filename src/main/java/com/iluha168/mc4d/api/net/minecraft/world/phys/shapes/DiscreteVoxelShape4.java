@@ -8,6 +8,7 @@ import com.mojang.math.OctahedralGroup;
 import net.minecraft.core.AxisCycle;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.shapes.DiscreteVoxelShape;
+import org.jetbrains.annotations.ApiStatus;
 import org.joml.Vector4i;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -16,10 +17,13 @@ import org.jspecify.annotations.Nullable;
  * Represents a hypervoxel shape.
  */
 public abstract class DiscreteVoxelShape4 extends DiscreteVoxelShape {
-	/** Always wrap with finally to set back to false! */
-	public static boolean UNSAFE_DISABLE_3D_ERRORS = false;
+	@ApiStatus.Internal
+	static final ThreadLocal<Integer> UNSAFE_3D_ERRORS_DISABLED = ThreadLocal.withInitial(() -> 0);
+	@ApiStatus.Internal
+	public static boolean __unsafe_3DErrorsDisabled() {
+		return UNSAFE_3D_ERRORS_DISABLED.get() > 0;
+	}
 
-	private static final Direction.Axis[] AXIS_VALUES = Direction.Axis.values();
 	public final int wSize;
 
 	protected DiscreteVoxelShape4(int xSize, int ySize, int zSize, int wSize) {

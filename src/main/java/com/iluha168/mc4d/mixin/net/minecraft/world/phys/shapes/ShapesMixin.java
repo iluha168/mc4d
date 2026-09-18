@@ -60,12 +60,7 @@ public class ShapesMixin {
 
 	@Redirect(method = "<clinit>", at = @At(value = "NEW", target = "(III)Lnet/minecraft/world/phys/shapes/BitSetDiscreteVoxelShape;", ordinal = 0))
 	private static BitSetDiscreteVoxelShape EMPTY(int xSize, int ySize, int zSize) {
-		try {
-			DiscreteVoxelShape4.UNSAFE_DISABLE_3D_ERRORS = true;
-			return new BitSetDiscreteVoxelShape(xSize, ySize, zSize);
-		} finally {
-			DiscreteVoxelShape4.UNSAFE_DISABLE_3D_ERRORS = false;
-		}
+		return BitSetDiscreteVoxelShape4.__unsafe_new3D(xSize, ySize, zSize);
 	}
 
 	@Redirect(method = "<clinit>", at = @At(value = "NEW", target = "(Lnet/minecraft/world/phys/shapes/DiscreteVoxelShape;Lit/unimi/dsi/fastutil/doubles/DoubleList;Lit/unimi/dsi/fastutil/doubles/DoubleList;Lit/unimi/dsi/fastutil/doubles/DoubleList;)Lnet/minecraft/world/phys/shapes/ArrayVoxelShape;"))

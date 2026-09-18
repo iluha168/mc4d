@@ -158,7 +158,7 @@ class StructureTemplateMixin implements StructureTemplate4 {
 		@Share("minW") LocalIntRef minW
 	) {
 		shape.set(new BitSetDiscreteVoxelShape4(xSize, ySize, zSize, maxW.get() - minW.get() + 1));
-		return null;
+		return BitSetDiscreteVoxelShape4.__unsafe_new3D(0, 0, 0);
 	}
 	@Redirect(method = "placeInWorld", at = @At(
 		value = "INVOKE",

@@ -2,8 +2,10 @@ package com.iluha168.mc4d.api.net.minecraft.world.phys.shapes;
 
 import com.iluha168.mc4d.api.net.minecraft.core.Direction4;
 import net.minecraft.core.Direction;
+import net.minecraft.world.phys.shapes.BitSetDiscreteVoxelShape;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.IndexMerger;
+import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NonNull;
 
 import java.util.BitSet;
@@ -26,6 +28,16 @@ public class BitSetDiscreteVoxelShape4 extends DiscreteVoxelShape4 {
 		this.yMin = ySize;
 		this.zMin = zSize;
 		this.wMin = wSize;
+	}
+
+	@ApiStatus.Internal
+	public static BitSetDiscreteVoxelShape __unsafe_new3D(final int xSize, final int ySize, final int zSize) {
+		DiscreteVoxelShape4.UNSAFE_3D_ERRORS_DISABLED.set(DiscreteVoxelShape4.UNSAFE_3D_ERRORS_DISABLED.get() + 1);
+		try {
+			return new BitSetDiscreteVoxelShape(xSize, ySize, zSize);
+		} finally {
+			DiscreteVoxelShape4.UNSAFE_3D_ERRORS_DISABLED.set(DiscreteVoxelShape4.UNSAFE_3D_ERRORS_DISABLED.get() - 1);
+		}
 	}
 
 	public static BitSetDiscreteVoxelShape4 withFilledBounds(

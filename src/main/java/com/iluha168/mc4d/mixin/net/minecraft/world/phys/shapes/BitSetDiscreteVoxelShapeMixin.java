@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class BitSetDiscreteVoxelShapeMixin {
 	@Inject(method = "<init>*", at = @At("TAIL"))
 	void banBaseClass(int xSize, int ySize, int zSize, CallbackInfo ci) {
-		if (!DiscreteVoxelShape4.UNSAFE_DISABLE_3D_ERRORS) {
+		if (!DiscreteVoxelShape4.__unsafe_3DErrorsDisabled()) {
 			throw Err4.arguments3("BitSetDiscreteVoxelShape4::new");
 		}
 	}
