@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/barrier",
+      "w": {
+        "0;16": "minecraft:block/barrier"
+      }
+    }
+  }
+}

@@ -12,8 +12,13 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.color.block.BlockColors;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.BlockQuadOutput;
+import net.minecraft.client.renderer.block.ModelBlockRenderer;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.chunk.RenderSectionRegion;
 import net.minecraft.client.renderer.chunk.SectionCompiler;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
@@ -23,16 +28,20 @@ import net.minecraft.util.ARGB;
 import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(SectionCompiler.class)
 class SectionCompilerMixin implements SectionCompiler4 {
+	@Shadow @Final private boolean ambientOcclusion;
+	@Shadow @Final private BlockColors blockColors;
+
 	@Unique private volatile double cameraW;
 	@Unique private volatile int closestIntegerNeighbourSliceDeltaW;
 	@Unique private volatile float ghostBlockShrinkFactor;
@@ -87,17 +96,31 @@ class SectionCompilerMixin implements SectionCompiler4 {
 		peeking.set(false);
 		return state;
 	}
-	@ModifyArg(index = 0, method = "compile(Lnet/minecraft/core/SectionPos;Lnet/minecraft/client/renderer/chunk/RenderSectionRegion;Lcom/mojang/blaze3d/vertex/VertexSorting;Lnet/minecraft/client/renderer/SectionBufferBuilderPack;Ljava/util/List;)Lnet/minecraft/client/renderer/chunk/SectionCompiler$Results;", at = @At(
+	@WrapOperation(method = "compile(Lnet/minecraft/core/SectionPos;Lnet/minecraft/client/renderer/chunk/RenderSectionRegion;Lcom/mojang/blaze3d/vertex/VertexSorting;Lnet/minecraft/client/renderer/SectionBufferBuilderPack;Ljava/util/List;)Lnet/minecraft/client/renderer/chunk/SectionCompiler$Results;", at = @At(
 		value = "INVOKE",
 		target = "Lnet/minecraft/client/renderer/block/ModelBlockRenderer;tesselateBlock(Lnet/minecraft/client/renderer/block/BlockQuadOutput;FFFLnet/minecraft/client/renderer/block/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/client/renderer/block/dispatch/BlockStateModel;J)V"
 	))
-	private BlockQuadOutput compile_tint(BlockQuadOutput output, @Share("peeking") LocalBooleanRef peeking) {
-		if (!peeking.get()) return output;
-		return (x, y, z, quad, instance) -> {
-			for (int vertex = 0; vertex < 4; vertex++)
-				instance.setColor(vertex, ARGB.alphaBlend(instance.getColor(vertex), this.tintColor));
-			output.put(x, y, z, scale(quad, this.ghostBlockShrinkFactor), instance);
-		};
+	private void compile_tesselateBlock(
+		ModelBlockRenderer blockRenderer, BlockQuadOutput output, float x, float y, float z, BlockAndTintGetter level, BlockPos pos, BlockState blockState, BlockStateModel model, long seed, Operation<Void> original,
+		@Share("peeking") LocalBooleanRef peeking,
+		@Share("previewRenderer") LocalRef<ModelBlockRenderer> previewRenderer
+	) {
+		if (!peeking.get()) {
+			original.call(blockRenderer, output, x, y, z, level, pos, blockState, model, seed);
+			return;
+		}
+		if (previewRenderer.get() == null)
+			previewRenderer.set(new ModelBlockRenderer(this.ambientOcclusion, false, this.blockColors));
+		pos = ((BlockPos4) pos).offset(0, 0, 0, this.closestIntegerNeighbourSliceDeltaW);
+		original.call(
+			previewRenderer.get(),
+			(BlockQuadOutput) (quadX, quadY, quadZ, quad, instance) -> {
+				for (int vertex = 0; vertex < 4; vertex++)
+					instance.setColor(vertex, ARGB.alphaBlend(instance.getColor(vertex), this.tintColor));
+				output.put(quadX, quadY, quadZ, scale(quad, this.ghostBlockShrinkFactor), instance);
+			},
+			x, y, z, level, pos, blockState, model, blockState.getSeed(pos)
+		);
 	}
 	@ModifyReturnValue(method = "compile(Lnet/minecraft/core/SectionPos;Lnet/minecraft/client/renderer/chunk/RenderSectionRegion;Lcom/mojang/blaze3d/vertex/VertexSorting;Lnet/minecraft/client/renderer/SectionBufferBuilderPack;Ljava/util/List;)Lnet/minecraft/client/renderer/chunk/SectionCompiler$Results;", at = @At("RETURN"))
 	private SectionCompiler.Results compile_wBoundaries(SectionCompiler.Results results, @Local(argsOnly = true, name = "region") RenderSectionRegion region) {

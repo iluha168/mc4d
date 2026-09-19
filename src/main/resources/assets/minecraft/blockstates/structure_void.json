@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/structure_void",
+      "w": {
+        "0;16": "minecraft:block/structure_void"
+      }
+    }
+  }
+}

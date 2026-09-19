@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/end_portal",
+      "w": {
+        "0;16": "minecraft:block/end_portal"
+      }
+    }
+  }
+}

@@ -24,8 +24,7 @@ but not really needed - block hitboxes (voxel shapes) have 1/16 precision in van
 
 The order matters. In overlapping ranges, the topmost line wins.
 
-The `"model"` field is ignored by MC4D when `"w"` is present, but it is required. You can technically put anything here.
-Vanilla 3D Minecraft will read `"model"` instead though, so resource pack makers can support both versions.
+The `"model"` field from vanilla is used by MC4D for the debug renderer, for blocks outside the camera slice. Put the most "full-looking" model variant there.
 
 Look for "3D-only model" or "Missing model for variant" in client logs to find models to work on.
 - The models must match the hitbox exactly, if the vanilla model does so too.

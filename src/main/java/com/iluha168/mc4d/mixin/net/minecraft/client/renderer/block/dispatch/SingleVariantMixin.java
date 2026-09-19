@@ -22,10 +22,11 @@ class SingleVariantMixin {
 
 		@WrapMethod(method = "bake")
 		BlockStateModel bake(ModelBaker modelBakery, Operation<BlockStateModel> original) {
-			final List<Variant4.WRangeModel> slices = Variant4.SimpleModelState.as(this.variant().modelState()).wRangeModels();
+			final Variant variant = this.variant();
+			final List<Variant4.WRangeModel> slices = Variant4.SimpleModelState.as(variant.modelState()).wRangeModels();
 			return slices == null
 				? original.call(modelBakery)
-				: WRangeVariant.bake(modelBakery, slices, this.variant().modelState().asModelState());
+				: WRangeVariant.bake(modelBakery, variant.modelLocation(), slices, variant.modelState().asModelState());
 		}
 	}
 }
