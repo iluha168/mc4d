@@ -1,0 +1,6 @@
+{
+  "parent": "mc4d:block/button/button_along_w_vertical",
+  "textures": {
+    "texture": "minecraft:block/birch_planks"
+  }
+}

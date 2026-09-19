@@ -1,0 +1,308 @@
+{
+  "variants": {
+    "face=ceiling,facing=east,powered=false": {
+      "model": "minecraft:block/warped_button",
+      "w": {
+        "5;11": "minecraft:block/warped_button",
+        "0;16": "mc4d:block/button/button_empty"
+      },
+      "x": 180,
+      "y": 270
+    },
+    "face=ceiling,facing=east,powered=true": {
+      "model": "minecraft:block/warped_button_pressed",
+      "w": {
+        "5;11": "minecraft:block/warped_button_pressed",
+        "0;16": "mc4d:block/button/button_empty"
+      },
+      "x": 180,
+      "y": 270
+    },
+    "face=ceiling,facing=north,powered=false": {
+      "model": "minecraft:block/warped_button",
+      "w": {
+        "5;11": "minecraft:block/warped_button",
+        "0;16": "mc4d:block/button/button_empty"
+      },
+      "x": 180,
+      "y": 180
+    },
+    "face=ceiling,facing=north,powered=true": {
+      "model": "minecraft:block/warped_button_pressed",
+      "w": {
+        "5;11": "minecraft:block/warped_button_pressed",
+        "0;16": "mc4d:block/button/button_empty"
+      },
+      "x": 180,
+      "y": 180
+    },
+    "face=ceiling,facing=south,powered=false": {
+      "model": "minecraft:block/warped_button",
+      "w": {
+        "5;11": "minecraft:block/warped_button",
+        "0;16": "mc4d:block/button/button_empty"
+      },
+      "x": 180
+    },
+    "face=ceiling,facing=south,powered=true": {
+      "model": "minecraft:block/warped_button_pressed",
+      "w": {
+        "5;11": "minecraft:block/warped_button_pressed",
+        "0;16": "mc4d:block/button/button_empty"
+      },
+      "x": 180
+    },
+    "face=ceiling,facing=west,powered=false": {
+      "model": "minecraft:block/warped_button",
+      "w": {
+        "5;11": "minecraft:block/warped_button",
+        "0;16": "mc4d:block/button/button_empty"
+      },
+      "x": 180,
+      "y": 90
+    },
+    "face=ceiling,facing=west,powered=true": {
+      "model": "minecraft:block/warped_button_pressed",
+      "w": {
+        "5;11": "minecraft:block/warped_button_pressed",
+        "0;16": "mc4d:block/button/button_empty"
+      },
+      "x": 180,
+      "y": 90
+    },
+    "face=ceiling,facing=ana,powered=false": {
+      "model": "mc4d:block/button/warped_button_along_w_vertical",
+      "w": {
+        "6;10": "mc4d:block/button/warped_button_along_w_vertical",
+        "0;16": "mc4d:block/button/button_empty"
+      },
+      "x": 180
+    },
+    "face=ceiling,facing=ana,powered=true": {
+      "model": "mc4d:block/button/warped_button_pressed_along_w_vertical",
+      "w": {
+        "6;10": "mc4d:block/button/warped_button_pressed_along_w_vertical",
+        "0;16": "mc4d:block/button/button_empty"
+      },
+      "x": 180
+    },
+    "face=ceiling,facing=kata,powered=false": {
+      "model": "mc4d:block/button/warped_button_along_w_vertical",
+      "w": {
+        "6;10": "mc4d:block/button/warped_button_along_w_vertical",
+        "0;16": "mc4d:block/button/button_empty"
+      },
+      "x": 180,
+      "y": 180
+    },
+    "face=ceiling,facing=kata,powered=true": {
+      "model": "mc4d:block/button/warped_button_pressed_along_w_vertical",
+      "w": {
+        "6;10": "mc4d:block/button/warped_button_pressed_along_w_vertical",
+        "0;16": "mc4d:block/button/button_empty"
+      },
+      "x": 180,
+      "y": 180
+    },
+    "face=floor,facing=east,powered=false": {
+      "model": "minecraft:block/warped_button",
+      "w": {
+        "5;11": "minecraft:block/warped_button",
+        "0;16": "mc4d:block/button/button_empty"
+      },
+      "y": 90
+    },
+    "face=floor,facing=east,powered=true": {
+      "model": "minecraft:block/warped_button_pressed",
+      "w": {
+        "5;11": "minecraft:block/warped_button_pressed",
+        "0;16": "mc4d:block/button/button_empty"
+      },
+      "y": 90
+    },
+    "face=floor,facing=north,powered=false": {
+      "model": "minecraft:block/warped_button",
+      "w": {
+        "5;11": "minecraft:block/warped_button",
+        "0;16": "mc4d:block/button/button_empty"
+      }
+    },
+    "face=floor,facing=north,powered=true": {
+      "model": "minecraft:block/warped_button_pressed",
+      "w": {
+        "5;11": "minecraft:block/warped_button_pressed",
+        "0;16": "mc4d:block/button/button_empty"
+      }
+    },
+    "face=floor,facing=south,powered=false": {
+      "model": "minecraft:block/warped_button",
+      "w": {
+        "5;11": "minecraft:block/warped_button",
+        "0;16": "mc4d:block/button/button_empty"
+      },
+      "y": 180
+    },
+    "face=floor,facing=south,powered=true": {
+      "model": "minecraft:block/warped_button_pressed",
+      "w": {
+        "5;11": "minecraft:block/warped_button_pressed",
+        "0;16": "mc4d:block/button/button_empty"
+      },
+      "y": 180
+    },
+    "face=floor,facing=west,powered=false": {
+      "model": "minecraft:block/warped_button",
+      "w": {
+        "5;11": "minecraft:block/warped_button",
+        "0;16": "mc4d:block/button/button_empty"
+      },
+      "y": 270
+    },
+    "face=floor,facing=west,powered=true": {
+      "model": "minecraft:block/warped_button_pressed",
+      "w": {
+        "5;11": "minecraft:block/warped_button_pressed",
+        "0;16": "mc4d:block/button/button_empty"
+      },
+      "y": 270
+    },
+    "face=floor,facing=ana,powered=false": {
+      "model": "mc4d:block/button/warped_button_along_w_vertical",
+      "w": {
+        "6;10": "mc4d:block/button/warped_button_along_w_vertical",
+        "0;16": "mc4d:block/button/button_empty"
+      }
+    },
+    "face=floor,facing=ana,powered=true": {
+      "model": "mc4d:block/button/warped_button_pressed_along_w_vertical",
+      "w": {
+        "6;10": "mc4d:block/button/warped_button_pressed_along_w_vertical",
+        "0;16": "mc4d:block/button/button_empty"
+      }
+    },
+    "face=floor,facing=kata,powered=false": {
+      "model": "mc4d:block/button/warped_button_along_w_vertical",
+      "w": {
+        "6;10": "mc4d:block/button/warped_button_along_w_vertical",
+        "0;16": "mc4d:block/button/button_empty"
+      },
+      "y": 180
+    },
+    "face=floor,facing=kata,powered=true": {
+      "model": "mc4d:block/button/warped_button_pressed_along_w_vertical",
+      "w": {
+        "6;10": "mc4d:block/button/warped_button_pressed_along_w_vertical",
+        "0;16": "mc4d:block/button/button_empty"
+      },
+      "y": 180
+    },
+    "face=wall,facing=east,powered=false": {
+      "model": "minecraft:block/warped_button",
+      "w": {
+        "5;11": "minecraft:block/warped_button",
+        "0;16": "mc4d:block/button/button_empty"
+      },
+      "uvlock": true,
+      "x": 90,
+      "y": 90
+    },
+    "face=wall,facing=east,powered=true": {
+      "model": "minecraft:block/warped_button_pressed",
+      "w": {
+        "5;11": "minecraft:block/warped_button_pressed",
+        "0;16": "mc4d:block/button/button_empty"
+      },
+      "uvlock": true,
+      "x": 90,
+      "y": 90
+    },
+    "face=wall,facing=north,powered=false": {
+      "model": "minecraft:block/warped_button",
+      "w": {
+        "5;11": "minecraft:block/warped_button",
+        "0;16": "mc4d:block/button/button_empty"
+      },
+      "uvlock": true,
+      "x": 90
+    },
+    "face=wall,facing=north,powered=true": {
+      "model": "minecraft:block/warped_button_pressed",
+      "w": {
+        "5;11": "minecraft:block/warped_button_pressed",
+        "0;16": "mc4d:block/button/button_empty"
+      },
+      "uvlock": true,
+      "x": 90
+    },
+    "face=wall,facing=south,powered=false": {
+      "model": "minecraft:block/warped_button",
+      "w": {
+        "5;11": "minecraft:block/warped_button",
+        "0;16": "mc4d:block/button/button_empty"
+      },
+      "uvlock": true,
+      "x": 90,
+      "y": 180
+    },
+    "face=wall,facing=south,powered=true": {
+      "model": "minecraft:block/warped_button_pressed",
+      "w": {
+        "5;11": "minecraft:block/warped_button_pressed",
+        "0;16": "mc4d:block/button/button_empty"
+      },
+      "uvlock": true,
+      "x": 90,
+      "y": 180
+    },
+    "face=wall,facing=west,powered=false": {
+      "model": "minecraft:block/warped_button",
+      "w": {
+        "5;11": "minecraft:block/warped_button",
+        "0;16": "mc4d:block/button/button_empty"
+      },
+      "uvlock": true,
+      "x": 90,
+      "y": 270
+    },
+    "face=wall,facing=west,powered=true": {
+      "model": "minecraft:block/warped_button_pressed",
+      "w": {
+        "5;11": "minecraft:block/warped_button_pressed",
+        "0;16": "mc4d:block/button/button_empty"
+      },
+      "uvlock": true,
+      "x": 90,
+      "y": 270
+    },
+    "face=wall,facing=ana,powered=false": {
+      "model": "mc4d:block/button/warped_button_along_w_horizontal",
+      "w": {
+        "0;2": "mc4d:block/button/warped_button_along_w_horizontal",
+        "0;16": "mc4d:block/button/button_empty"
+      }
+    },
+    "face=wall,facing=ana,powered=true": {
+      "model": "mc4d:block/button/warped_button_along_w_horizontal",
+      "w": {
+        "0;1.02": "mc4d:block/button/warped_button_along_w_horizontal",
+        "0;16": "mc4d:block/button/button_empty"
+      }
+    },
+    "face=wall,facing=kata,powered=false": {
+      "model": "mc4d:block/button/warped_button_along_w_horizontal",
+      "w": {
+        "14;16": "mc4d:block/button/warped_button_along_w_horizontal",
+        "0;16": "mc4d:block/button/button_empty"
+      },
+      "y": 180
+    },
+    "face=wall,facing=kata,powered=true": {
+      "model": "mc4d:block/button/warped_button_along_w_horizontal",
+      "w": {
+        "14.98;16": "mc4d:block/button/warped_button_along_w_horizontal",
+        "0;16": "mc4d:block/button/button_empty"
+      },
+      "y": 180
+    }
+  }
+}

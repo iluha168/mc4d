@@ -1,0 +1,6 @@
+{
+  "parent": "mc4d:block/button/button_pressed_along_w_vertical",
+  "textures": {
+    "texture": "minecraft:block/acacia_planks"
+  }
+}

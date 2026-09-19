@@ -1,0 +1,6 @@
+{
+  "parent": "mc4d:block/button/button_along_w_horizontal",
+  "textures": {
+    "texture": "minecraft:block/mangrove_planks"
+  }
+}
