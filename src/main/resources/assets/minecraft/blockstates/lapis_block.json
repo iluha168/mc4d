@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/lapis_block",
+      "w": {
+        "0;16": "minecraft:block/lapis_block"
+      }
+    }
+  }
+}

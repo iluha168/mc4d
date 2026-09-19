@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/emerald_block",
+      "w": {
+        "0;16": "minecraft:block/emerald_block"
+      }
+    }
+  }
+}

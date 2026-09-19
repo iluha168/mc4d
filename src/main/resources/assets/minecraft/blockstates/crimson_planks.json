@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/crimson_planks",
+      "w": {
+        "0;16": "minecraft:block/crimson_planks"
+      }
+    }
+  }
+}

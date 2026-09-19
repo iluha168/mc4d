@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/magma_block",
+      "w": {
+        "0;16": "minecraft:block/magma_block"
+      }
+    }
+  }
+}

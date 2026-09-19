@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/brain_coral_block",
+      "w": {
+        "0;16": "minecraft:block/brain_coral_block"
+      }
+    }
+  }
+}

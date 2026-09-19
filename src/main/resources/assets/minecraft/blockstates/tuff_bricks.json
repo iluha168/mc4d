@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/tuff_bricks",
+      "w": {
+        "0;16": "minecraft:block/tuff_bricks"
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/blue_terracotta",
+      "w": {
+        "0;16": "minecraft:block/blue_terracotta"
+      }
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "minecraft:block/stone",
+        "w": {
+          "0;16": "minecraft:block/stone"
+        }
+      },
+      {
+        "model": "minecraft:block/stone_mirrored",
+        "w": {
+          "0;16": "minecraft:block/stone_mirrored"
+        }
+      },
+      {
+        "model": "minecraft:block/stone",
+        "w": {
+          "0;16": "minecraft:block/stone"
+        },
+        "y": 180
+      },
+      {
+        "model": "minecraft:block/stone_mirrored",
+        "w": {
+          "0;16": "minecraft:block/stone_mirrored"
+        },
+        "y": 180
+      }
+    ]
+  }
+}

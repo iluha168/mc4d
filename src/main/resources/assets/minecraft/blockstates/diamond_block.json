@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/diamond_block",
+      "w": {
+        "0;16": "minecraft:block/diamond_block"
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/smooth_stone",
+      "w": {
+        "0;16": "minecraft:block/smooth_stone"
+      }
+    }
+  }
+}

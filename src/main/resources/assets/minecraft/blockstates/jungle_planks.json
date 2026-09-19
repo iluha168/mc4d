@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/jungle_planks",
+      "w": {
+        "0;16": "minecraft:block/jungle_planks"
+      }
+    }
+  }
+}

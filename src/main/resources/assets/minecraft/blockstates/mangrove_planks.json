@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/mangrove_planks",
+      "w": {
+        "0;16": "minecraft:block/mangrove_planks"
+      }
+    }
+  }
+}

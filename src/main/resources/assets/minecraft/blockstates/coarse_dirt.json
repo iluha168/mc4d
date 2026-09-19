@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/coarse_dirt",
+      "w": {
+        "0;16": "minecraft:block/coarse_dirt"
+      }
+    }
+  }
+}

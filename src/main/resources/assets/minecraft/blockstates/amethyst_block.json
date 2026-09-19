@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/amethyst_block",
+      "w": {
+        "0;16": "minecraft:block/amethyst_block"
+      }
+    }
+  }
+}

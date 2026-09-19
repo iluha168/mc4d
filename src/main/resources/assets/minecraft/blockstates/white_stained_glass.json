@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/white_stained_glass",
+      "w": {
+        "0;16": "minecraft:block/white_stained_glass"
+      }
+    }
+  }
+}

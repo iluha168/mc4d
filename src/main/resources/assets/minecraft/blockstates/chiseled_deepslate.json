@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/chiseled_deepslate",
+      "w": {
+        "0;16": "minecraft:block/chiseled_deepslate"
+      }
+    }
+  }
+}

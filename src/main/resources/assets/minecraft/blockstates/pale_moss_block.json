@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/pale_moss_block",
+      "w": {
+        "0;16": "minecraft:block/pale_moss_block"
+      }
+    }
+  }
+}

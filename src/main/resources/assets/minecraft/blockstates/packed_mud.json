@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/packed_mud",
+      "w": {
+        "0;16": "minecraft:block/packed_mud"
+      }
+    }
+  }
+}

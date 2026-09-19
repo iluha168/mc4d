@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/magenta_concrete",
+      "w": {
+        "0;16": "minecraft:block/magenta_concrete"
+      }
+    }
+  }
+}

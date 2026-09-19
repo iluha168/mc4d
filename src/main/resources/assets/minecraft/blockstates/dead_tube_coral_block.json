@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/dead_tube_coral_block",
+      "w": {
+        "0;16": "minecraft:block/dead_tube_coral_block"
+      }
+    }
+  }
+}

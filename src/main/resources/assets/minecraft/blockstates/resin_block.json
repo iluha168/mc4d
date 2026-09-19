@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/resin_block",
+      "w": {
+        "0;16": "minecraft:block/resin_block"
+      }
+    }
+  }
+}

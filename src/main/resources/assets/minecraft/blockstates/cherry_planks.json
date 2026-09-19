@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/cherry_planks",
+      "w": {
+        "0;16": "minecraft:block/cherry_planks"
+      }
+    }
+  }
+}

@@ -1,0 +1,126 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "minecraft:block/netherrack",
+        "w": {
+          "0;16": "minecraft:block/netherrack"
+        }
+      },
+      {
+        "model": "minecraft:block/netherrack",
+        "w": {
+          "0;16": "minecraft:block/netherrack"
+        },
+        "x": 90
+      },
+      {
+        "model": "minecraft:block/netherrack",
+        "w": {
+          "0;16": "minecraft:block/netherrack"
+        },
+        "x": 180
+      },
+      {
+        "model": "minecraft:block/netherrack",
+        "w": {
+          "0;16": "minecraft:block/netherrack"
+        },
+        "x": 270
+      },
+      {
+        "model": "minecraft:block/netherrack",
+        "w": {
+          "0;16": "minecraft:block/netherrack"
+        },
+        "y": 90
+      },
+      {
+        "model": "minecraft:block/netherrack",
+        "w": {
+          "0;16": "minecraft:block/netherrack"
+        },
+        "x": 90,
+        "y": 90
+      },
+      {
+        "model": "minecraft:block/netherrack",
+        "w": {
+          "0;16": "minecraft:block/netherrack"
+        },
+        "x": 180,
+        "y": 90
+      },
+      {
+        "model": "minecraft:block/netherrack",
+        "w": {
+          "0;16": "minecraft:block/netherrack"
+        },
+        "x": 270,
+        "y": 90
+      },
+      {
+        "model": "minecraft:block/netherrack",
+        "w": {
+          "0;16": "minecraft:block/netherrack"
+        },
+        "y": 180
+      },
+      {
+        "model": "minecraft:block/netherrack",
+        "w": {
+          "0;16": "minecraft:block/netherrack"
+        },
+        "x": 90,
+        "y": 180
+      },
+      {
+        "model": "minecraft:block/netherrack",
+        "w": {
+          "0;16": "minecraft:block/netherrack"
+        },
+        "x": 180,
+        "y": 180
+      },
+      {
+        "model": "minecraft:block/netherrack",
+        "w": {
+          "0;16": "minecraft:block/netherrack"
+        },
+        "x": 270,
+        "y": 180
+      },
+      {
+        "model": "minecraft:block/netherrack",
+        "w": {
+          "0;16": "minecraft:block/netherrack"
+        },
+        "y": 270
+      },
+      {
+        "model": "minecraft:block/netherrack",
+        "w": {
+          "0;16": "minecraft:block/netherrack"
+        },
+        "x": 90,
+        "y": 270
+      },
+      {
+        "model": "minecraft:block/netherrack",
+        "w": {
+          "0;16": "minecraft:block/netherrack"
+        },
+        "x": 180,
+        "y": 270
+      },
+      {
+        "model": "minecraft:block/netherrack",
+        "w": {
+          "0;16": "minecraft:block/netherrack"
+        },
+        "x": 270,
+        "y": 270
+      }
+    ]
+  }
+}

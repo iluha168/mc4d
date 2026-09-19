@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/green_terracotta",
+      "w": {
+        "0;16": "minecraft:block/green_terracotta"
+      }
+    }
+  }
+}

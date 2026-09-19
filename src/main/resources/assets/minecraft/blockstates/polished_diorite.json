@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/polished_diorite",
+      "w": {
+        "0;16": "minecraft:block/polished_diorite"
+      }
+    }
+  }
+}

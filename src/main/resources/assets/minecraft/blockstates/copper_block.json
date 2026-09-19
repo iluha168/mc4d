@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/copper_block",
+      "w": {
+        "0;16": "minecraft:block/copper_block"
+      }
+    }
+  }
+}

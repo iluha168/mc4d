@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/gravel",
+      "w": {
+        "0;16": "minecraft:block/gravel"
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/bamboo_mosaic",
+      "w": {
+        "0;16": "minecraft:block/bamboo_mosaic"
+      }
+    }
+  }
+}

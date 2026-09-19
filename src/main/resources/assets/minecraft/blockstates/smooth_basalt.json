@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/smooth_basalt",
+      "w": {
+        "0;16": "minecraft:block/smooth_basalt"
+      }
+    }
+  }
+}

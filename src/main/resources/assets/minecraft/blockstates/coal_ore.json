@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/coal_ore",
+      "w": {
+        "0;16": "minecraft:block/coal_ore"
+      }
+    }
+  }
+}

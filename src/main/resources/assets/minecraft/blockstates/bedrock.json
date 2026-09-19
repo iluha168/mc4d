@@ -1,0 +1,32 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "minecraft:block/bedrock",
+        "w": {
+          "0;16": "minecraft:block/bedrock"
+        }
+      },
+      {
+        "model": "minecraft:block/bedrock_mirrored",
+        "w": {
+          "0;16": "minecraft:block/bedrock_mirrored"
+        }
+      },
+      {
+        "model": "minecraft:block/bedrock",
+        "w": {
+          "0;16": "minecraft:block/bedrock"
+        },
+        "y": 180
+      },
+      {
+        "model": "minecraft:block/bedrock_mirrored",
+        "w": {
+          "0;16": "minecraft:block/bedrock_mirrored"
+        },
+        "y": 180
+      }
+    ]
+  }
+}

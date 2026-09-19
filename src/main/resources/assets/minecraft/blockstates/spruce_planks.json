@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/spruce_planks",
+      "w": {
+        "0;16": "minecraft:block/spruce_planks"
+      }
+    }
+  }
+}

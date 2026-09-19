@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/obsidian",
+      "w": {
+        "0;16": "minecraft:block/obsidian"
+      }
+    }
+  }
+}

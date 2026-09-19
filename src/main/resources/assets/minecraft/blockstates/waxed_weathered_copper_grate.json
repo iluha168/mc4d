@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/weathered_copper_grate",
+      "w": {
+        "0;16": "minecraft:block/weathered_copper_grate"
+      }
+    }
+  }
+}

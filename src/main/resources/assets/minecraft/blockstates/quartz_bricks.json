@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/quartz_bricks",
+      "w": {
+        "0;16": "minecraft:block/quartz_bricks"
+      }
+    }
+  }
+}

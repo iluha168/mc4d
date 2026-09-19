@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/stone_bricks",
+      "w": {
+        "0;16": "minecraft:block/stone_bricks"
+      }
+    }
+  }
+}

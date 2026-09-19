@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/cracked_stone_bricks",
+      "w": {
+        "0;16": "minecraft:block/cracked_stone_bricks"
+      }
+    }
+  }
+}

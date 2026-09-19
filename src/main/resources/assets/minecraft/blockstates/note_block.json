@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/note_block",
+      "w": {
+        "0;16": "minecraft:block/note_block"
+      }
+    }
+  }
+}

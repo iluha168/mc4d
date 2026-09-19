@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/cobbled_deepslate",
+      "w": {
+        "0;16": "minecraft:block/cobbled_deepslate"
+      }
+    }
+  }
+}

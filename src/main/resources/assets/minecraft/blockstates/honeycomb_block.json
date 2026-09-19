@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/honeycomb_block",
+      "w": {
+        "0;16": "minecraft:block/honeycomb_block"
+      }
+    }
+  }
+}

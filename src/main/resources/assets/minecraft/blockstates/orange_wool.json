@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/orange_wool",
+      "w": {
+        "0;16": "minecraft:block/orange_wool"
+      }
+    }
+  }
+}

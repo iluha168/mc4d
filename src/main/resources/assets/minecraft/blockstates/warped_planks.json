@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/warped_planks",
+      "w": {
+        "0;16": "minecraft:block/warped_planks"
+      }
+    }
+  }
+}

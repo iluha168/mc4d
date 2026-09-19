@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/dead_brain_coral_block",
+      "w": {
+        "0;16": "minecraft:block/dead_brain_coral_block"
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/calcite",
+      "w": {
+        "0;16": "minecraft:block/calcite"
+      }
+    }
+  }
+}

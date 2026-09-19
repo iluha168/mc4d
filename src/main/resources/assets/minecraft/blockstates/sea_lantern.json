@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/sea_lantern",
+      "w": {
+        "0;16": "minecraft:block/sea_lantern"
+      }
+    }
+  }
+}

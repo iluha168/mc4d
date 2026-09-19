@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/light_blue_concrete",
+      "w": {
+        "0;16": "minecraft:block/light_blue_concrete"
+      }
+    }
+  }
+}

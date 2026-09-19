@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/ice",
+      "w": {
+        "0;16": "minecraft:block/ice"
+      }
+    }
+  }
+}

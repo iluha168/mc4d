@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/clay",
+      "w": {
+        "0;16": "minecraft:block/clay"
+      }
+    }
+  }
+}

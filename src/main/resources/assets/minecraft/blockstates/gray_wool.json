@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/gray_wool",
+      "w": {
+        "0;16": "minecraft:block/gray_wool"
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/dripstone_block",
+      "w": {
+        "0;16": "minecraft:block/dripstone_block"
+      }
+    }
+  }
+}

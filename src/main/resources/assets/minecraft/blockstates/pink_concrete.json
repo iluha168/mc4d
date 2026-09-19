@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/pink_concrete",
+      "w": {
+        "0;16": "minecraft:block/pink_concrete"
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/mud",
+      "w": {
+        "0;16": "minecraft:block/mud"
+      }
+    }
+  }
+}

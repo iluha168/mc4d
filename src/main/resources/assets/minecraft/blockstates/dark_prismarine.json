@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/dark_prismarine",
+      "w": {
+        "0;16": "minecraft:block/dark_prismarine"
+      }
+    }
+  }
+}

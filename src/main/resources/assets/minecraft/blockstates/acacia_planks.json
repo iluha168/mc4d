@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/acacia_planks",
+      "w": {
+        "0;16": "minecraft:block/acacia_planks"
+      }
+    }
+  }
+}

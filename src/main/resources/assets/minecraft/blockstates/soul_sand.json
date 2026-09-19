@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/soul_sand",
+      "w": {
+        "0;16": "minecraft:block/soul_sand"
+      }
+    }
+  }
+}

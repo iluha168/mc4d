@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/gilded_blackstone",
+      "w": {
+        "0;16": "minecraft:block/gilded_blackstone"
+      }
+    }
+  }
+}

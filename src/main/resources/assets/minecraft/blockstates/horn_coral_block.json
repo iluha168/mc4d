@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/horn_coral_block",
+      "w": {
+        "0;16": "minecraft:block/horn_coral_block"
+      }
+    }
+  }
+}

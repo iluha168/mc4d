@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": {
+      "model": "minecraft:block/polished_granite",
+      "w": {
+        "0;16": "minecraft:block/polished_granite"
+      }
+    }
+  }
+}
