@@ -1,0 +1,126 @@
+{
+  "variants": {
+    "facing=down,powered=false": {
+      "model": "minecraft:block/observer",
+      "w": {
+        "0;16": "minecraft:block/observer"
+      },
+      "x": 90
+    },
+    "facing=down,powered=true": {
+      "model": "minecraft:block/observer_on",
+      "w": {
+        "0;16": "minecraft:block/observer_on"
+      },
+      "x": 90
+    },
+    "facing=east,powered=false": {
+      "model": "minecraft:block/observer",
+      "w": {
+        "0;16": "minecraft:block/observer"
+      },
+      "y": 90
+    },
+    "facing=east,powered=true": {
+      "model": "minecraft:block/observer_on",
+      "w": {
+        "0;16": "minecraft:block/observer_on"
+      },
+      "y": 90
+    },
+    "facing=north,powered=false": {
+      "model": "minecraft:block/observer",
+      "w": {
+        "0;16": "minecraft:block/observer"
+      }
+    },
+    "facing=north,powered=true": {
+      "model": "minecraft:block/observer_on",
+      "w": {
+        "0;16": "minecraft:block/observer_on"
+      }
+    },
+    "facing=south,powered=false": {
+      "model": "minecraft:block/observer",
+      "w": {
+        "0;16": "minecraft:block/observer"
+      },
+      "y": 180
+    },
+    "facing=south,powered=true": {
+      "model": "minecraft:block/observer_on",
+      "w": {
+        "0;16": "minecraft:block/observer_on"
+      },
+      "y": 180
+    },
+    "facing=up,powered=false": {
+      "model": "minecraft:block/observer",
+      "w": {
+        "0;16": "minecraft:block/observer"
+      },
+      "x": 270
+    },
+    "facing=up,powered=true": {
+      "model": "minecraft:block/observer_on",
+      "w": {
+        "0;16": "minecraft:block/observer_on"
+      },
+      "x": 270
+    },
+    "facing=west,powered=false": {
+      "model": "minecraft:block/observer",
+      "w": {
+        "0;16": "minecraft:block/observer"
+      },
+      "y": 270
+    },
+    "facing=west,powered=true": {
+      "model": "minecraft:block/observer_on",
+      "w": {
+        "0;16": "minecraft:block/observer_on"
+      },
+      "y": 270
+    },
+    "facing=ana,powered=false": {
+      "model": "mc4d:block/observer/observer_along_w_back",
+      "w": {
+        "0;2": "mc4d:block/observer/observer_along_w_back",
+        "2;6": "mc4d:block/observer/observer_along_w_side_0",
+        "6;10": "mc4d:block/observer/observer_along_w_side_1",
+        "10;14": "mc4d:block/observer/observer_along_w_side_2",
+        "14;16": "mc4d:block/observer/observer_along_w_front"
+      }
+    },
+    "facing=ana,powered=true": {
+      "model": "mc4d:block/observer/observer_along_w_back_on",
+      "w": {
+        "0;2": "mc4d:block/observer/observer_along_w_back_on",
+        "2;6": "mc4d:block/observer/observer_along_w_side_0",
+        "6;10": "mc4d:block/observer/observer_along_w_side_1",
+        "10;14": "mc4d:block/observer/observer_along_w_side_2",
+        "14;16": "mc4d:block/observer/observer_along_w_front"
+      }
+    },
+    "facing=kata,powered=false": {
+      "model": "mc4d:block/observer/observer_along_w_front",
+      "w": {
+        "0;2": "mc4d:block/observer/observer_along_w_front",
+        "2;6": "mc4d:block/observer/observer_along_w_side_2",
+        "6;10": "mc4d:block/observer/observer_along_w_side_1",
+        "10;14": "mc4d:block/observer/observer_along_w_side_0",
+        "14;16": "mc4d:block/observer/observer_along_w_back"
+      }
+    },
+    "facing=kata,powered=true": {
+      "model": "mc4d:block/observer/observer_along_w_front",
+      "w": {
+        "0;2": "mc4d:block/observer/observer_along_w_front",
+        "2;6": "mc4d:block/observer/observer_along_w_side_2",
+        "6;10": "mc4d:block/observer/observer_along_w_side_1",
+        "10;14": "mc4d:block/observer/observer_along_w_side_0",
+        "14;16": "mc4d:block/observer/observer_along_w_back_on"
+      }
+    }
+  }
+}
