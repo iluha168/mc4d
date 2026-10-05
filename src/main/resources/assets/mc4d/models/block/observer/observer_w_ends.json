@@ -1,0 +1,7 @@
+{
+    "parent": "minecraft:block/cube_column",
+    "textures": {
+        "end": "mc4d:block/observer_top_w_ends",
+        "side": "minecraft:block/observer_side"
+    }
+}
